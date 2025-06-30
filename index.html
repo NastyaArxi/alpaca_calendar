@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark light">
+<meta name="description" content="Альпака календарь">
+<title>Альпака календарь</title>
+<link rel="stylesheet" href="./styles/globals.css">
+<link rel="stylesheet" href="./styles/variables.css">
+<link rel="stylesheet" href="./styles/style.css">
+<link rel="stylesheet" href="./styles/dark.css">
+<link rel="stylesheet" href="./styles/light.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+</head>
+<body class="page">
+  <header class="header">
+    <nav class="header__theme-menu">
+      <ul class="header__theme-menu-list">
+        <li class="header__theme-menu-item">
+          <button
+            class="header__theme-menu-button header__theme-menu-button_type_light">
+            День
+          </button>
+        </li>
+        <li class="header__theme-menu-item">
+          <button
+            class="header__theme-menu-button header__theme-menu-button_active header__theme-menu-button_type_auto"
+            disabled>
+            Авто
+          </button>
+        </li>
+        <li class="header__theme-menu-item">
+          <button
+            class="header__theme-menu-button header__theme-menu-button_type_dark">
+            Ночь
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  <section class="calendar">
+   <div class="calendar__header">
+      <button class="calendar__title__nav-button calendar__title__nav-button_left" type="button" name="button-left" aria-label="Предыдущий месяц">
+        <img src="./images/arrow_left.png" alt="&lt;" width="8" height="12">
+      </button>
+      <h2 class="calendar__title">Январь</h2>
+      <button class="calendar__title__nav-button calendar__title__nav-button_right" type="button" name="button-right" aria-label="Следующий месяц">
+        <img src="./images/arrow_right.png" alt="&gt;" width="8" height="12">
+      </button>
+    </div>
+    <div class="calendar__days">
+      <div class="calendar__day">1</div>
+      <div class="calendar__day">2</div>
+      <div class="calendar__day">3</div>
+      <div class="calendar__day calendar__day--selected">4</div>
+      <div class="calendar__day">5</div>
+      <div class="calendar__day">6</div>
+      <div class="calendar__day">7</div>
+      <div class="calendar__day">8</div>
+      <div class="calendar__day">9</div>
+      <div class="calendar__day">10</div>
+      <div class="calendar__day">11</div>
+      <div class="calendar__day">12</div>
+      <div class="calendar__day">13</div>
+      <div class="calendar__day">14</div>
+      <div class="calendar__day">15</div>
+      <div class="calendar__day">16</div>
+      <div class="calendar__day">17</div>
+      <div class="calendar__day">18</div>
+      <div class="calendar__day">19</div>
+      <div class="calendar__day">20</div>
+      <div class="calendar__day">21</div>
+      <div class="calendar__day">22</div>
+      <div class="calendar__day calendar__day--selected calendar__day--range-start">23</div>
+      <div class="calendar__day calendar__day--in-range">24</div>
+      <div class="calendar__day calendar__day--in-range">25</div>
+      <div class="calendar__day calendar__day--in-range">26</div>
+      <div class="calendar__day calendar__day--in-range">27</div>
+      <div class="calendar__day calendar__day--in-range">28</div>
+      <div class="calendar__day calendar__day--in-range">29</div>
+      <div class="calendar__day calendar__day--selected calendar__day--range-end">30</div>
+      <div class="calendar__day calendar__day--next-month">1</div>
+      <div class="calendar__day calendar__day--next-month">2</div>
+      <div class="calendar__day calendar__day--next-month">3</div>
+      <div class="calendar__day calendar__day--next-month">4</div>
+    </div>
+  </section>
+
+  <script src="/scripts/script.js"></script>
+</body>
+</html>
