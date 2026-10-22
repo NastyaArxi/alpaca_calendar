@@ -261,7 +261,6 @@
   const SLACK = 0.30, SNAP = 0.82;
   const LEAD_URL = "https://trosbarrier.ru/#lead";
   const TELEGRAM = "https://t.me/Galkin_Vlad";
-  const DETECTIVE_URL = "/game/detective/";
 
   let W = 800, H = 600;
   let S = 1;               // size of posts/lines; bigger on phones so fingers can hit them
@@ -522,7 +521,6 @@
     add("Заказать расчёт", "btn-main", null, LEAD_URL).focus();
     add("Написать в Telegram", "btn-dark", null, TELEGRAM);
     add("Сыграть снова", "btn-ghost", () => { total = { score: 0, snaps: 0, cells: 0 }; startLevel(0); });
-    add("Игра-расследование", "btn-ghost", null, DETECTIVE_URL);
     show("ov-end");
   }
   function show(id) { $(id).hidden = false; }

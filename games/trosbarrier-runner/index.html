@@ -217,7 +217,6 @@
 (() => {
   const LEAD_URL = "https://trosbarrier.ru/#lead";
   const TELEGRAM = "https://t.me/Galkin_Vlad";
-  const ARCADE_URL = "../trosbarrier-arcade/";
 
   /* ---------- Screen and physics, all in game pixels ---------- */
   const T = 16, VW = 320, VH = 208, ROWS = 13;
@@ -544,12 +543,12 @@
     ground(0, 14);
     row(5, 10, 3, "rope");
     qbox(9, 7, "turn");
-    plat(11, 8, 3); row(11, 7, 3, "mesh");
+    plat(10, 8, 4); row(11, 7, 3, "mesh");
     // pit 15-16
     ground(17, 34);
     drum(20, 10); drum(22, 10); drum(22, 9); item(22, 8, "clamp"); item(20, 9, "clamp");
     fork(24, 32);
-    plat(27, 7, 4); row(27, 6, 4, "rope");
+    plat(26, 7, 6); row(27, 6, 4, "rope");
     check(33);
     // pit 35-37 with an arc of parts over it
     item(35, 8, "rope"); item(36, 7, "turn"); item(37, 8, "rope");
@@ -557,22 +556,22 @@
     ground(38, 60);
     qbox(41, 7, "mesh"); qbox(42, 7, "clamp"); qbox(43, 7, "turn");
     box(46, 10); box(47, 10); box(47, 9); item(47, 8, "clamp");
-    plat(50, 8, 3); item(50, 7, "turn");
-    plat(54, 5, 3); row(54, 4, 3, "mesh");
+    plat(49, 8, 4); item(50, 7, "turn");
+    plat(53, 5, 5); row(54, 4, 3, "mesh");
     fork(52, 59);
     check(60);
     // pit 61-63
     ground(64, 80);
     drum(66, 10); drum(67, 10); drum(68, 10); drum(68, 9); drum(67, 9); drum(68, 8);
     item(66, 9, "clamp"); item(67, 8, "rope"); item(68, 7, "rope");
-    plat(71, 7, 5); item(71, 6, "rope"); item(72, 6, "mesh"); item(73, 6, "turn"); item(74, 6, "mesh"); item(75, 6, "clamp");
+    plat(70, 7, 7); item(71, 6, "rope"); item(72, 6, "mesh"); item(73, 6, "turn"); item(74, 6, "mesh"); item(75, 6, "clamp");
     fork(70, 79);
     // pit 81-82
     // 3. Substation
     ground(83, W - 1);
     qbox(85, 7, "rope"); qbox(86, 7, "mesh");
     check(88);
-    plat(90, 9, 2); plat(92, 7, 2); item(93, 6, "turn"); item(90, 8, "clamp");
+    plat(89, 9, 3); plat(92, 7, 3); item(93, 6, "turn"); item(90, 8, "clamp");
     // Excavators: stomp them from above
     exc(9, 11); exc(28, 11); exc(28, 7, 1); exc(42, 11); exc(54, 5, 1);
     exc(75, 11); exc(72, 7, 1); exc(86, 11); exc(94, 11);
@@ -811,7 +810,6 @@
       add("Заказать расчёт", "btn-main", null, LEAD_URL).focus();
       add("Telegram", "btn-dark", null, TELEGRAM);
       add("↻ Ещё раз", "btn-ghost", start);
-      add("Натяни трос", "btn-ghost", null, ARCADE_URL);
     } else {
       add("↻ Ещё раз", "btn-main", start).focus();
       add("Заказать расчёт", "btn-ghost", null, LEAD_URL);
@@ -932,9 +930,9 @@
         R(x + ((tx * 5) % 11), y + 6 + ((tx * 3) % 7), 2, 1, "#66737b");
         R(x + ((tx * 7 + 4) % 13), y + 11, 1, 1, "#66737b");
       } else if (v === "=") {
-        for (let i = 0; i < T; i++) R(x + i, y, 1, 3, ((i + tx * 2) >> 2) % 2 ? "#10171c" : "#f2b705");
-        R(x, y + 3, T, 3, "#4d5d68"); R(x, y + 3, T, 1, "#7d8f9a");
-        pixLine(x + 1, y + 11, x + 7, y + 6, "#3d4b55"); pixLine(x + 8, y + 6, x + 14, y + 11, "#3d4b55"); R(x, y + 11, T, 1, "#3d4b55");
+        for (let i = 0; i < T; i++) R(x + i, y, 1, 5, ((i + tx * 2) >> 2) % 2 ? "#10171c" : "#f2b705");
+        R(x, y + 5, T, 5, "#4d5d68"); R(x, y + 5, T, 1, "#9fb0bd"); R(x, y + 9, T, 1, "#10171c");
+        pixLine(x + 1, y + 15, x + 7, y + 10, "#3d4b55"); pixLine(x + 8, y + 10, x + 14, y + 15, "#3d4b55"); R(x, y + 15, T, 1, "#3d4b55");
         R(x, y, T, 1, SNOW); R(x + ((tx * 5) % 9), y - 1, 6, 1, SNOW);
       } else if (v === "B") {
         R(x, y, T, T, "#7c5a2f"); R(x + 1, y + 1, T - 2, T - 2, "#c08a4a");
