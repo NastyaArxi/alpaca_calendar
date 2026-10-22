@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Натяни трос</title>
+<meta name="description" content="Аркада ТросБарьер: протяните трос между опорами, поймайте натяжение талрепом и закройте кровлю сеткой">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  /* Layout: brand bar, HUD, a 4:3 canvas with the roof plan, tension gauge under it; overlays for intro / level end / result.
+     Colors from trosbarrier.ru: graphite #182027, signal yellow #f2b705, orange #e06200, light #eef2f4. */
+  :root {
+    --bg: #eef2f4;
+    --panel: #ffffff;
+    --ink: #182027;
+    --muted: #4d5d68;
+    --line: rgba(24, 32, 39, .12);
+    --accent: #f2b705;
+    --accent-deep: #e0a100;
+    --orange: #e06200;
+    --ok: #2e8b57;
+    --bad: #c4421a;
+    --plan: #dfe7ec;        /* drawing sheet */
+    --plan-grid: rgba(24, 32, 39, .07);
+    --roof: #c3ced5;
+    --roof-edge: #8fa1ab;
+    --rope: #3d4b55;
+    --font: "Inter", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11171c; --panel: #182027; --ink: #eef2f4; --muted: #a3b2bb; --line: rgba(238, 242, 244, .12);
+      --ok: #4cc286; --bad: #ff7a4d;
+      --plan: #1a242c; --plan-grid: rgba(238, 242, 244, .05); --roof: #2b3943; --roof-edge: #5d6e79; --rope: #dfe7ec;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11171c; --panel: #182027; --ink: #eef2f4; --muted: #a3b2bb; --line: rgba(238, 242, 244, .12);
+    --ok: #4cc286; --bad: #ff7a4d;
+    --plan: #1a242c; --plan-grid: rgba(238, 242, 244, .05); --roof: #2b3943; --roof-edge: #5d6e79; --rope: #dfe7ec;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { min-height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--font); font-size: 16px; line-height: 1.5;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 16px 40px;
+  }
+  [hidden] { display: none !important; }
+  .app { max-width: 820px; margin: 0 auto; display: grid; gap: 14px; }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; color: inherit; text-decoration: none; font-weight: 800; font-size: 18px; }
+  .title { margin: 0; font-weight: 800; font-size: clamp(22px, 5vw, 30px); line-height: 1.1; }
+
+  /* HUD */
+  .hud { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .hud__item { background: var(--panel); border-radius: 12px; padding: 8px 12px; box-shadow: inset 0 0 0 1px var(--line); min-width: 0; }
+  .hud__label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .hud__value { font-family: var(--font-mono); font-weight: 700; font-size: 18px; font-variant-numeric: tabular-nums; }
+  .hud__value.warn { color: var(--orange); }
+
+  /* Board */
+  .board { position: relative; border-radius: 18px; overflow: hidden; background: var(--plan); box-shadow: 0 0 0 1px var(--line), 0 20px 50px -30px rgba(24, 32, 39, .5); }
+  canvas { display: block; width: 100%; height: auto; max-width: 100%; touch-action: none; cursor: pointer; }
+  .hint {
+    margin: 0; min-height: 1.5em;
+    font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--muted);
+  }
+
+  /* Tension gauge (talrep) */
+  .gauge { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 14px; background: var(--panel); border-radius: 14px; box-shadow: inset 0 0 0 1px var(--line); }
+  .gauge__scale { position: relative; height: 34px; border-radius: 8px; overflow: hidden;
+    background: linear-gradient(90deg, #8fa1ab 0 35%, #2e8b57 35% 80%, #c4421a 80% 100%); }
+  .gauge__labels { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: .05em; }
+  .gauge__labels span:nth-child(2) { margin-left: 8%; }
+  .needle { position: absolute; top: -4px; bottom: -4px; width: 6px; margin-left: -3px; background: var(--accent); border: 2px solid #182027; border-radius: 3px; left: 0; }
+  .gauge.idle { opacity: .5; }
+  .gauge.idle .needle { display: none; }
+
+  button, .btn { font: inherit; font-weight: 700; border: 0; cursor: pointer; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-main { background: var(--accent); color: #182027; padding: 14px 22px; box-shadow: inset 0 -3px 0 var(--accent-deep); }
+  .btn-main:hover { background: #ffc61a; }
+  .btn-main:disabled { opacity: .45; cursor: default; }
+  .btn-dark { background: var(--ink); color: var(--panel); padding: 12px 18px; }
+  .btn-ghost { background: transparent; color: var(--ink); padding: 12px 18px; box-shadow: inset 0 0 0 2px var(--line); }
+  button:focus-visible, .btn:focus-visible, a:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+  /* Overlays */
+  .overlay {
+    position: absolute; inset: 0; display: grid; place-items: center; padding: 16px;
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(3px);
+  }
+  .card {
+    width: min(520px, 100%); max-height: 100%; overflow: auto;
+    background: var(--panel); border-radius: 18px; padding: 20px; display: grid; gap: 12px;
+    box-shadow: 0 0 0 1px var(--line), 0 20px 50px -24px rgba(24, 32, 39, .6);
+  }
+  .card h2 { margin: 0; font-size: clamp(20px, 4.6vw, 26px); font-weight: 800; line-height: 1.15; text-wrap: balance; }
+  .card p { margin: 0; }
+  .kicker { font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--orange); }
+  .rules { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 15px; }
+  .rules li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; }
+  .rules li::before { content: ""; width: 10px; height: 10px; margin-top: 7px; border-radius: 2px; background: var(--accent); }
+  .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .stat { padding: 10px; border-radius: 12px; background: var(--bg); text-align: center; }
+  .stat b { display: block; font-family: var(--font-mono); font-size: 20px; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: 12px; color: var(--muted); font-weight: 600; }
+
+  .say { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 10px; align-items: start; }
+  .say__avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--accent); overflow: hidden; }
+  .say__avatar svg { width: 100%; height: 100%; display: block; }
+  .say__bubble { margin: 0; padding: 10px 12px; border-radius: 4px 14px 14px 14px; background: var(--ink); color: var(--panel); font-size: 14px; }
+  .say__name { display: block; font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+  .note { font-size: 12px; color: var(--muted); }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    transform: translate(-50%, 16px); opacity: 0; z-index: 30; pointer-events: none;
+    max-width: calc(100% - 32px); padding: 10px 16px; border-radius: 12px;
+    background: var(--ink); color: var(--panel); font-weight: 600; font-size: 14px;
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 560px) {
+    .hud { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stat { padding: 8px 4px; }
+    .stat b { font-size: 17px; }
+    .overlay { position: fixed; z-index: 20; }
+  }
+  @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <!-- Manager portrait, same as in the detective game -->
+    <symbol id="manager" viewBox="0 0 200 240">
+      <path d="M56 132 Q36 140 34 186 L32 222 L47 224 L50 186 Q52 164 58 154 Z" fill="#e8f0f6" stroke="#8fa1ab" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M144 132 Q164 140 166 186 L168 222 L153 224 L150 186 Q148 164 142 154 Z" fill="#e8f0f6" stroke="#8fa1ab" stroke-width="2" stroke-linejoin="round"/>
+      <ellipse cx="39.5" cy="231" rx="8" ry="10" fill="#e8b9a0" stroke="#c48f78" stroke-width="1.5"/>
+      <ellipse cx="160.5" cy="231" rx="8" ry="10" fill="#e8b9a0" stroke="#c48f78" stroke-width="1.5"/>
+      <path d="M52 240 L52 152 Q56 128 84 118 L116 118 Q144 128 148 152 L148 240 Z" fill="#e8f0f6" stroke="#8fa1ab" stroke-width="2" stroke-linejoin="round"/>
+      <rect x="89" y="96" width="22" height="26" fill="#dca58c"/>
+      <path d="M84 116 L100 128 L91 140 L80 122 Z" fill="#ffffff" stroke="#8fa1ab" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M116 116 L100 128 L109 140 L120 122 Z" fill="#ffffff" stroke="#8fa1ab" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M95 126 L105 126 L103.5 136 L96.5 136 Z" fill="#e0a100" stroke="#b88400" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M96.5 136 L103.5 136 L109 184 L100 196 L91 184 Z" fill="#f2b705" stroke="#b88400" stroke-width="1.5" stroke-linejoin="round"/>
+      <ellipse cx="69" cy="70" rx="6" ry="9" fill="#dca58c"/>
+      <ellipse cx="131" cy="70" rx="6" ry="9" fill="#dca58c"/>
+      <path d="M70 62 Q70 30 100 28 Q130 30 130 62 L129 82 Q126 104 100 110 Q74 104 71 82 Z" fill="#e8b9a0" stroke="#c48f78" stroke-width="1.5"/>
+      <path d="M68 66 Q63 34 92 25 Q114 19 128 32 Q136 42 132 66 Q129 50 122 45 Q110 40 98 44 Q90 38 82 44 Q72 50 68 66 Z" fill="#d8b46e" stroke="#a9833f" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M86 30 Q104 26 120 36 M80 38 Q92 32 104 34" stroke="#f0d79c" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M80 60 Q88 56 95 59" stroke="#9c7a43" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M105 59 Q112 56 120 60" stroke="#9c7a43" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="88" cy="68" rx="3.4" ry="2.8" fill="#2a2a30"/>
+      <ellipse cx="112" cy="68" rx="3.4" ry="2.8" fill="#2a2a30"/>
+      <path d="M100 68 Q98 80 96 83 Q100 86 104 83" stroke="#c48f78" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M90 93 Q100 100 110 93" stroke="#a9604c" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="app">
+  <div class="bar">
+    <a class="brand" href="https://trosbarrier.ru/" aria-label="ТросБарьер — на главную">
+      <svg viewBox="0 0 40 40" width="32" height="32" aria-hidden="true">
+        <defs><linearGradient id="lgLight" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2b705"/><stop offset="1" stop-color="#e0a100"/></linearGradient></defs>
+        <rect x="2" y="2" width="36" height="36" rx="10" fill="#1c252c" stroke="url(#lgLight)" stroke-width="2"/>
+        <g stroke="#8fa1ab" stroke-width="1.1" opacity=".5"><path d="M10 14 H30 M10 20 H30 M10 26 H30"/><path d="M14 10 V30 M20 10 V30 M26 10 V30"/></g>
+        <path d="M8 26 Q20 8 32 26" fill="none" stroke="url(#lgLight)" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="20" cy="16" r="2" fill="#ffcd2e"/>
+      </svg>
+      <span>ТросБарьер</span>
+    </a>
+    <h1 class="title">Натяни трос</h1>
+  </div>
+
+  <div class="hud" aria-live="off">
+    <div class="hud__item"><span class="hud__label">Время</span><span class="hud__value" id="hudTime">60</span></div>
+    <div class="hud__item"><span class="hud__label">Трос, м</span><span class="hud__value" id="hudRope">0</span></div>
+    <div class="hud__item"><span class="hud__label">Закрыто</span><span class="hud__value" id="hudCells">0/0</span></div>
+    <div class="hud__item"><span class="hud__label">Баллы</span><span class="hud__value" id="hudScore">0</span></div>
+  </div>
+
+  <p class="hint" id="hint" aria-live="polite"></p>
+
+  <div class="board" id="board">
+    <canvas id="game" width="800" height="600" aria-label="План кровли с опорами. Соединяйте соседние опоры тросом."></canvas>
+
+    <!-- Intro -->
+    <div class="overlay" id="ov-intro">
+      <div class="card">
+        <p class="kicker">Мини-аркада</p>
+        <h2>Закройте кровлю тросом и сеткой</h2>
+        <ul class="rules">
+          <li>Нажмите на опору, потом на соседнюю: между ними пойдёт трос.</li>
+          <li>Поймайте натяжение талрепом: остановите стрелку в зелёной зоне кнопкой «Натянуть» или пробелом.</li>
+          <li>Слабо — трос провиснет, нажмите на него и подтяните. Сильно — трос лопнет, метры пропадут.</li>
+          <li>Ячейка с тросом на всех четырёх сторонах затягивается сеткой. Закройте все, пока не вышло время.</li>
+        </ul>
+        <div class="say">
+          <div class="say__avatar"><svg viewBox="45 20 110 110" aria-hidden="true"><use href="#manager" width="200" height="240"/></svg></div>
+          <p class="say__bubble"><span class="say__name">Владислав, менеджер</span>Трос оцинкованный, талрепы регулируемые. Главное — натяжение. Поехали!</p>
+        </div>
+        <div class="row"><button class="btn btn-main" id="startBtn" type="button">Начать: уровень 1</button></div>
+      </div>
+    </div>
+
+    <!-- Level end / game over -->
+    <div class="overlay" id="ov-end" hidden>
+      <div class="card">
+        <p class="kicker" id="endKicker"></p>
+        <h2 id="endTitle"></h2>
+        <p id="endText"></p>
+        <div class="stats">
+          <div class="stat"><b id="stCells">0</b><span>ячеек закрыто</span></div>
+          <div class="stat"><b id="stSnaps">0</b><span>обрывов троса</span></div>
+          <div class="stat"><b id="stScore">0</b><span>баллов</span></div>
+        </div>
+        <div class="say" id="endSayWrap">
+          <div class="say__avatar"><svg viewBox="45 20 110 110" aria-hidden="true"><use href="#manager" width="200" height="240"/></svg></div>
+          <p class="say__bubble" id="endSay"></p>
+        </div>
+        <div class="row" id="endBtns"></div>
+        <p class="note" id="endNote" hidden>Игра упрощена: в жизни шаг троса, ячейку сетки и натяжение задаёт проект. Ни одно средство не даёт полной гарантии.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gauge idle" id="gauge">
+    <div>
+      <div class="gauge__scale"><div class="needle" id="needle"></div></div>
+      <div class="gauge__labels"><span>Провис</span><span>Норма</span><span>Обрыв</span></div>
+    </div>
+    <button class="btn btn-main" id="lockBtn" type="button" disabled>Натянуть</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  const LEVELS = [
+    { name: "Навес над погрузкой", cols: 3, rows: 2, time: 60, rope: 130, speed: 0.75 },
+    { name: "Кровля цеха",         cols: 4, rows: 3, time: 100, rope: 230, speed: 1.1 },
+  ];
+  const SEG_M = 6;              // metres of rope per span between posts
+  const SLACK = 0.35, SNAP = 0.80;
+  const LEAD_URL = "https://trosbarrier.ru/#lead";
+  const TELEGRAM = "https://t.me/Galkin_Vlad";
+  const DETECTIVE_URL = "/game/detective/";
+
+  let W = 800, H = 600;
+  let S = 1;               // size of posts/lines; bigger on phones so fingers can hit them
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+  const $ = (id) => document.getElementById(id);
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  let colors = {};
+  function readColors() {
+    const cs = getComputedStyle(document.documentElement);
+    for (const k of ["plan", "plan-grid", "roof", "roof-edge", "rope", "accent", "orange", "ok", "bad", "ink", "muted"]) colors[k] = cs.getPropertyValue("--" + k).trim();
+  }
+  readColors();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", readColors);
+  new MutationObserver(readColors).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  /* ---------- Game state ---------- */
+  let G = null;           // current level state
+  let total = { score: 0, snaps: 0, cells: 0 };
+  let mode = "intro";     // intro | play | tension | end
+  let levelIdx = 0;
+
+  function setupCanvas() {
+    // Portrait plan on narrow screens: the roof fills the phone and posts stay finger-sized
+    const narrow = $("board").clientWidth < 560;
+    W = narrow ? 600 : 800; H = narrow ? 780 : 600; S = narrow ? 1.6 : 1;
+    canvas.style.aspectRatio = `${W} / ${H}`;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  setupCanvas();
+
+  function newLevel(i) {
+    setupCanvas();
+    const L = LEVELS[i];
+    const pad = 90;
+    const portrait = H > W;
+    // On a portrait plan, turn the roof so its long side runs down the screen
+    const cols = portrait ? Math.min(L.cols, L.rows) : L.cols, rows = portrait ? Math.max(L.cols, L.rows) : L.rows;
+    L.gridCols = cols; L.gridRows = rows;
+    const cw = (W - pad * 2) / cols, ch = (H - pad * 2) / rows;
+    const posts = [];
+    for (let r = 0; r <= rows; r++) for (let c = 0; c <= cols; c++) posts.push({ c, r, x: pad + c * cw, y: pad + r * ch });
+    G = {
+      L, posts, cw, ch, pad,
+      segs: new Map(),       // key "a-b" -> { a, b, state: "taut" | "sag" }
+      closed: new Set(),     // "c,r"
+      time: L.time, rope: L.rope, score: 0, snaps: 0,
+      selected: -1, hover: null, dragging: false,
+      pending: null,         // { a, b, key, retension }
+      needleT: 0,
+      fx: [],                // { type, x, y, t }
+    };
+    updateHud();
+    $("hint").textContent = `Уровень ${i + 1}: ${L.name}`;
+  }
+
+  const idx = (c, r) => r * (G.L.gridCols + 1) + c;
+  const keyOf = (a, b) => (a < b ? `${a}-${b}` : `${b}-${a}`);
+  const adjacent = (a, b) => {
+    const A = G.posts[a], B = G.posts[b];
+    return Math.abs(A.c - B.c) + Math.abs(A.r - B.r) === 1;
+  };
+
+  function updateHud() {
+    $("hudTime").textContent = Math.ceil(G.time);
+    $("hudTime").classList.toggle("warn", G.time <= 10);
+    $("hudRope").textContent = G.rope;
+    $("hudRope").classList.toggle("warn", G.rope < SEG_M * 3);
+    $("hudCells").textContent = `${G.closed.size}/${G.L.cols * G.L.rows}`;
+    $("hudScore").textContent = total.score + G.score;
+  }
+
+  /* ---------- Input ---------- */
+  function toLogical(e) {
+    const r = canvas.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * (W / r.width), y: (e.clientY - r.top) * (H / r.height) };
+  }
+  function postAt(p) {
+    let best = -1, bd = (30 * S) ** 2;
+    G.posts.forEach((q, i) => { const d = (q.x - p.x) ** 2 + (q.y - p.y) ** 2; if (d < bd) { bd = d; best = i; } });
+    return best;
+  }
+  function sagSegAt(p) {
+    for (const [k, s] of G.segs) {
+      if (s.state !== "sag") continue;
+      const A = G.posts[s.a], B = G.posts[s.b];
+      const mx = (A.x + B.x) / 2, my = (A.y + B.y) / 2;
+      if ((mx - p.x) ** 2 + (my - p.y) ** 2 < (34 * S) ** 2) return k;
+    }
+    return null;
+  }
+
+  canvas.addEventListener("pointerdown", (e) => {
+    if (mode !== "play") return;
+    const p = toLogical(e);
+    const pi = postAt(p);
+    if (pi < 0) {
+      const k = sagSegAt(p);
+      if (k) { const s = G.segs.get(k); startTension(s.a, s.b, true); return; }
+      G.selected = -1; return;
+    }
+    if (G.selected >= 0 && G.selected !== pi) { tryConnect(G.selected, pi); return; }
+    G.selected = pi === G.selected ? -1 : pi;
+    G.dragging = G.selected >= 0;
+    if (G.dragging) canvas.setPointerCapture(e.pointerId);
+  });
+  canvas.addEventListener("pointermove", (e) => { if (G) G.hover = toLogical(e); });
+  canvas.addEventListener("pointerup", (e) => {
+    if (mode !== "play" || !G.dragging) return;
+    G.dragging = false;
+    const pi = postAt(toLogical(e));
+    if (pi >= 0 && pi !== G.selected) tryConnect(G.selected, pi);
+  });
+  canvas.addEventListener("pointerleave", () => { if (G) G.hover = null; });
+
+  function tryConnect(a, b) {
+    if (!adjacent(a, b)) { toast("Трос тянем только к соседней опоре"); G.selected = b; return; }
+    const k = keyOf(a, b);
+    const s = G.segs.get(k);
+    if (s && s.state === "taut") { toast("Здесь трос уже натянут"); G.selected = b; return; }
+    if (s && s.state === "sag") { startTension(a, b, true); return; }
+    if (G.rope < SEG_M) { toast("Трос закончился"); return; }
+    G.rope -= SEG_M;
+    startTension(a, b, false);
+  }
+
+  /* ---------- Tension (talrep) ---------- */
+  function startTension(a, b, retension) {
+    G.pending = { a, b, key: keyOf(a, b), retension };
+    G.needleT = Math.random();
+    $("needle").style.left = (needleValue() * 100) + "%";  // no stale needle from the previous rope
+    mode = "tension";
+    G.selected = -1;
+    $("gauge").classList.remove("idle");
+    $("lockBtn").disabled = false;
+    $("lockBtn").focus({ preventScroll: true });
+    updateHud();
+  }
+  function needleValue() {
+    // triangle wave 0..1..0
+    const t = G.needleT % 2;
+    return t < 1 ? t : 2 - t;
+  }
+  function lockTension() {
+    if (mode !== "tension") return;
+    const v = needleValue();
+    const { a, b, key, retension } = G.pending;
+    const A = G.posts[a], B = G.posts[b];
+    const mx = (A.x + B.x) / 2, my = (A.y + B.y) / 2;
+    if (v < SLACK) {
+      G.segs.set(key, { a, b, state: "sag" });
+      G.fx.push({ type: "text", text: "Провис", color: colors.orange, x: mx, y: my, t: 0 });
+      say("Провис. Нажмите на трос и подтяните ещё раз.");
+    } else if (v > SNAP) {
+      if (retension) G.segs.delete(key); // a sagging rope that snaps is lost too
+      G.snaps++; G.score = Math.max(0, G.score - 20);
+      G.fx.push({ type: "snap", x: mx, y: my, t: 0 });
+      G.fx.push({ type: "text", text: "Обрыв −" + SEG_M + " м", color: colors.bad, x: mx, y: my, t: 0 });
+      say("Перетянули — трос лопнул. Нужен новый пролёт.");
+    } else {
+      G.segs.set(key, { a, b, state: "taut" });
+      const good = v > 0.5 && v < 0.68;
+      G.score += good ? 15 : 10;
+      G.fx.push({ type: "text", text: good ? "Идеально +15" : "Норма +10", color: colors.ok, x: mx, y: my, t: 0 });
+      checkCells();
+    }
+    G.pending = null;
+    mode = "play";
+    $("gauge").classList.add("idle");
+    $("lockBtn").disabled = true;
+    updateHud();
+    if (G.closed.size === G.L.cols * G.L.rows) return endLevel(true);
+    if (G.rope < SEG_M && ![...G.segs.values()].some((s) => s.state === "sag")) return endLevel(false, "rope");
+  }
+  $("lockBtn").addEventListener("click", lockTension);
+  addEventListener("keydown", (e) => {
+    if ((e.code === "Space" || e.key === "Enter") && mode === "tension") { e.preventDefault(); lockTension(); }
+  });
+
+  function checkCells() {
+    const taut = (a, b) => G.segs.get(keyOf(a, b))?.state === "taut";
+    for (let r = 0; r < G.L.gridRows; r++) for (let c = 0; c < G.L.gridCols; c++) {
+      const k = `${c},${r}`;
+      if (G.closed.has(k)) continue;
+      const tl = idx(c, r), tr = idx(c + 1, r), bl = idx(c, r + 1), br = idx(c + 1, r + 1);
+      if (taut(tl, tr) && taut(bl, br) && taut(tl, bl) && taut(tr, br)) {
+        G.closed.add(k);
+        G.score += 50;
+        G.fx.push({ type: "cell", c, r, t: 0 });
+        G.fx.push({ type: "text", text: "Сетка +50", color: colors.accent, x: G.pad + (c + .5) * G.cw, y: G.pad + (r + .5) * G.ch, t: 0 });
+      }
+    }
+  }
+
+  /* ---------- Level flow ---------- */
+  function startLevel(i) {
+    levelIdx = i;
+    newLevel(i);
+    $("ov-intro").hidden = true;
+    $("ov-end").hidden = true;
+    mode = "play";
+    say(i === 0 ? "Начните с края: опора, соседняя опора, потом ловите зелёную зону." : "Кровля больше, стрелка быстрее. Берегите трос.");
+  }
+
+  function endLevel(win, reason) {
+    mode = "end";
+    $("gauge").classList.add("idle");
+    $("lockBtn").disabled = true;
+    const timeBonus = win ? Math.ceil(G.time) * 3 : 0;
+    const ropeBonus = win ? G.rope : 0;
+    const levelScore = G.score + timeBonus + ropeBonus;
+    total.score += levelScore; total.snaps += G.snaps; total.cells += G.closed.size;
+    G.score = 0;  // already moved into total, so the HUD does not count it twice
+    updateHud();
+    const last = levelIdx === LEVELS.length - 1;
+    const cellsAll = G.L.cols * G.L.rows;
+
+    $("endKicker").textContent = `Уровень ${levelIdx + 1} · ${G.L.name}`;
+    $("stCells").textContent = `${G.closed.size}/${cellsAll}`;
+    $("stSnaps").textContent = G.snaps;
+    $("stScore").textContent = levelScore;
+    const btns = $("endBtns");
+    btns.innerHTML = "";
+    const add = (label, cls, fn, href) => {
+      const el = document.createElement(href ? "a" : "button");
+      el.className = "btn " + cls; el.textContent = label;
+      if (href) { el.href = href; el.target = "_blank"; el.rel = "noopener"; } else { el.type = "button"; el.addEventListener("click", fn); }
+      btns.appendChild(el); return el;
+    };
+
+    if (win && !last) {
+      $("endTitle").textContent = "Навес закрыт!";
+      $("endText").textContent = `Бонус за время +${timeBonus}, за остаток троса +${ropeBonus}.`;
+      setEndSay("Отлично. Теперь кровля цеха: пролётов больше, а натягивать придётся быстрее.");
+      $("endNote").hidden = true;
+      add("Уровень 2", "btn-main", () => startLevel(levelIdx + 1)).focus();
+      return show("ov-end");
+    }
+
+    // Final screen: whole game finished (won the last level, or lost on any level)
+    const rank = total.score >= 1700 ? "Бригадир монтажников" : total.score >= 1100 ? "Монтажник-высотник" : "Стажёр на кровле";
+    if (win) {
+      $("endTitle").textContent = "Кровля закрыта. Объектов больше нет";
+      $("endText").textContent = `Итог игры: ${total.score} баллов · ${rank}. Бонус за время +${timeBonus}, за остаток троса +${ropeBonus}.`;
+    } else {
+      $("endTitle").textContent = reason === "rope" ? "Трос закончился" : "Время вышло";
+      $("endText").textContent = `Закрыто ${G.closed.size} из ${cellsAll} ячеек. Итог: ${total.score} баллов · ${rank}.`;
+    }
+    $("stScore").textContent = total.score;
+    $("stSnaps").textContent = total.snaps;
+    setEndSay(win
+      ? "В игре трос рвётся от лишнего оборота, а в жизни натяжение считают заранее. Пришлите размеры кровли — посчитаю трос, сетку и талрепы за час."
+      : "Бывает. В жизни запас троса и натяжение считают заранее — пришлите размеры, и я посчитаю за час.");
+    $("endNote").hidden = false;
+    add("Заказать расчёт", "btn-main", null, LEAD_URL).focus();
+    add("Написать в Telegram", "btn-dark", null, TELEGRAM);
+    add("Сыграть снова", "btn-ghost", () => { total = { score: 0, snaps: 0, cells: 0 }; startLevel(0); });
+    add("Игра-расследование", "btn-ghost", null, DETECTIVE_URL);
+    show("ov-end");
+  }
+  function show(id) { $(id).hidden = false; }
+  function setEndSay(text) { $("endSay").innerHTML = `<span class="say__name">Владислав, менеджер</span>`; $("endSay").append(text); }
+
+  let sayT;
+  function say(text) { $("hint").textContent = text; clearTimeout(sayT); sayT = setTimeout(() => { if (G && mode !== "end") $("hint").textContent = `Уровень ${levelIdx + 1}: ${G.L.name}`; }, 3500); }
+  let toastT;
+  function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 1800); }
+
+  $("startBtn").addEventListener("click", () => startLevel(0));
+
+  /* ---------- Drawing ---------- */
+  function drawPlan() {
+    ctx.fillStyle = colors.plan; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = colors["plan-grid"]; ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += 20) { ctx.moveTo(x, 0); ctx.lineTo(x, H); }
+    for (let y = 0; y <= H; y += 20) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
+    ctx.stroke();
+  }
+  function drawRoof() {
+    const p = G.pad - 30;
+    ctx.fillStyle = colors.roof;
+    ctx.strokeStyle = colors["roof-edge"]; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.roundRect(p, p, W - p * 2, H - p * 2, 6); ctx.fill(); ctx.stroke();
+    // dimension line, like on a drawing
+    ctx.fillStyle = colors.muted; ctx.strokeStyle = colors.muted; ctx.lineWidth = 1;
+    ctx.font = `600 ${Math.round(13 * S)}px JetBrains Mono, monospace`; ctx.textAlign = "center";
+    const y = p - 22;
+    ctx.beginPath(); ctx.moveTo(p, y); ctx.lineTo(W - p, y); ctx.moveTo(p, y - 6); ctx.lineTo(p, y + 6); ctx.moveTo(W - p, y - 6); ctx.lineTo(W - p, y + 6); ctx.stroke();
+    ctx.fillText(`${G.L.gridCols * SEG_M} м`, W / 2, y - 6);
+    // closed cells: mesh
+    for (const k of G.closed) {
+      const [c, r] = k.split(",").map(Number);
+      drawMesh(G.pad + c * G.cw, G.pad + r * G.ch, G.cw, G.ch, 1);
+    }
+  }
+  function drawMesh(x, y, w, h, alpha) {
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+    ctx.globalAlpha = 0.18 * alpha; ctx.fillStyle = colors.accent; ctx.fillRect(x, y, w, h);
+    ctx.globalAlpha = 0.75 * alpha; ctx.strokeStyle = colors.accent; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (let d = -h; d < w + h; d += 16) { ctx.moveTo(x + d, y); ctx.lineTo(x + d + h, y + h); ctx.moveTo(x + d + h, y); ctx.lineTo(x + d, y + h); }
+    ctx.stroke();
+    ctx.restore();
+  }
+  function drawSegs(now) {
+    for (const s of G.segs.values()) {
+      const A = G.posts[s.a], B = G.posts[s.b];
+      if (s.state === "taut") {
+        ctx.strokeStyle = colors.rope; ctx.lineWidth = 5 * S; ctx.setLineDash([]);
+        ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.stroke();
+        // talrep in the middle
+        const mx = (A.x + B.x) / 2, my = (A.y + B.y) / 2;
+        ctx.fillStyle = colors.accent; ctx.strokeStyle = "#182027"; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.ellipse(mx, my, (A.y === B.y ? 9 : 4) * S, (A.y === B.y ? 4 : 9) * S, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      } else {
+        // sagging: wavy orange curve that wobbles
+        const wob = reduceMotion ? 0 : Math.sin(now / 250) * 3;
+        const mx = (A.x + B.x) / 2, my = (A.y + B.y) / 2;
+        const nx = A.y === B.y ? 0 : 1, ny = A.y === B.y ? 1 : 0;
+        ctx.strokeStyle = colors.orange; ctx.lineWidth = 4 * S; ctx.setLineDash([10 * S, 7 * S]);
+        ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.quadraticCurveTo(mx + nx * (22 + wob), my + ny * (22 + wob), B.x, B.y); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+  }
+  function drawPending() {
+    if (mode === "tension" && G.pending) {
+      const A = G.posts[G.pending.a], B = G.posts[G.pending.b];
+      const v = needleValue();
+      const col = v < SLACK ? colors.orange : v > SNAP ? colors.bad : colors.ok;
+      const mx = (A.x + B.x) / 2, my = (A.y + B.y) / 2;
+      const nx = A.y === B.y ? 0 : 1, ny = A.y === B.y ? 1 : 0;
+      const sag = Math.max(0, (SLACK + 0.2 - v)) * 50;
+      ctx.strokeStyle = col; ctx.lineWidth = 5 * S;
+      ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.quadraticCurveTo(mx + nx * sag, my + ny * sag, B.x, B.y); ctx.stroke();
+    } else if (mode === "play" && G.selected >= 0 && G.hover) {
+      const A = G.posts[G.selected];
+      ctx.strokeStyle = colors.muted; ctx.lineWidth = 2; ctx.setLineDash([6, 6]);
+      ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(G.hover.x, G.hover.y); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+  function drawPosts(now) {
+    G.posts.forEach((q, i) => {
+      const sel = i === G.selected;
+      const neighbour = G.selected >= 0 && adjacent(G.selected, i) && G.segs.get(keyOf(G.selected, i))?.state !== "taut";
+      if (neighbour && mode === "play") {
+        const pulse = reduceMotion ? 0 : (Math.sin(now / 180) + 1) * 3;
+        ctx.strokeStyle = colors.accent; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(q.x, q.y, 20 * S + pulse, 0, Math.PI * 2); ctx.stroke();
+      }
+      ctx.fillStyle = "#182027";
+      const pr = (sel ? 15 : 12) * S;
+      ctx.beginPath(); ctx.arc(q.x, q.y, pr, 0, Math.PI * 2); ctx.fill();
+      // hazard ring
+      ctx.strokeStyle = colors.accent; ctx.lineWidth = 4;
+      ctx.setLineDash([5, 4]);
+      ctx.beginPath(); ctx.arc(q.x, q.y, pr, 0, Math.PI * 2); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = colors.accent;
+      ctx.beginPath(); ctx.arc(q.x, q.y, 4 * S, 0, Math.PI * 2); ctx.fill();
+    });
+  }
+  function drawFx(dt) {
+    G.fx = G.fx.filter((f) => (f.t += dt) < 1.1);
+    for (const f of G.fx) {
+      const k = f.t / 1.1;
+      if (f.type === "text") {
+        ctx.globalAlpha = 1 - k; ctx.fillStyle = f.color;
+        ctx.font = `800 ${Math.round(20 * S)}px Inter, sans-serif`; ctx.textAlign = "center";
+        ctx.lineWidth = 4; ctx.strokeStyle = colors.plan;
+        const y = f.y - 18 * S - k * 30;
+        ctx.strokeText(f.text, f.x, y); ctx.fillText(f.text, f.x, y);
+        ctx.globalAlpha = 1;
+      } else if (f.type === "snap") {
+        ctx.strokeStyle = colors.bad; ctx.lineWidth = 3; ctx.globalAlpha = 1 - k;
+        for (let i = 0; i < 8; i++) {
+          const a = i / 8 * Math.PI * 2, r1 = 6 + k * 20, r2 = 14 + k * 34;
+          ctx.beginPath(); ctx.moveTo(f.x + Math.cos(a) * r1, f.y + Math.sin(a) * r1); ctx.lineTo(f.x + Math.cos(a) * r2, f.y + Math.sin(a) * r2); ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+      } else if (f.type === "cell") {
+        const x = G.pad + f.c * G.cw, y = G.pad + f.r * G.ch;
+        ctx.save(); ctx.globalAlpha = (1 - k) * .6; ctx.fillStyle = colors.accent; ctx.fillRect(x, y, G.cw, G.ch); ctx.restore();
+      }
+    }
+  }
+
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (G) {
+      if (mode === "play" || mode === "tension") {
+        G.time -= dt;
+        if (G.time <= 0) { G.time = 0; updateHud(); endLevel(false, "time"); }
+        else if (Math.ceil(G.time) !== +$("hudTime").textContent) updateHud();
+      }
+      if (mode === "tension") {
+        G.needleT += dt * G.L.speed * 2;
+        $("needle").style.left = (needleValue() * 100) + "%";
+      }
+      drawPlan(); drawRoof(); drawSegs(now); drawPending(); drawPosts(now); drawFx(dt);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // Draw level 1 behind the intro so the first frame already shows the roof
+  newLevel(0);
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

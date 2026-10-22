@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Дело о незащищённом объекте</title>
+<meta name="description" content="Игра ТросБарьер: осмотрите объект, найдите уязвимости и подберите пассивную защиту от БПЛА">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  /* Layout: one column "case file". Top bar with brand + score, then one screen at a time:
+     intro -> pick object -> inspect scene -> choose solutions -> case closed + lead form.
+     Colors are taken from trosbarrier.ru: graphite #182027, signal yellow #f2b705, orange #e06200, light #eef2f4. */
+  :root {
+    --bg: #eef2f4;
+    --panel: #ffffff;
+    --ink: #182027;
+    --muted: #4d5d68;
+    --steel: #8fa1ab;
+    --line: rgba(24, 32, 39, .12);
+    --accent: #f2b705;
+    --accent-deep: #e0a100;
+    --orange: #e06200;
+    --ok: #2e8b57;
+    --bad: #c4421a;
+    --sky-top: #dbe7ee;
+    --sky-bottom: #f4f8fa;
+    --ground: #c9d3d8;
+    --metal: #6b7b86;
+    --metal-light: #a9b7bf;
+    --wall: #d9e1e5;
+    --font: "Inter", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11171c; --panel: #182027; --ink: #eef2f4; --muted: #a3b2bb; --steel: #8fa1ab;
+      --line: rgba(238, 242, 244, .12);
+      --sky-top: #1b2833; --sky-bottom: #26343f; --ground: #2c3a44; --metal: #8fa1ab; --metal-light: #5d6e79; --wall: #33424d;
+      --ok: #4cc286; --bad: #ff7a4d;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11171c; --panel: #182027; --ink: #eef2f4; --muted: #a3b2bb; --steel: #8fa1ab;
+    --line: rgba(238, 242, 244, .12);
+    --sky-top: #1b2833; --sky-bottom: #26343f; --ground: #2c3a44; --metal: #8fa1ab; --metal-light: #5d6e79; --wall: #33424d;
+    --ok: #4cc286; --bad: #ff7a4d;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { min-height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.5;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 16px 40px;
+  }
+  .app { max-width: 760px; margin: 0 auto; display: grid; gap: 16px; }
+  [hidden] { display: none !important; }
+
+  /* Top bar */
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: inherit; text-decoration: none; font-weight: 800; font-size: 18px; }
+  .score {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+    padding: 6px 12px; border-radius: 99px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line);
+    font-variant-numeric: tabular-nums;
+  }
+  .score b { color: var(--orange); font-size: 15px; }
+
+  /* Case file panel */
+  .file {
+    position: relative;
+    background: var(--panel);
+    border-radius: 20px;
+    box-shadow: 0 0 0 1px var(--line), 0 20px 50px -30px rgba(24, 32, 39, .5);
+    overflow: hidden;
+  }
+  .file__tab {
+    display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    padding: 10px 18px;
+    background: repeating-linear-gradient(-45deg, var(--accent) 0 14px, #182027 14px 28px);
+    font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  }
+  .file__tab span { background: var(--accent); color: #182027; padding: 2px 8px; border-radius: 4px; }
+  .screen { padding: 22px 20px 24px; display: grid; gap: 16px; }
+  .kicker { margin: 0; font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--orange); }
+  h1, h2 { margin: 0; font-weight: 800; line-height: 1.08; text-wrap: balance; letter-spacing: -.01em; }
+  h1 { font-size: clamp(28px, 7vw, 44px); }
+  h2 { font-size: clamp(22px, 5vw, 30px); }
+  p { margin: 0; }
+  .muted { color: var(--muted); }
+
+  /* Intro */
+  .intro { display: grid; grid-template-columns: minmax(0, 1fr) 210px; gap: 16px; align-items: end; }
+  .intro__text { display: grid; gap: 14px; min-width: 0; }
+  .manager-full { width: 100%; max-width: 210px; height: auto; justify-self: center; }
+  .steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; counter-reset: s; }
+  .steps li { display: flex; gap: 10px; align-items: baseline; counter-increment: s; }
+  .steps li::before {
+    content: counter(s); flex: none;
+    width: 22px; height: 22px; border-radius: 6px; display: inline-grid; place-items: center;
+    background: var(--ink); color: var(--panel); font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+  }
+
+  /* Buttons */
+  button, .btn { font: inherit; font-weight: 700; border: 0; cursor: pointer; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-main { background: var(--accent); color: #182027; padding: 14px 22px; box-shadow: inset 0 -3px 0 var(--accent-deep); }
+  .btn-main:hover { background: #ffc61a; }
+  .btn-dark { background: var(--ink); color: var(--panel); padding: 12px 18px; }
+  .btn-ghost { background: transparent; color: var(--ink); padding: 12px 18px; box-shadow: inset 0 0 0 2px var(--line); }
+  button:focus-visible, .btn:focus-visible, a:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+  /* Object picker */
+  .objects { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .obj {
+    text-align: left; padding: 0; background: var(--bg); color: var(--ink);
+    border-radius: 16px; overflow: hidden; display: grid; align-content: start;
+    box-shadow: inset 0 0 0 2px transparent; transition: box-shadow .15s ease, transform .15s ease;
+  }
+  .obj:hover { box-shadow: inset 0 0 0 2px var(--accent); transform: translateY(-2px); }
+  .obj svg { width: 100%; height: auto; display: block; }
+  .obj__body { padding: 10px 12px 14px; display: grid; gap: 2px; }
+  .obj__name { font-weight: 800; }
+  .obj__meta { font-size: 13px; color: var(--muted); font-weight: 600; }
+  .obj.done .obj__name::after { content: " · закрыто"; color: var(--ok); font-size: 13px; }
+
+  /* Scene */
+  .scene-wrap { position: relative; border-radius: 14px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
+  .scene { width: 100%; height: auto; display: block; cursor: zoom-in; touch-action: manipulation; }
+  .spot { cursor: zoom-in; }
+  .spot .hit { fill: transparent; }
+  .spot:focus { outline: none; }
+  .spot:focus-visible .hit { fill: rgba(242, 183, 5, .18); stroke: var(--orange); stroke-width: 2; stroke-dasharray: 5 4; }
+  .mark { pointer-events: none; }
+  .mark circle { fill: rgba(242, 183, 5, .22); stroke: var(--accent); stroke-width: 3; }
+  .mark path { stroke: var(--accent); stroke-width: 5; stroke-linecap: round; }
+  .mark text { font-family: var(--font-mono); font-weight: 700; font-size: 13px; fill: #182027; }
+  .mark rect { fill: var(--accent); }
+  .ping { pointer-events: none; fill: none; stroke: var(--muted); stroke-width: 2; animation: ping .6s ease-out forwards; }
+  @keyframes ping { from { r: 4; opacity: .9; } to { r: 26; opacity: 0; } }
+
+  .clues { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .clue {
+    display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; align-items: start;
+    padding: 10px 12px; border-radius: 12px; background: var(--bg); font-size: 14px;
+  }
+  .clue__n { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; font-family: var(--font-mono); font-weight: 700; background: var(--line); color: var(--muted); }
+  .clue.found .clue__n { background: var(--accent); color: #182027; }
+  .clue__t { font-weight: 700; }
+  .clue:not(.found) .clue__t { color: var(--muted); font-weight: 600; }
+
+  /* Manager speech */
+  .say { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; align-items: start; }
+  .say__avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--accent); overflow: hidden; }
+  .say__avatar svg { width: 100%; height: 100%; display: block; }
+  .say__bubble {
+    position: relative; padding: 12px 14px; border-radius: 4px 14px 14px 14px;
+    background: var(--ink); color: var(--panel); font-size: 15px; min-width: 0;
+  }
+  .say__name { display: block; font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; }
+
+  /* Solutions */
+  .question { display: grid; gap: 12px; }
+  .q-count { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--muted); }
+  .options { display: grid; gap: 10px; }
+  .opt {
+    text-align: left; padding: 14px 16px; background: var(--bg); color: var(--ink);
+    border-radius: 14px; font-weight: 600; box-shadow: inset 0 0 0 2px var(--line);
+    display: grid; gap: 4px; justify-content: stretch;
+  }
+  .opt:hover:not(:disabled) { box-shadow: inset 0 0 0 2px var(--accent); }
+  .opt:disabled { cursor: default; }
+  .opt__why { font-size: 14px; font-weight: 500; color: var(--muted); }
+  .opt.is-ok { box-shadow: inset 0 0 0 2px var(--ok); }
+  .opt.is-ok .opt__why { color: var(--ink); }
+  .opt.is-bad { box-shadow: inset 0 0 0 2px var(--bad); opacity: .8; }
+  .tag { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+  .is-ok .tag { color: var(--ok); }
+  .is-bad .tag { color: var(--bad); }
+
+  /* Result */
+  .result-head { position: relative; display: grid; gap: 8px; }
+  .stamp {
+    position: absolute; right: 0; top: -6px;
+    padding: 6px 12px; border: 3px solid var(--orange); border-radius: 8px;
+    color: var(--orange); font-family: var(--font-mono); font-weight: 700; font-size: 14px; letter-spacing: .08em; text-transform: uppercase;
+    transform: rotate(-9deg); opacity: .9;
+  }
+  .rank { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; padding: 14px 16px; border-radius: 14px; background: var(--ink); color: var(--panel); }
+  .rank__score { font-family: var(--font-mono); font-size: 34px; font-weight: 700; color: var(--accent); line-height: 1; font-variant-numeric: tabular-nums; }
+  .rank__title { font-weight: 800; font-size: 18px; }
+  .rank__sub { font-size: 14px; opacity: .75; }
+  .final {
+    display: grid; gap: 12px; padding: 18px; border-radius: 16px;
+    background: var(--accent); color: #182027;
+  }
+  .final h3 { margin: 0; font-size: 22px; font-weight: 800; line-height: 1.15; }
+  .final__total { font-family: var(--font-mono); font-weight: 700; font-size: 14px; }
+  .final .btn-dark { background: #182027; color: #fff; }
+  .final .btn-ghost { color: #182027; box-shadow: inset 0 0 0 2px rgba(24, 32, 39, .35); }
+  .next { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: 14px; background: var(--bg); }
+  .next p { font-weight: 700; }
+  .kit { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+  .kit li { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 10px; font-size: 15px; }
+  .kit li::before { content: ""; width: 10px; height: 10px; margin-top: 7px; background: var(--accent); border-radius: 2px; }
+  .disclaimer { font-size: 13px; color: var(--muted); padding: 10px 12px; border-left: 3px solid var(--accent); background: var(--bg); border-radius: 0 10px 10px 0; }
+
+  /* Lead form, mirrors the form on trosbarrier.ru */
+  .lead { display: grid; gap: 14px; padding: 18px; border-radius: 16px; background: var(--bg); }
+  .lead h3 { margin: 0; font-size: 18px; font-weight: 800; }
+  .lead-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .lead label { display: grid; gap: 4px; font-size: 13px; font-weight: 700; color: var(--muted); min-width: 0; }
+  .lead .wide { grid-column: 1 / -1; }
+  .lead input, .lead select, .lead textarea {
+    font: inherit; font-size: 15px; font-weight: 500; color: var(--ink);
+    padding: 10px 12px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--panel); width: 100%; min-width: 0;
+  }
+  .lead textarea { min-height: 96px; resize: vertical; }
+  .lead input:focus, .lead select:focus, .lead textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(242, 183, 5, .25); }
+  .req { color: var(--orange); }
+  .lead-status { font-size: 14px; font-weight: 600; min-height: 1.5em; }
+  .lead-status.ok { color: var(--ok); }
+  .lead-status.err { color: var(--bad); }
+  .lead-note { font-size: 12px; color: var(--muted); }
+  .lead-note a { color: inherit; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    transform: translate(-50%, 16px); opacity: 0; z-index: 30; pointer-events: none;
+    max-width: calc(100% - 32px); padding: 10px 16px; border-radius: 12px;
+    background: var(--ink); color: var(--panel); font-weight: 600; font-size: 14px;
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 620px) {
+    .intro { grid-template-columns: 1fr; }
+    .manager-full { max-width: 170px; grid-row: 1; }
+    .objects { grid-template-columns: 1fr; }
+    .obj { grid-template-columns: 130px minmax(0, 1fr); align-items: center; }
+    .lead-grid { grid-template-columns: 1fr; }
+    .stamp { position: static; justify-self: start; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .obj, .toast { transition: none; }
+    .ping { animation: none; opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Manager portrait (stylized: light hair, shirt and tie in brand yellow): used full-size on the intro and cropped in the avatar -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <pattern id="rib" width="6" height="10" patternUnits="userSpaceOnUse">
+      <path d="M3 0V10" stroke="#ffffff" stroke-opacity=".07" stroke-width="1.6"/>
+    </pattern>
+    <pattern id="ribH" width="10" height="6" patternUnits="userSpaceOnUse">
+      <path d="M0 3H10" stroke="#ffffff" stroke-opacity=".07" stroke-width="1.6"/>
+    </pattern>
+    <symbol id="manager" viewBox="0 0 200 240">
+      <!-- arms down along the body, light shirt sleeves -->
+      <path d="M56 132 Q36 140 34 186 L32 222 L47 224 L50 186 Q52 164 58 154 Z" fill="#e8f0f6" stroke="#8fa1ab" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M144 132 Q164 140 166 186 L168 222 L153 224 L150 186 Q148 164 142 154 Z" fill="#e8f0f6" stroke="#8fa1ab" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M32 216 L47 218 M168 216 L153 218" stroke="#8fa1ab" stroke-width="2"/>
+      <ellipse cx="39.5" cy="231" rx="8" ry="10" fill="#e8b9a0" stroke="#c48f78" stroke-width="1.5"/>
+      <ellipse cx="160.5" cy="231" rx="8" ry="10" fill="#e8b9a0" stroke="#c48f78" stroke-width="1.5"/>
+      <!-- torso: shirt -->
+      <path d="M52 240 L52 152 Q56 128 84 118 L116 118 Q144 128 148 152 L148 240 Z" fill="#e8f0f6" stroke="#8fa1ab" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M100 190 V240" stroke="#a9b7bf" stroke-width="1.5"/>
+      <circle cx="100" cy="206" r="1.8" fill="#a9b7bf"/><circle cx="100" cy="224" r="1.8" fill="#a9b7bf"/>
+      <!-- neck -->
+      <rect x="89" y="96" width="22" height="26" fill="#dca58c"/>
+      <!-- collar -->
+      <path d="M84 116 L100 128 L91 140 L80 122 Z" fill="#ffffff" stroke="#8fa1ab" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M116 116 L100 128 L109 140 L120 122 Z" fill="#ffffff" stroke="#8fa1ab" stroke-width="2" stroke-linejoin="round"/>
+      <!-- tie in the brand yellow -->
+      <path d="M95 126 L105 126 L103.5 136 L96.5 136 Z" fill="#e0a100" stroke="#b88400" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M96.5 136 L103.5 136 L109 184 L100 196 L91 184 Z" fill="#f2b705" stroke="#b88400" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M95 150 L106 146 M94 164 L107 160 M93 178 L108 174" stroke="#b88400" stroke-width="1.5" opacity=".55"/>
+      <!-- ears -->
+      <ellipse cx="69" cy="70" rx="6" ry="9" fill="#dca58c"/>
+      <ellipse cx="131" cy="70" rx="6" ry="9" fill="#dca58c"/>
+      <!-- head, clean-shaven -->
+      <path d="M70 62 Q70 30 100 28 Q130 30 130 62 L129 82 Q126 104 100 110 Q74 104 71 82 Z" fill="#e8b9a0" stroke="#c48f78" stroke-width="1.5"/>
+      <!-- light hair with a side part -->
+      <path d="M68 66 Q63 34 92 25 Q114 19 128 32 Q136 42 132 66 Q129 50 122 45 Q110 40 98 44 Q90 38 82 44 Q72 50 68 66 Z" fill="#d8b46e" stroke="#a9833f" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M86 30 Q104 26 120 36 M80 38 Q92 32 104 34" stroke="#f0d79c" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M98 44 Q96 34 90 28" stroke="#a9833f" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <!-- brows + eyes -->
+      <path d="M80 60 Q88 56 95 59" stroke="#9c7a43" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M105 59 Q112 56 120 60" stroke="#9c7a43" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="88" cy="68" rx="3.4" ry="2.8" fill="#2a2a30"/>
+      <ellipse cx="112" cy="68" rx="3.4" ry="2.8" fill="#2a2a30"/>
+      <circle cx="89.2" cy="67" r="1" fill="#fff"/><circle cx="113.2" cy="67" r="1" fill="#fff"/>
+      <!-- nose, cheeks, smile -->
+      <path d="M100 68 Q98 80 96 83 Q100 86 104 83" stroke="#c48f78" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <ellipse cx="80" cy="84" rx="6" ry="3.5" fill="#e59a86" opacity=".35"/>
+      <ellipse cx="120" cy="84" rx="6" ry="3.5" fill="#e59a86" opacity=".35"/>
+      <path d="M90 93 Q100 100 110 93" stroke="#a9604c" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="app">
+  <div class="bar">
+    <a class="brand" href="https://trosbarrier.ru/" aria-label="ТросБарьер — на главную">
+      <svg viewBox="0 0 40 40" width="32" height="32" aria-hidden="true">
+        <defs><linearGradient id="lgLight" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2b705"/><stop offset="1" stop-color="#e0a100"/></linearGradient></defs>
+        <rect x="2" y="2" width="36" height="36" rx="10" fill="#1c252c" stroke="url(#lgLight)" stroke-width="2"/>
+        <g stroke="#8fa1ab" stroke-width="1.1" opacity=".5"><path d="M10 14 H30 M10 20 H30 M10 26 H30"/><path d="M14 10 V30 M20 10 V30 M26 10 V30"/></g>
+        <path d="M8 26 Q20 8 32 26" fill="none" stroke="url(#lgLight)" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="20" cy="16" r="2" fill="#ffcd2e"/>
+      </svg>
+      <span>ТросБарьер</span>
+    </a>
+    <div class="score" id="scoreBox" hidden>Баллы <b id="score">100</b></div>
+  </div>
+
+  <article class="file">
+    <div class="file__tab"><span id="caseNo">Дело № ТБ-0412</span><span id="caseStage">Новое</span></div>
+
+    <!-- 1. Intro -->
+    <section class="screen" id="s-intro">
+      <div class="intro">
+        <div class="intro__text">
+          <p class="kicker">Игра-расследование</p>
+          <h1>Дело о незащищённом объекте</h1>
+          <p class="muted">Три объекта остались без защиты сверху. Осмотрите площадку, найдите слабые места и подберите пассивный барьер из троса и сетки. В конце получите состав комплекта для своего объекта.</p>
+          <ol class="steps">
+            <li>Выберите объект</li>
+            <li>Найдите на схеме 3 улики</li>
+            <li>Подберите решение для каждой</li>
+            <li>Получите расчёт от менеджера</li>
+          </ol>
+        </div>
+        <svg class="manager-full" viewBox="0 0 200 240" role="img" aria-label="Владислав, менеджер ТросБарьер"><use href="#manager"/></svg>
+      </div>
+      <div class="say">
+        <div class="say__avatar"><svg viewBox="45 20 110 110" aria-hidden="true"><use href="#manager" width="200" height="240"/></svg></div>
+        <p class="say__bubble"><span class="say__name">Владислав, менеджер</span>Я считаю трос, сетку и крепёж под каждый объект. Помогите разобрать дела, а я подскажу, где ошибка.</p>
+      </div>
+      <div class="row"><button class="btn btn-main" id="startBtn" type="button">Взять дело</button></div>
+    </section>
+
+    <!-- 2. Pick object -->
+    <section class="screen" id="s-pick" hidden>
+      <p class="kicker">Шаг 1 из 3</p>
+      <h2>Какой объект проверяем?</h2>
+      <div class="objects" id="objects"></div>
+    </section>
+
+    <!-- 3. Inspect -->
+    <section class="screen" id="s-inspect" hidden>
+      <p class="kicker" id="inspectKicker">Шаг 2 из 3 · осмотр</p>
+      <h2 id="inspectTitle"></h2>
+      <p class="muted" id="inspectBrief"></p>
+      <div class="scene-wrap" id="sceneWrap"></div>
+      <div class="say">
+        <div class="say__avatar"><svg viewBox="45 20 110 110" aria-hidden="true"><use href="#manager" width="200" height="240"/></svg></div>
+        <p class="say__bubble" id="inspectSay" aria-live="polite"></p>
+      </div>
+      <ul class="clues" id="clueList"></ul>
+      <div class="row"><button class="btn btn-main" id="toSolveBtn" type="button" hidden>Перейти к решениям</button></div>
+    </section>
+
+    <!-- 4. Solve -->
+    <section class="screen" id="s-solve" hidden>
+      <p class="kicker">Шаг 3 из 3 · решение</p>
+      <div class="question">
+        <span class="q-count" id="qCount"></span>
+        <h2 id="qTitle"></h2>
+        <p class="muted" id="qText"></p>
+        <div class="options" id="options"></div>
+      </div>
+      <div class="say" id="solveSayWrap" hidden>
+        <div class="say__avatar"><svg viewBox="45 20 110 110" aria-hidden="true"><use href="#manager" width="200" height="240"/></svg></div>
+        <p class="say__bubble" id="solveSay" aria-live="polite"></p>
+      </div>
+      <div class="row"><button class="btn btn-main" id="nextQBtn" type="button" hidden>Дальше</button></div>
+    </section>
+
+    <!-- 5. Result + lead -->
+    <section class="screen" id="s-result" hidden>
+      <div class="result-head">
+        <p class="kicker" id="resultKicker"></p>
+        <h2>Дело закрыто</h2>
+        <span class="stamp">Закрыто</span>
+      </div>
+      <div class="rank">
+        <span class="rank__score" id="rankScore">100</span>
+        <div><div class="rank__title" id="rankTitle"></div><div class="rank__sub" id="rankSub"></div></div>
+      </div>
+      <div class="next" id="nextBox">
+        <p id="nextText"></p>
+        <button class="btn btn-dark" id="nextCaseBtn" type="button">Следующее дело</button>
+      </div>
+      <div class="final" id="finalBox" hidden>
+        <p class="final__total" id="finalTotal"></p>
+        <h3>Все дела закрыты. Новых дел пока нет</h3>
+        <p id="finalText"></p>
+        <div class="row">
+          <button class="btn btn-dark" id="orderBtn" type="button">Заказать расчёт</button>
+          <button class="btn btn-ghost" id="replayTopBtn" type="button">Пройти снова</button>
+        </div>
+      </div>
+      <div>
+        <p style="font-weight:800;margin-bottom:8px">Что вошло в комплект</p>
+        <ul class="kit" id="kitList"></ul>
+      </div>
+      <p class="disclaimer">Состав ориентировочный. Ни одно средство не даёт полной гарантии: для каждого объекта нужен проект, его делает проектная организация. Мы поставляем трос, сетку и фурнитуру и считаем комплект под ваш проект.</p>
+
+      <div class="say">
+        <div class="say__avatar"><svg viewBox="45 20 110 110" aria-hidden="true"><use href="#manager" width="200" height="240"/></svg></div>
+        <p class="say__bubble"><span class="say__name">Владислав, менеджер</span>«Пришлите размеры и фото объекта — вернусь с расчётом троса, сетки и крепежа в течение часа».</p>
+      </div>
+
+      <form class="lead" id="lead" novalidate>
+        <h3>Получить расчёт для своего объекта</h3>
+        <div class="lead-grid">
+          <label>Что нужно
+            <select name="need" id="f-need">
+              <option>Оцинкованный трос/канат</option><option>Антидроновая сетка</option><option>Крепёж и натяжные узлы</option>
+              <option>Каркас под сетку</option><option>Оцинкованные трубы и хомуты</option><option>Тросовая решётка</option>
+              <option>Купол и арка</option><option>Пока не знаю, нужна консультация</option>
+            </select>
+          </label>
+          <label>Тип объекта
+            <select name="obj" id="f-obj">
+              <option>Крыша цеха или склада</option><option>Подстанция, энергообъект</option><option>Погрузочная зона, склад</option>
+              <option>Спецтехника</option><option>Частная территория</option><option>Другое</option>
+            </select>
+          </label>
+          <label>Размеры зоны, м<input name="size" id="f-size" placeholder="Например, 40 × 25, опоры 8 м" autocomplete="off"></label>
+          <label>Город<input name="city" id="f-city" autocomplete="address-level2"></label>
+          <label><span>E-mail <span class="req" aria-hidden="true">*</span></span><input name="email" id="f-email" type="email" inputmode="email" autocomplete="email" placeholder="name@company.ru" required aria-required="true"></label>
+          <label>Имя<input name="name" id="f-name" autocomplete="name"></label>
+          <label class="wide">Комментарий<textarea name="comment" id="f-comment"></textarea></label>
+        </div>
+        <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <div class="row">
+          <button class="btn btn-main" type="submit" id="leadSend">Отправить заявку</button>
+          <a class="btn btn-dark" id="leadTg" href="https://t.me/Galkin_Vlad" target="_blank" rel="noopener" hidden>Открыть Telegram</a>
+        </div>
+        <p class="lead-status" id="leadStatus" role="status" aria-live="polite"></p>
+        <p class="lead-note">Не указывайте лишних персональных данных, если они не нужны для расчёта. Отправляя заявку, вы соглашаетесь с <a href="https://trosbarrier.ru/privacy/" target="_blank" rel="noopener">политикой конфиденциальности</a>.</p>
+      </form>
+
+      <div class="row">
+        <button class="btn btn-ghost" id="againBtn" type="button">Взять другое дело</button>
+      </div>
+    </section>
+  </article>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  /* Where to send leads. Leave empty to fall back to "copy the request + open Telegram".
+     On trosbarrier.ru point this at the same handler the site form uses (expects JSON). */
+  const LEAD_ENDPOINT = "";
+  const TELEGRAM = "https://t.me/Galkin_Vlad";
+
+  /* Scenes are drawn in a 400×260 box. Each clue is a clickable zone (x, y, r) in those units.
+     Decoys are fine spots: clicking them costs nothing but says "всё в порядке". */
+  const CASES = [
+    {
+      id: "substation",
+      name: "Подстанция",
+      meta: "Энергообъект, открытое распредустройство",
+      obj: "Подстанция, энергообъект",
+      need: "Купол и арка",
+      brief: "Подстанция в промзоне. Сверху ничем не закрыта. Найдите три слабых места.",
+      clues: [
+        { x: 98, y: 150, r: 46, label: "Осмотреть трансформатор", name: "Трансформатор открыт сверху",
+          found: "Трансформатор — компактный и самый критичный узел. Над ним ничего нет.",
+          q: "Чем закрыть трансформатор?",
+          options: [
+            { t: "Купол или арка из сетки на тросовом каркасе над узлом", ok: true, why: "Для компактных критичных объектов купол или арка — основной вариант: закрывают узел сверху и с боков." },
+            { t: "Поднять забор по периметру повыше", ok: false, why: "Забор закрывает только по горизонтали. Сверху объект остаётся открытым." },
+            { t: "Ничего: корпус металлический", ok: false, why: "Корпус не рассчитан на удар сверху. Пассивный барьер должен задержать угрозу до контакта." },
+          ],
+          kit: "Купол или арка над трансформатором: антидроновая сетка на каркасе из оцинкованного троса" },
+        { x: 262, y: 108, r: 52, label: "Осмотреть порталы и шины", name: "Широкая открытая площадка с порталами",
+          found: "Открытое распредустройство: большая площадь, высокие порталы. Купол такой ширины делать дорого.",
+          q: "Как закрыть широкую площадку с порталами?",
+          options: [
+            { t: "Сетку прямо на шины и оборудование", ok: false, why: "На токоведущие части ничего не крепят. Барьер ставят на отдельные опоры с отступом по проекту." },
+            { t: "Тросовая решётка на отдельных опорах над площадкой", ok: true, why: "Трос с заданным шагом без сплошной сетки: лёгкая конструкция, перекрывает большие пролёты." },
+            { t: "Маскировочная сетка", ok: false, why: "Маскировка не останавливает. Нужен силовой барьер из стального троса." },
+          ],
+          kit: "Тросовая решётка над распредустройством: оцинкованный трос по ГОСТ 3062 или DIN 3055 на опорах" },
+        { x: 356, y: 150, r: 36, label: "Осмотреть старую сетку", name: "Старая сетка провисла",
+          found: "Сетку натягивали вручную, после снега она провисла почти до оборудования.",
+          q: "Что делать с провисанием?",
+          options: [
+            { t: "Подвязать проволокой к ближайшей опоре", ok: false, why: "Проволока растянется и проржавеет, через сезон провисание вернётся." },
+            { t: "Снимать сетку на зиму", ok: false, why: "Тогда объект полгода стоит без защиты." },
+            { t: "Натяжная система с регулируемыми талрепами", ok: true, why: "Талрепы позволяют подтянуть трос после снега и сезонных перепадов, без переделки конструкции." },
+          ],
+          kit: "Натяжные узлы: талрепы, коуши и зажимы для регулировки натяжения" },
+      ],
+      decoys: [
+        { x: 30, y: 196, r: 22, label: "Осмотреть забор", say: "Забор в порядке. Но он не защищает сверху." },
+        { x: 190, y: 190, r: 26, label: "Осмотреть щитовую", say: "Щитовая под кровлей, сейчас не главное. Ищем дальше." },
+      ],
+    },
+    {
+      id: "roof",
+      name: "Кровля цеха",
+      meta: "Плоская крыша, вентиляция",
+      obj: "Крыша цеха или склада",
+      need: "Антидроновая сетка",
+      brief: "Производственный цех с плоской кровлей. Найдите три слабых места.",
+      clues: [
+        { x: 170, y: 118, r: 50, label: "Осмотреть плоскую кровлю", name: "Большая открытая кровля",
+          found: "Кровля большая и плоская, под ней оборудование и люди.",
+          q: "Чем закрыть большую кровлю?",
+          options: [
+            { t: "Сетка на тросовом каркасе над кровлей", ok: true, why: "Для кровель и площадок это основной вариант: трос держит пролёт, сетка закрывает площадь." },
+            { t: "Положить сетку прямо на кровлю", ok: false, why: "Барьер должен задерживать угрозу на расстоянии от кровли. Сетка, лежащая на крыше, этого не делает." },
+            { t: "Только тросовая решётка с шагом 2 м", ok: false, why: "Для кровли с людьми и оборудованием под ней обычно нужна сетка. Шаг и ячейку задаёт проект." },
+          ],
+          kit: "Антидроновая сетка на каркасе из оцинкованного троса над кровлей" },
+        { x: 318, y: 92, r: 34, label: "Осмотреть вентшахты", name: "Вентшахты выше уровня кровли",
+          found: "Вентшахты торчат над крышей. Сетка над ними может лечь прямо на оборудование.",
+          q: "Как пройти над вентшахтами?",
+          options: [
+            { t: "Вырезать в сетке отверстия под шахты", ok: false, why: "Отверстие в барьере — это готовая брешь." },
+            { t: "Поднять каркас с отступом над самой высокой точкой", ok: true, why: "Каркас под сетку ставят на опоры выше оборудования, и сетка ни на что не ложится." },
+            { t: "Оставить этот участок открытым", ok: false, why: "Шахты ведут внутрь цеха. Это как раз то место, которое нужно закрыть." },
+          ],
+          kit: "Каркас под сетку: стойки из оцинкованных труб с хомутами, отступ над вентшахтами" },
+        { x: 62, y: 156, r: 38, label: "Осмотреть сетку на соседнем навесе", name: "У соседнего навеса крупная ячейка",
+          found: "На соседнем навесе сетка с ячейкой около 150 мм. Её хотят взять и для цеха.",
+          q: "Подойдёт ли такая сетка?",
+          options: [
+            { t: "Да, крупнее ячейка — меньше вес", ok: false, why: "Слишком крупная ячейка пропустит то, что должна задержать." },
+            { t: "Взять сетку с ячейкой из диапазона 30–100 мм по проекту", ok: true, why: "У нас сетка с ячейкой 30–100 мм. Конкретный размер выбирают в проекте под объект." },
+            { t: "Сложить две крупные сетки внахлёст", ok: false, why: "Ячейки не совпадут, вес вырастет вдвое, а нагрузка на каркас станет непредсказуемой." },
+          ],
+          kit: "Сетка с ячейкой 30–100 мм, размер по проекту" },
+      ],
+      decoys: [
+        { x: 230, y: 206, r: 26, label: "Осмотреть ворота цеха", say: "Ворота закрываются. Ищем сверху." },
+        { x: 370, y: 214, r: 22, label: "Осмотреть автомобиль", say: "Это машина сотрудника, к делу не относится." },
+      ],
+    },
+    {
+      id: "warehouse",
+      name: "Склад и погрузка",
+      meta: "Погрузочная зона, техника",
+      obj: "Погрузочная зона, склад",
+      need: "Тросовая решётка",
+      brief: "Склад с открытой погрузочной зоной и стоянкой техники. Найдите три слабых места.",
+      clues: [
+        { x: 214, y: 150, r: 46, label: "Осмотреть погрузочную зону", name: "Погрузочная зона без перекрытия",
+          found: "У рампы весь день стоят фуры, а сверху ничего нет.",
+          q: "Как закрыть погрузочную зону?",
+          options: [
+            { t: "Тросовая решётка или сетка на опорах над рампой", ok: true, why: "Перекрытие на отдельных опорах закрывает зону и не мешает подъезду фур. Высоту задают под габарит транспорта." },
+            { t: "Перенести погрузку внутрь склада", ok: false, why: "Обычно на это нет ни места, ни денег. Проще закрыть зону сверху." },
+            { t: "Натянуть брезент", ok: false, why: "Брезент закрывает от дождя, а не от удара." },
+          ],
+          kit: "Перекрытие погрузочной зоны: тросовая решётка или сетка на опорах" },
+        { x: 336, y: 182, r: 40, label: "Осмотреть стоянку техники", name: "Техника стоит под открытым небом",
+          found: "Погрузчики и спецтехника на открытой стоянке. Это дорогое имущество.",
+          q: "Как защитить стоянку техники?",
+          options: [
+            { t: "Расставить технику подальше друг от друга", ok: false, why: "Это уменьшит потери, но ничего не защитит." },
+            { t: "Сетка на каркасе над стоянкой", ok: true, why: "Сетка на тросовом каркасе над площадкой стоянки — типовое решение для техники." },
+            { t: "Накрыть каждую машину сеткой", ok: false, why: "Сетка на технике мешает работать и не держит удар на расстоянии." },
+          ],
+          kit: "Сетка на тросовом каркасе над стоянкой техники" },
+        { x: 92, y: 200, r: 34, label: "Осмотреть барабан с тросом", name: "Трос без покрытия начал ржаветь",
+          found: "Для каркаса закупили чёрный трос без покрытия. Он уже рыжеет.",
+          q: "Какой трос нужен для барьера на улице?",
+          options: [
+            { t: "Оцинкованный трос по ГОСТ 3062 или DIN 3055", ok: true, why: "Цинк защищает от коррозии на улице. Диаметр подбирают под пролёт, у нас есть от 0,65 до 56 мм." },
+            { t: "Покрасить чёрный трос", ok: false, why: "Краска трескается на изгибах, и ржавчина пойдёт изнутри." },
+            { t: "Синтетический канат", ok: false, why: "Синтетика вытягивается и стареет на солнце. Для силового каркаса нужна сталь." },
+          ],
+          kit: "Оцинкованный трос по ГОСТ 3062 или DIN 3055, диаметр под пролёт" },
+      ],
+      decoys: [
+        { x: 60, y: 110, r: 26, label: "Осмотреть окна офиса", say: "Окна офиса в порядке. Смотрим на открытые зоны." },
+        { x: 300, y: 70, r: 24, label: "Осмотреть флагшток", say: "Флагшток — просто флагшток." },
+      ],
+    },
+  ];
+
+  /* Scene art, 400×260, drawn with theme tokens */
+  const SKY = `<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--sky-top)"/><stop offset="1" stop-color="var(--sky-bottom)"/></linearGradient></defs>
+    <rect width="400" height="260" fill="url(#sky)"/>
+    <rect y="214" width="400" height="46" fill="var(--ground)"/>`;
+  const ART = {
+    substation: `${SKY}
+      <!-- fence -->
+      <g stroke="var(--metal)" stroke-width="2">${Array.from({length: 21}, (_, i) => `<path d="M${4 + i*19} 186 V214"/>`).join("")}<path d="M0 190 H400 M0 204 H400"/></g>
+      <!-- transformer -->
+      <rect x="58" y="128" width="80" height="70" rx="4" fill="var(--metal)"/>
+      <g fill="var(--metal-light)">${Array.from({length: 7}, (_, i) => `<rect x="${62 + i*11}" y="136" width="6" height="56" rx="2"/>`).join("")}</g>
+      <g fill="#c9a227"><rect x="70" y="112" width="8" height="18" rx="3"/><rect x="94" y="108" width="8" height="22" rx="3"/><rect x="118" y="112" width="8" height="18" rx="3"/></g>
+      <rect x="54" y="196" width="88" height="10" fill="var(--metal-light)"/>
+      <!-- portals + busbars -->
+      <g fill="none" stroke="var(--metal)" stroke-width="5"><path d="M206 214 V70 H318 V214"/><path d="M226 214 V70 M298 214 V70"/></g>
+      <g stroke="var(--metal-light)" stroke-width="2"><path d="M206 84 L318 84 M206 98 L318 98"/><path d="M206 70 L226 90 M226 70 L246 90 M298 70 L318 90"/></g>
+      <g stroke="var(--muted)" stroke-width="1.5" fill="none"><path d="M140 118 Q175 132 206 90"/><path d="M318 84 Q360 100 400 80"/></g>
+      <g fill="#c9a227"><circle cx="246" cy="84" r="4"/><circle cx="262" cy="84" r="4"/><circle cx="278" cy="84" r="4"/><circle cx="246" cy="98" r="4"/><circle cx="262" cy="98" r="4"/><circle cx="278" cy="98" r="4"/></g>
+      <rect x="244" y="150" width="36" height="64" fill="var(--wall)" stroke="var(--metal)" stroke-width="2"/>
+      <!-- control room -->
+      <rect x="166" y="168" width="48" height="46" fill="var(--wall)" stroke="var(--metal)" stroke-width="2"/>
+      <rect x="176" y="180" width="12" height="10" fill="var(--metal-light)"/><rect x="194" y="180" width="12" height="10" fill="var(--metal-light)"/>
+      <!-- sagging old mesh -->
+      <g stroke="var(--metal)" stroke-width="4"><path d="M330 214 V120 M384 214 V120"/></g>
+      <path d="M330 122 Q357 176 384 122" fill="none" stroke="var(--muted)" stroke-width="2"/>
+      <path d="M330 122 Q357 176 384 122 L384 128 Q357 182 330 128 Z" fill="var(--muted)" opacity=".25"/>
+      <g stroke="var(--muted)" stroke-width="1" opacity=".6">${Array.from({length: 6}, (_, i) => `<path d="M${336 + i*8} ${130 + Math.round(Math.sin((i+1)/7*Math.PI)*36)} V${126 + Math.round(Math.sin((i+1)/7*Math.PI)*24)}"/>`).join("")}</g>
+      <rect x="342" y="186" width="30" height="28" fill="var(--metal)"/>`,
+
+    roof: `${SKY}
+      <!-- neighbour shed with coarse mesh -->
+      <rect x="20" y="164" width="86" height="50" fill="var(--wall)" stroke="var(--metal)" stroke-width="2"/>
+      <g stroke="var(--metal)" stroke-width="3"><path d="M24 164 V128 M102 164 V128"/></g>
+      <rect x="24" y="128" width="78" height="30" fill="none" stroke="var(--muted)" stroke-width="2"/>
+      <g stroke="var(--muted)" stroke-width="1.5"><path d="M50 128 V158 M76 128 V158 M24 143 H102"/></g>
+      <!-- workshop -->
+      <path d="M120 214 V122 H380 V214 Z" fill="var(--wall)" stroke="var(--metal)" stroke-width="2"/>
+      <path d="M112 122 H388 L372 110 H128 Z" fill="var(--metal-light)" stroke="var(--metal)" stroke-width="2"/>
+      <g fill="var(--metal-light)">${Array.from({length: 6}, (_, i) => `<rect x="${136 + i*40}" y="140" width="26" height="22" rx="2"/>`).join("")}</g>
+      <rect x="206" y="176" width="50" height="38" fill="var(--metal)"/>
+      <g stroke="var(--metal-light)" stroke-width="1.5">${Array.from({length: 5}, (_, i) => `<path d="M206 ${182 + i*7} H256"/>`).join("")}</g>
+      <!-- vent shafts -->
+      <rect x="300" y="78" width="18" height="34" fill="var(--metal)"/><rect x="296" y="72" width="26" height="8" fill="var(--muted)"/>
+      <rect x="328" y="88" width="14" height="24" fill="var(--metal)"/><rect x="325" y="83" width="20" height="7" fill="var(--muted)"/>
+      <!-- car -->
+      <path d="M352 214 V204 Q354 196 364 194 L376 188 H390 L398 196 V214 Z" fill="var(--orange)" opacity=".85"/>
+      <circle cx="362" cy="214" r="6" fill="var(--ink)"/><circle cx="390" cy="214" r="6" fill="var(--ink)"/>`,
+
+    warehouse: `${SKY}
+      <!-- warehouse + office -->
+      <path d="M10 214 V96 H160 V214 Z" fill="var(--wall)" stroke="var(--metal)" stroke-width="2"/>
+      <path d="M4 96 H166 L150 80 H20 Z" fill="var(--metal-light)" stroke="var(--metal)" stroke-width="2"/>
+      <g fill="var(--metal-light)"><rect x="30" y="104" width="22" height="16"/><rect x="62" y="104" width="22" height="16"/></g>
+      <rect x="110" y="140" width="50" height="74" fill="var(--metal)"/>
+      <!-- dock -->
+      <rect x="160" y="184" width="40" height="30" fill="var(--metal-light)" stroke="var(--metal)" stroke-width="2"/>
+      <!-- truck at the dock -->
+      <rect x="196" y="140" width="80" height="58" rx="3" fill="var(--wall)" stroke="var(--metal)" stroke-width="2"/>
+      <path d="M276 160 H300 L312 178 V204 H276 Z" fill="var(--orange)" opacity=".9"/>
+      <rect x="282" y="166" width="16" height="12" fill="var(--sky-bottom)"/>
+      <circle cx="216" cy="206" r="9" fill="var(--ink)"/><circle cx="240" cy="206" r="9" fill="var(--ink)"/><circle cx="296" cy="206" r="9" fill="var(--ink)"/>
+      <!-- flagpole -->
+      <path d="M300 214 V56" stroke="var(--metal)" stroke-width="3"/><path d="M302 58 H330 L324 68 H302 Z" fill="var(--accent)"/>
+      <!-- loader on parking -->
+      <rect x="320" y="200" width="70" height="6" fill="var(--metal)" opacity=".4"/>
+      <path d="M328 196 V174 H352 L360 186 H372 V196 Z" fill="var(--accent)"/>
+      <path d="M372 196 V160 M380 196 V160" stroke="var(--metal)" stroke-width="3"/>
+      <path d="M372 192 H392" stroke="var(--metal)" stroke-width="3"/>
+      <rect x="334" y="178" width="12" height="10" fill="var(--sky-bottom)"/>
+      <circle cx="336" cy="200" r="7" fill="var(--ink)"/><circle cx="362" cy="200" r="7" fill="var(--ink)"/>
+      <!-- rope drum with rust -->
+      <circle cx="92" cy="198" r="16" fill="#8a6a3f"/><circle cx="92" cy="198" r="16" fill="none" stroke="#5c4526" stroke-width="3"/>
+      <circle cx="92" cy="198" r="10" fill="none" stroke="#b5562a" stroke-width="4" stroke-dasharray="3 2"/>
+      <circle cx="92" cy="198" r="3" fill="#5c4526"/>`,
+  };
+
+  const RANKS = [
+    { min: 90, title: "Главный эксперт по барьерам", sub: "Ни одной лишней улики и ошибки в решениях." },
+    { min: 65, title: "Инженер-проектировщик", sub: "Пара промахов, но объект закрыт." },
+    { min: 0,  title: "Стажёр-следователь", sub: "Объект закрыт со второй попытки. Детали лучше обсудить с менеджером." },
+  ];
+  const MISS_SAY = ["Здесь всё в порядке. Ищем дальше.", "Это не улика.", "Тут ничего подозрительного.", "Смотрим внимательнее: что открыто сверху?"];
+
+  const $ = (id) => document.getElementById(id);
+  const screens = ["s-intro", "s-pick", "s-inspect", "s-solve", "s-result"];
+  let state = { score: 100, caseIdx: 0, found: new Set(), q: 0, answeredWrong: false, done: new Set(), scores: {} };
+
+  function show(id, stage) {
+    for (const s of screens) $(s).hidden = s !== id;
+    $("caseStage").textContent = stage;
+    $("scoreBox").hidden = id === "s-intro" || id === "s-pick";
+    window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }
+  function setScore(delta) {
+    state.score = Math.max(0, state.score + delta);
+    $("score").textContent = state.score;
+  }
+  function say(el, text) { el.innerHTML = `<span class="say__name">Владислав, менеджер</span>`; el.append(text); }
+  let toastT;
+  function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 2200); }
+
+  /* Object picker */
+  function renderPick() {
+    const box = $("objects");
+    box.innerHTML = "";
+    CASES.forEach((c, i) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "obj" + (state.done.has(c.id) ? " done" : "");
+      b.innerHTML = `<svg viewBox="0 0 400 260" aria-hidden="true">${ART[c.id].replace(/id="sky"/, `id="sky-p${i}"`).replace(/url\(#sky\)/, `url(#sky-p${i})`)}</svg>
+        <span class="obj__body"><span class="obj__name">${c.name}</span><span class="obj__meta">${c.meta}</span></span>`;
+      b.addEventListener("click", () => startCase(i));
+      box.appendChild(b);
+    });
+    show("s-pick", "Выбор объекта");
+  }
+
+  /* Inspection */
+  function startCase(i) {
+    state.caseIdx = i; state.found = new Set(); state.q = 0; state.score = 100; setScore(0);
+    const c = CASES[i];
+    $("caseNo").textContent = `Дело № ТБ-${String(412 + i).padStart(4, "0")}`;
+    $("inspectTitle").textContent = c.name;
+    $("inspectBrief").textContent = c.brief;
+    say($("inspectSay"), "Нажимайте на всё, что кажется уязвимым. За клики мимо снимаю по 5 баллов.");
+    $("toSolveBtn").hidden = true;
+
+    const spots = [...c.clues.map((cl, k) => ({ ...cl, k, clue: true })), ...c.decoys.map((d) => ({ ...d, clue: false }))];
+    $("sceneWrap").innerHTML = `<svg class="scene" id="scene" viewBox="0 0 400 260" role="group" aria-label="Схема объекта: ${c.name}">
+      ${ART[c.id]}
+      <g id="marks"></g>
+      ${spots.map((s, n) => `<g class="spot" tabindex="0" role="button" aria-label="${s.label}" data-n="${n}">
+        <circle class="hit" cx="${s.x}" cy="${s.y}" r="${s.r}"/></g>`).join("")}
+    </svg>`;
+    const scene = $("scene");
+    scene.querySelectorAll(".spot").forEach((g) => {
+      const s = spots[+g.dataset.n];
+      const act = (e) => { e.stopPropagation(); s.clue ? hitClue(s) : hitDecoy(s); };
+      g.addEventListener("click", act);
+      g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); act(e); } });
+    });
+    scene.addEventListener("click", (e) => miss(e, scene));
+    renderClues();
+    show("s-inspect", "Осмотр");
+  }
+
+  function renderClues() {
+    const c = CASES[state.caseIdx];
+    $("clueList").innerHTML = c.clues.map((cl, k) => {
+      const f = state.found.has(k);
+      return `<li class="clue${f ? " found" : ""}"><span class="clue__n">${k + 1}</span>
+        <span><span class="clue__t">${f ? cl.name : "Улика не найдена"}</span>${f ? `<br><span class="muted">${cl.found}</span>` : ""}</span></li>`;
+    }).join("");
+  }
+
+  function hitClue(s) {
+    if (state.found.has(s.k)) { say($("inspectSay"), "Эту улику мы уже записали."); return; }
+    state.found.add(s.k);
+    const n = state.found.size;
+    $("marks").insertAdjacentHTML("beforeend", `<g class="mark"><circle cx="${s.x}" cy="${s.y}" r="${Math.min(s.r, 30)}"/>
+      <path d="M${s.x + 21} ${s.y + 21} L${s.x + 32} ${s.y + 32}"/>
+      <rect x="${s.x - 11}" y="${s.y - Math.min(s.r, 30) - 22}" width="22" height="18" rx="4"/>
+      <text x="${s.x}" y="${s.y - Math.min(s.r, 30) - 8.5}" text-anchor="middle">${s.k + 1}</text></g>`);
+    say($("inspectSay"), s.found);
+    renderClues();
+    if (n === CASES[state.caseIdx].clues.length) {
+      $("toSolveBtn").hidden = false;
+      say($("inspectSay"), "Все три улики найдены. Теперь подберём решение для каждой.");
+      $("toSolveBtn").focus({ preventScroll: true });
+    }
+  }
+  function hitDecoy(s) { say($("inspectSay"), s.say); }
+  function miss(e, scene) {
+    if (state.found.size === CASES[state.caseIdx].clues.length) return;
+    const pt = scene.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    const p = pt.matrixTransform(scene.getScreenCTM().inverse());
+    $("marks").insertAdjacentHTML("beforeend", `<circle class="ping" cx="${p.x}" cy="${p.y}" r="4"/>`);
+    setScore(-5);
+    say($("inspectSay"), MISS_SAY[Math.floor(Math.random() * MISS_SAY.length)] + " −5 баллов.");
+  }
+
+  /* Solutions */
+  function renderQuestion() {
+    const c = CASES[state.caseIdx], cl = c.clues[state.q];
+    state.answeredWrong = false;
+    $("qCount").textContent = `Улика ${state.q + 1} из ${c.clues.length}: ${cl.name.toLowerCase()}`;
+    $("qTitle").textContent = cl.q;
+    $("qText").textContent = cl.found;
+    $("solveSayWrap").hidden = true;
+    $("nextQBtn").hidden = true;
+    const box = $("options");
+    box.innerHTML = "";
+    cl.options.forEach((o) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "opt";
+      b.innerHTML = `<span>${o.t}</span>`;
+      b.addEventListener("click", () => answer(b, o));
+      box.appendChild(b);
+    });
+    show("s-solve", "Решение");
+  }
+  function answer(btn, o) {
+    btn.disabled = true;
+    btn.classList.add(o.ok ? "is-ok" : "is-bad");
+    btn.insertAdjacentHTML("afterbegin", `<span class="tag">${o.ok ? "Верно" : "Не подойдёт"}</span>`);
+    btn.insertAdjacentHTML("beforeend", `<span class="opt__why">${o.why}</span>`);
+    $("solveSayWrap").hidden = false;
+    if (o.ok) {
+      $("options").querySelectorAll(".opt").forEach((b) => (b.disabled = true));
+      say($("solveSay"), state.answeredWrong ? "Теперь верно. Записываю в комплект." : "Точно. Записываю в комплект.");
+      const last = state.q === CASES[state.caseIdx].clues.length - 1;
+      $("nextQBtn").textContent = last ? "Закрыть дело" : "Следующая улика";
+      $("nextQBtn").hidden = false;
+      $("nextQBtn").focus({ preventScroll: true });
+    } else {
+      state.answeredWrong = true;
+      setScore(-15);
+      say($("solveSay"), "Так не сработает, −15 баллов. Попробуйте другой вариант.");
+    }
+  }
+  $("nextQBtn").addEventListener("click", () => {
+    if (state.q < CASES[state.caseIdx].clues.length - 1) { state.q++; renderQuestion(); }
+    else showResult();
+  });
+
+  /* Result */
+  function showResult() {
+    const c = CASES[state.caseIdx];
+    state.done.add(c.id);
+    state.scores[c.id] = state.score;
+    const rank = RANKS.find((r) => state.score >= r.min);
+    const left = CASES.filter((x) => !state.done.has(x.id));
+    const allDone = left.length === 0;
+    $("resultKicker").textContent = `${c.name} · дело № ТБ-${String(412 + state.caseIdx).padStart(4, "0")}`;
+    $("rankScore").textContent = state.score;
+    $("rankTitle").textContent = rank.title;
+    $("rankSub").textContent = rank.sub;
+    $("kitList").innerHTML = c.clues.map((cl) => `<li><span>${cl.kit}</span></li>`).join("");
+    $("f-need").value = c.need;
+    $("f-obj").value = c.obj;
+    $("f-comment").value = `Прошёл игру «Дело о незащищённом объекте» (${c.name}, ${state.score} баллов). Интересует комплект:\n` + c.clues.map((cl) => "— " + cl.kit).join("\n");
+
+    $("nextBox").hidden = allDone;
+    $("finalBox").hidden = !allDone;
+    if (!allDone) {
+      $("nextText").textContent = `Осталось ${left.length === 1 ? "одно дело" : left.length + " дела"}: ${left.map((x) => x.name.toLowerCase()).join(", ")}`;
+      $("againBtn").textContent = "Выбрать другое дело";
+    } else {
+      const total = CASES.reduce((sum, x) => sum + (state.scores[x.id] || 0), 0);
+      const max = CASES.length * 100;
+      const finalRank = RANKS.find((r) => total / CASES.length >= r.min);
+      $("finalTotal").textContent = `Итог: ${total} из ${max} баллов · ${finalRank.title}`;
+      $("finalText").textContent = "Вы разобрали подстанцию, кровлю и склад. Следующее дело — ваш объект: пришлите размеры, и менеджер посчитает трос, сетку и крепёж за час в рабочее время.";
+      $("againBtn").textContent = "Пройти все дела заново";
+      $("f-comment").value = `Прошёл все дела в игре «Дело о незащищённом объекте»: ${total} из ${max} баллов. Хочу расчёт для своего объекта.`;
+      $("f-need").value = "Пока не знаю, нужна консультация";
+    }
+    $("leadStatus").textContent = ""; $("leadStatus").className = "lead-status";
+    $("leadTg").hidden = true;
+    show("s-result", "Закрыто");
+  }
+
+  /* Lead form */
+  $("lead").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const f = e.target, status = $("leadStatus");
+    if (f._gotcha.value) return;
+    const email = $("f-email");
+    if (!email.value.trim() || !email.checkValidity()) {
+      status.className = "lead-status err";
+      status.textContent = "Укажите e-mail, чтобы менеджер прислал расчёт.";
+      email.focus();
+      return;
+    }
+    const data = Object.fromEntries(new FormData(f));
+    delete data._gotcha;
+    data.source = "game-detective";
+    const text = `Заявка на расчёт\nЧто нужно: ${data.need}\nОбъект: ${data.obj}\nРазмеры: ${data.size || "—"}\nГород: ${data.city || "—"}\nE-mail: ${data.email}\nИмя: ${data.name || "—"}\n\n${data.comment}`;
+
+    if (LEAD_ENDPOINT) {
+      try {
+        const r = await fetch(LEAD_ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+        if (!r.ok) throw new Error(r.status);
+        status.className = "lead-status ok";
+        status.textContent = "Заявка отправлена. Ответим в течение часа в рабочее время.";
+        return;
+      } catch (_) { /* fall through to Telegram */ }
+    }
+    let copied = false;
+    try { await navigator.clipboard.writeText(text); copied = true; } catch (_) {}
+    status.className = "lead-status ok";
+    status.textContent = copied
+      ? "Текст заявки скопирован. Откройте Telegram и вставьте его в чат с менеджером."
+      : "Откройте Telegram и отправьте менеджеру размеры объекта и e-mail. Можно написать и на info@trosbarrier.ru.";
+    $("leadTg").hidden = false;
+    $("leadTg").focus();
+  });
+
+  $("startBtn").addEventListener("click", renderPick);
+  $("toSolveBtn").addEventListener("click", () => { state.q = 0; renderQuestion(); });
+  function replay() {
+    state.done = new Set(); state.scores = {};
+    renderPick();
+  }
+  function nextCase() {
+    const i = CASES.findIndex((x) => !state.done.has(x.id));
+    if (i >= 0) startCase(i); else replay();
+  }
+  $("againBtn").addEventListener("click", () => (state.done.size === CASES.length ? replay() : renderPick()));
+  $("nextCaseBtn").addEventListener("click", nextCase);
+  $("replayTopBtn").addEventListener("click", replay);
+  $("orderBtn").addEventListener("click", () => {
+    $("lead").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    $("f-size").focus({ preventScroll: true });
+  });
+})();
+</script>
+</body>
+</html>
