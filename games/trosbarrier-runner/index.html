@@ -179,7 +179,7 @@
         <p class="controls-help" id="controlsHelp"></p>
         <div class="say">
           <div class="say__avatar" data-face></div>
-          <p class="say__bubble"><span class="say__name">Владислав</span>Каску надел, список деталей взял. Помогите собрать всё до последнего зажима!</p>
+          <p class="say__bubble"><span class="say__name">Владислав</span>Колпак надел, список деталей взял. Помогите собрать всё до последнего зажима!</p>
         </div>
         <div class="row"><button class="btn btn-main" id="startBtn" type="button">▶ Старт</button></div>
       </div>
@@ -226,17 +226,17 @@
   /* ---------- Palette (8-bit style, brand colors included) ---------- */
   const PAL = {
     k: "#10171c", y: "#f2b705", Y: "#c98f00", s: "#f3bc9c", S: "#c98a6c", h: "#e8c070",
-    w: "#f4f8fa", g: "#9fb0bd", b: "#36424c", o: "#e06200", r: "#b03a1a", l: "#d7e0e5",
+    w: "#f4f8fa", g: "#9fb0bd", b: "#36424c", o: "#e06200", r: "#b03a1a", R: "#d8322f", l: "#d7e0e5",
     m: "#7d8f9a", d: "#3d4b55", n: "#c08a4a", N: "#7c5a2f", B: "#3c6d8f", c: "#9fd0e8", G: "#2e8b57", W: "#ffffff",
   };
 
   /* ---------- Sprites: one character per pixel ---------- */
   const SPR = {
     head: [
-      "....kkkk....",
-      "...kyyyyk...",
-      "..kyyWyyyk..",
-      ".kkkkkkkkkk.",
+      "WW..kkkk....",
+      "WWkkRRRRk...",
+      "..kRRRRRRk..",
+      ".kWWWWWWWWk.",
       "..khsssssk..",
       "..khssskSk..",
       "..kssssssk..",
@@ -253,34 +253,34 @@
       ".kgwwwwwwgk.",
     ],
     legsStand: [
-      "..kbbbbbbk..",
-      "..kbbkkbbk..",
-      "..kbbk.kbbk.",
-      "..kbbk.kbbk.",
+      "..kRRRRRRk..",
+      "..kRRkkRRk..",
+      "..kRRk.kRRk.",
+      "..kRRk.kRRk.",
       "..kkkk.kkkk.",
       ".kkkkk..kkkk",
     ],
     legsRun1: [
-      "..kbbbbbbk..",
-      ".kbbbkkbbbk.",
-      ".kbbk..kbbk.",
-      "kbbk....kbbk",
+      "..kRRRRRRk..",
+      ".kRRRkkRRRk.",
+      ".kRRk..kRRk.",
+      "kRRk....kRRk",
       "kkkk....kkkk",
       "............",
     ],
     legsRun2: [
-      "..kbbbbbbk..",
-      "...kbbbbk...",
-      "...kbkkbk...",
-      "...kbk.kbk..",
+      "..kRRRRRRk..",
+      "...kRRRRk...",
+      "...kRkkRk...",
+      "...kRk.kRk..",
       "..kkkk.kkk..",
       "............",
     ],
     legsJump: [
-      "..kbbbbbbk..",
-      "..kbbkkbbbk.",
-      ".kbbk..kbbk.",
-      ".kkkk...kbbk",
+      "..kRRRRRRk..",
+      "..kRRkkRRRk.",
+      ".kRRk..kRRk.",
+      ".kkkk...kRRk",
       "........kkkk",
       "............",
     ],
@@ -366,11 +366,11 @@
       "..kk..",
     ],
     face: [
-      "....kkkkkkkk....",
-      "...kyyyyyyyyk...",
-      "..kyyyWWyyyyyk..",
-      "..kyyyyyyyyyyk..",
-      ".kkkkkkkkkkkkkk.",
+      "WW...kkkkkk.....",
+      "WWkkkRRRRRRk....",
+      "..kRRRRRRRRRk...",
+      "..kRRRRRRRRRRk..",
+      ".kWWWWWWWWWWWWk.",
       "..khhsssssssshk.",
       "..khsssssssssk..",
       "..ksskksssksskk.",
@@ -847,8 +847,8 @@
   /* Winter evening: stars, moon, snowy skyline with lit windows, fir trees with garlands, falling snow */
   const SNOW = "#f4f8fa", SNOW_SH = "#b9d3e3";
   const LIGHTS = ["#ff5a5a", "#f2b705", "#5ad2ff", "#7ee2a8"];
-  const STARS = Array.from({ length: 46 }, (_, i) => [(i * 73 + 11) % VW, 20 + ((i * 37) % 96), i % 4]);
-  const FLAKES = Array.from({ length: 90 }, (_, i) => ({ x: (i * 97) % VW, y: (i * 53) % VH, v: 12 + (i % 5) * 6, s: i % 7 === 0 ? 2 : 1, ph: i }));
+  const STARS = Array.from({ length: 24 }, (_, i) => [(i * 73 + 11) % VW, 20 + ((i * 37) % 96), i % 4]);
+  const FLAKES = Array.from({ length: 45 }, (_, i) => ({ x: (i * 97) % VW, y: (i * 53) % VH, v: 12 + (i % 5) * 6, s: i % 7 === 0 ? 2 : 1, ph: i }));
 
   function drawFir(x, base, h, seed, lit) {
     R(x - 1, base - 3, 3, 3, "#4a3423");
@@ -889,32 +889,20 @@
     const o1 = Math.floor(-(cam * 0.25) % 160);
     for (let k = -1; k < 4; k++) {
       const x = o1 + k * 160;
-      for (const [bx, by, bw] of [[6, 110, 34], [46, 128, 50], [104, 92, 18], [128, 120, 26]]) {
+      for (const [bx, by, bw] of [[10, 118, 34], [96, 96, 22]]) {
         R(x + bx, by, bw, 176 - by, "#24335c"); R(x + bx, by - 1, bw, 2, SNOW_SH);
         for (let wy = by + 5; wy < 168; wy += 7) for (let wx = bx + 3; wx < bx + bw - 3; wx += 6) {
-          if (((wx * 7 + wy * 3 + k * 11) % 5) < 2) R(x + wx, wy, 2, 3, "#f2c94c");
+          if (((wx * 7 + wy * 3 + k * 11) % 4) === 0) R(x + wx, wy, 2, 3, "#f2c94c");
         }
       }
-      R(x + 110, 74, 6, 18, "#24335c"); R(x + 110, 73, 6, 1, SNOW_SH);
-    }
-    // near hangars with snowy roofs + pylons
-    const o2 = Math.floor(-(cam * 0.5) % 200);
-    for (let k = -1; k < 3; k++) {
-      const x = o2 + k * 200;
-      R(x + 10, 140, 76, 36, "#2d406f");
-      for (let i = 0; i < 38; i++) { R(x + 10 + i, 140 - Math.floor(i / 3), 76 - i * 2, 1, "#2d406f"); R(x + 10 + i, 140 - Math.floor(i / 3) - 1, 1, 1, SNOW); R(x + 85 - i, 140 - Math.floor(i / 3) - 1, 1, 1, SNOW); }
-      R(x + 110, 150, 48, 26, "#2d406f"); R(x + 110, 149, 48, 2, SNOW);
-      pixLine(x + 176, 176, x + 184, 110, "#2d406f"); pixLine(x + 192, 176, x + 184, 110, "#2d406f"); pixLine(x + 176, 122, x + 192, 122, "#2d406f");
+      R(x + 104, 80, 6, 16, "#24335c"); R(x + 104, 79, 6, 1, SNOW_SH);
     }
     // fir trees, closest layer
     const o3 = Math.floor(-(cam * 0.7) % 240);
     for (let k = -1; k < 3; k++) {
       const x = o3 + k * 240;
-      drawFir(x + 30, 176, 34, 1, true); drawFir(x + 52, 176, 24, 2, false);
-      drawFir(x + 120, 176, 44, 3, true); drawFir(x + 190, 176, 28, 4, false); drawFir(x + 206, 176, 36, 5, true);
+      drawFir(x + 60, 176, 38, 1, true); drawFir(x + 180, 176, 26, 4, false);
     }
-    // snowdrifts along the horizon
-    for (let i = 0; i < VW; i += 8) R(i, 174 - ((i + Math.floor(cam * 0.7)) % 24 < 12 ? 1 : 0), 8, 2, SNOW_SH);
   }
 
   function drawSnowfall(dt) {
@@ -940,7 +928,7 @@
       if (v === "#") {
         const top = !L.tiles[ty - 1]?.[tx];
         R(x, y, T, T, "#7d8a92");
-        if (top) { R(x, y, T, 3, SNOW); R(x, y + 3, T, 1, SNOW_SH); if (tx % 2) R(x + 4, y - 1, 6, 1, SNOW); }
+        if (top) { R(x, y, T, 2, "#3d4b55"); R(x, y + 2, T, 1, "#a9b6bd"); if (tx % 3 === 0) R(x + 4, y, 6, 1, "#f2b705"); }
         R(x + ((tx * 5) % 11), y + 6 + ((tx * 3) % 7), 2, 1, "#66737b");
         R(x + ((tx * 7 + 4) % 13), y + 11, 1, 1, "#66737b");
       } else if (v === "=") {
