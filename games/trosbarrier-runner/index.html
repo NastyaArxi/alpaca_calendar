@@ -174,7 +174,7 @@
       <div class="card">
         <p class="kicker">8-бит платформер</p>
         <h2>Собери комплект и закрой подстанцию</h2>
-        <p>Бегите через промзону и собирайте детали: бухты троса, сетку, талрепы и зажимы. Бейте снизу по ящикам «?». Не попадайтесь под погрузчики и не падайте в ямы. В конце над подстанцией соберётся купол из того, что вы нашли.</p>
+        <p>Бегите через промзону и собирайте детали: бухты троса, сетку, талрепы и зажимы. Бейте снизу по ящикам «?». Экскаваторы останавливайте прыжком сверху, а погрузчики обходите. И не падайте в ямы. В конце над подстанцией соберётся купол из того, что вы нашли.</p>
         <div class="parts" id="introParts"></div>
         <p class="controls-help" id="controlsHelp"></p>
         <div class="say">
@@ -485,6 +485,7 @@
           case "jump":   tone(sfxBus, "square", 280, 720, t, 0.12, 0.6); break;
           case "pickup": tone(sfxBus, "square", mtof(83), 0, t, 0.06, 0.6); tone(sfxBus, "square", mtof(88), 0, t + 0.06, 0.14, 0.6); break;
           case "bump":   tone(sfxBus, "square", 160, 110, t, 0.09, 0.8); break;
+          case "stomp":  tone(sfxBus, "square", 700, 180, t, 0.1, 0.7); tone(sfxBus, "triangle", 120, 60, t + 0.05, 0.15, 0.9); break;
           case "hurt":   tone(sfxBus, "sawtooth", 420, 90, t, 0.35, 0.5); break;
           case "check":  [72, 76, 79, 84].forEach((m, i) => tone(sfxBus, "square", mtof(m), 0, t + i * 0.07, 0.08, 0.5)); break;
           case "win":    [72, 76, 79, 84, 79, 84, 88].forEach((m, i) => tone(sfxBus, "square", mtof(m), 0, t + i * 0.12, i === 6 ? 0.6 : 0.11, 0.55));
@@ -518,7 +519,7 @@
   function buildLevel() {
     const W = 108;
     const tiles = Array.from({ length: ROWS }, () => Array(W).fill(0));
-    const items = [], forklifts = [], checkpoints = [];
+    const items = [], forklifts = [], checkpoints = [], excavators = [];
     const set = (x, y, v) => { if (y >= 0 && y < ROWS && x >= 0 && x < W) tiles[y][x] = v; };
     const ground = (x1, x2) => { for (let x = x1; x <= x2; x++) { set(x, 11, "#"); set(x, 12, "#"); } };
     const plat = (x, y, len) => { for (let i = 0; i < len; i++) set(x + i, y, "="); };
@@ -527,7 +528,9 @@
     const qbox = (x, y, type) => { set(x, y, "?"); items.push({ x: x * T + T / 2, y: y * T + T / 2, type, hidden: true, box: [x, y] }); };
     const item = (x, y, type) => items.push({ x: x * T + T / 2, y: y * T + T / 2, type });
     const row = (x, y, n, type) => { for (let i = 0; i < n; i++) item(x + i, y, type); };
-    const fork = (x1, x2) => forklifts.push({ x: x1 * T, y: 11 * T - 22, w: 28, h: 22, min: x1 * T, max: x2 * T, dir: 1, speed: 34 });
+    const fork = (x1, x2) => forklifts.push({ x: x1 * T, y: 11 * T - 22, w: 28, h: 22, min: x1 * T, max: x2 * T, dir: 1, speed: 44 });
+    // Excavator standing on the solid tile row `row`; drives until a wall or an edge, then turns
+    const exc = (x, row, dir = -1) => excavators.push({ x: x * T, y: row * T - 16, w: 24, h: 16, dir, speed: 28, dead: 0, phase: 0 });
     const check = (x) => checkpoints.push({ x: x * T, hit: false });
 
     // 1. Yard
@@ -563,13 +566,16 @@
     qbox(85, 7, "rope"); qbox(86, 7, "mesh");
     check(88);
     plat(90, 9, 2); plat(92, 7, 2); item(93, 6, "turn"); item(90, 8, "clamp");
+    // Excavators: stomp them from above
+    exc(9, 11); exc(28, 11); exc(28, 7, 1); exc(42, 11); exc(54, 5, 1);
+    exc(75, 11); exc(72, 7, 1); exc(86, 11); exc(94, 11);
     for (let y = 0; y < 11; y++) set(W - 1, y, "#");
-    return { W, tiles, items, forklifts, checkpoints, goalX: 97 * T, startX: 2 * T };
+    return { W, tiles, items, forklifts, checkpoints, excavators, goalX: 97 * T, startX: 2 * T };
   }
   const solid = (v) => v === "#" || v === "=" || v === "B" || v === "D" || v === "?" || v === "U";
 
   /* ---------- State ---------- */
-  let L, P, cam = 0, mode = "intro", got, totals, hearts, timeT, fx, lastCheck, finishT, frameN = 0;
+  let L, P, cam = 0, mode = "intro", got, totals, hearts, timeT, fx, lastCheck, finishT, frameN = 0, stomps = 0;
   const keys = { left: false, right: false, jump: false };
   let jumpHeld = false, jumpBuffer = 0;
 
@@ -578,7 +584,7 @@
     totals = { rope: 0, mesh: 0, turn: 0, clamp: 0 };
     for (const it of L.items) totals[it.type]++;
     got = { rope: 0, mesh: 0, turn: 0, clamp: 0 };
-    hearts = 3; timeT = 0; fx = []; finishT = 0;
+    hearts = 3; timeT = 0; fx = []; finishT = 0; stomps = 0;
     lastCheck = L.startX;
     spawn(L.startX);
   }
@@ -708,8 +714,33 @@
         P.face = P.x + P.w / 2 < f.x + f.w / 2 ? 1 : -1; hurt(false);
       }
     }
+    for (const e of L.excavators) {
+      if (e.dead) continue;
+      if (P.x < e.x + e.w - 2 && P.x + P.w > e.x + 2 && P.y < e.y + e.h && P.y + P.h > e.y + 2) {
+        const prevBottom = P.y + P.h - P.vy * dt;
+        if (P.vy > 0 && prevBottom <= e.y + 6) {
+          e.dead = 0.001; stomps++;
+          P.vy = keys.jump ? JUMP_V : -210; jumpHeld = keys.jump;
+          Sound.sfx("stomp");
+          fx.push({ type: "score", x: e.x + e.w / 2, y: e.y, t: 0 });
+        } else { P.face = P.x + P.w / 2 < e.x + e.w / 2 ? 1 : -1; hurt(false); }
+      }
+    }
     for (const c of L.checkpoints) if (!c.hit && P.x > c.x) { c.hit = true; lastCheck = c.x; Sound.sfx("check"); fx.push({ type: "check", x: c.x, t: 0 }); }
     if (P.x > L.goalX) finish();
+  }
+  function moveExcavators(dt) {
+    for (const e of L.excavators) {
+      if (e.dead) { e.dead += dt; continue; }
+      if (Math.abs(e.x - cam - VW / 2) > VW) continue;   // sleep while far off screen
+      const nx = e.x + e.dir * e.speed * dt;
+      const front = e.dir > 0 ? nx + e.w : nx;
+      const tx = Math.floor(front / T), feet = Math.floor((e.y + e.h) / T), body = Math.floor((e.y + e.h - 1) / T);
+      if (solid(tileAt(tx, body)) || !solid(tileAt(tx, feet))) e.dir *= -1;
+      else e.x = nx;
+      e.phase += e.speed * dt;
+    }
+    L.excavators = L.excavators.filter((e) => !e.dead || e.dead < 1.2);
   }
   function moveForklifts(dt) {
     for (const f of L.forklifts) {
@@ -747,14 +778,14 @@
     document.body.classList.remove("playing");
     const share = sumGot() / sumAll();
     const stars = !win ? 0 : share >= 0.9 && hearts === 3 ? 3 : share >= 0.6 ? 2 : 1;
-    const score = sumGot() * 100 + (win ? hearts * 200 + Math.max(0, Math.round(150 - timeT)) * 5 : 0);
+    const score = sumGot() * 100 + stomps * 200 + (win ? hearts * 200 + Math.max(0, Math.round(150 - timeT)) * 5 : 0);
     $("endKicker").textContent = win ? `Время ${Math.round(timeT)} с · ${score} очков` : `${score} очков`;
     $("endTitle").textContent = win
       ? (share === 1 ? "Полный комплект! Подстанция закрыта" : "Подстанция закрыта куполом")
       : "Game over: жизни закончились";
     $("stars").innerHTML = win ? [0, 1, 2].map((i) => `<span class="${i < stars ? "" : "off"}">★</span>`).join("") : "";
     $("endText").textContent = win
-      ? `Собрано ${sumGot()} из ${sumAll()} деталей. ${share === 1 ? "Ничего не пропустили." : "Часть деталей осталась на дороге, поэтому купол вышел не таким плотным."}`
+      ? `Собрано ${sumGot()} из ${sumAll()} деталей, остановлено экскаваторов: ${stomps}. ${share === 1 ? "Ничего не пропустили." : "Часть деталей осталась на дороге, поэтому купол вышел не таким плотным."}`
       : `Вы собрали ${sumGot()} из ${sumAll()} деталей, но до подстанции не дошли.`;
     const parts = $("endParts"); parts.innerHTML = "";
     for (const t of ORDER) parts.append(partTile(t, `${got[t]}/${totals[t]}`));
@@ -944,6 +975,35 @@
     for (const wx of [4, 15]) { R(X(wx, 5), y + 16, 5, 5, "#10171c"); R(X(wx + 2, 1), y + 18, 1, 1, "#7d8f9a"); }
   }
 
+  function drawExcavator(e) {
+    const x = Math.round(e.x - cam), y = Math.round(e.y);
+    if (x < -30 || x > VW + 30) return;
+    const flip = e.dir < 0;
+    const X = (dx, w) => (flip ? x + e.w - dx - w : x + dx);
+    if (e.dead) {
+      // squashed and stalled, puffs of smoke rise
+      R(X(1, 20), y + 11, 20, 5, "#10171c"); R(X(2, 18), y + 12, 18, 3, "#4d5d68");
+      R(X(2, 18), y + 9, 18, 3, "#10171c"); R(X(3, 16), y + 10, 16, 1, "#f2b705");
+      const k = e.dead / 1.2;
+      for (let i = 0; i < 3; i++) R(X(4 + i * 6, 3), y + 4 - Math.round(k * 14) - i * 2, 3, 3, `rgba(200,210,215,${1 - k})`);
+      return;
+    }
+    const ph = Math.floor(e.phase) % 3;
+    // tracks
+    R(X(0, 20), y + 11, 20, 5, "#10171c"); R(X(1, 18), y + 12, 18, 3, "#4d5d68");
+    for (let i = 1 + ph; i < 19; i += 3) R(X(i, 1), y + 12, 1, 3, "#10171c");
+    // body + cab
+    R(X(2, 15), y + 5, 15, 6, "#10171c"); R(X(3, 13), y + 6, 13, 4, "#f2b705"); R(X(3, 13), y + 6, 13, 1, "#ffd95a");
+    R(X(3, 8), y, 8, 6, "#10171c"); R(X(4, 6), y + 1, 6, 5, "#f2b705"); R(X(6, 3), y + 1, 3, 3, "#9fd0e8");
+    R(X(13, 1), y - 3, 1, 3, "#4d5d68");
+    // boom, stick and bucket at the front
+    const fx0 = flip ? x + e.w - 16 : x + 16, sgn = flip ? -1 : 1;
+    const lift = (Math.floor(e.phase / 6) % 2);
+    pixLine(fx0, y + 6, fx0 + sgn * 4, y - 1 + lift, "#c98f00"); pixLine(fx0, y + 7, fx0 + sgn * 4, y + lift, "#10171c");
+    pixLine(fx0 + sgn * 4, y - 1 + lift, fx0 + sgn * 7, y + 7, "#c98f00"); pixLine(fx0 + sgn * 5, y + lift, fx0 + sgn * 8, y + 7, "#10171c");
+    R(flip ? x - 2 : x + e.w - 2, y + 7, 4, 3, "#10171c"); R(flip ? x - 1 : x + e.w - 1, y + 8, 2, 1, "#7d8f9a");
+  }
+
   function drawItems() {
     for (const it of L.items) {
       if (it.taken || it.hidden) continue;
@@ -975,6 +1035,8 @@
         const k = f.t / 0.9, x = Math.round(f.x - cam), y = Math.round(f.y - k * 22);
         if ((frameN >> 1) % 2 || k < 0.5) { const s = spr(f.part); ctx.drawImage(s, x - (s.width >> 1), y - (s.height >> 1)); }
         text("+1", x, y - 16, "#ffffff", "center");
+      } else if (f.type === "score") {
+        text("+200", Math.round(f.x - cam), Math.round(f.y - 10 - f.t * 18), "#f2b705", "center");
       } else if (f.type === "check") {
         text("ТОЧКА!", Math.round(f.x - cam), 136 - Math.round(f.t * 10), "#7ee2a8", "center");
       } else if (f.type === "flash") {
@@ -1001,6 +1063,7 @@
   function drawScene(dt) {
     drawBackground(); drawCheckpoints(); drawGoal(); drawTiles(); drawItems();
     for (const f of L.forklifts) drawForklift(f);
+    for (const e of L.excavators) drawExcavator(e);
     drawPlayer(); drawFx(dt); drawHud();
   }
 
@@ -1009,13 +1072,13 @@
   function frame(now) {
     const dt = Math.min(0.033, (now - last) / 1000); last = now; frameN++;
     if (!document.hidden) {
-      if (mode === "play") { moveForklifts(dt); update(dt); follow(dt, P.x - VW / 3); }
+      if (mode === "play") { moveForklifts(dt); moveExcavators(dt); update(dt); follow(dt, P.x - VW / 3); }
       else if (mode === "finish") {
         finishT += dt;
         P.vx = 45; P.face = 1; P.vy = Math.min(P.vy + GRAV * dt, MAX_FALL); moveX(P.vx * dt); moveY(P.vy * dt); P.step += P.vx * dt;
         follow(dt * 0.4, L.W * T - VW);
         if (finishT > 3) mode = "done";
-      } else if (mode === "intro") { moveForklifts(dt); cam = (Math.sin(now / 6000) * 0.5 + 0.5) * 220; }
+      } else if (mode === "intro") { moveForklifts(dt); moveExcavators(dt); cam = (Math.sin(now / 6000) * 0.5 + 0.5) * 220; }
       else if (mode === "done") { finishT += dt; }
       drawScene(dt);
     }
