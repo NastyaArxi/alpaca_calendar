@@ -201,6 +201,16 @@
   .rank__score { font-family: var(--font-mono); font-size: 34px; font-weight: 700; color: var(--accent); line-height: 1; font-variant-numeric: tabular-nums; }
   .rank__title { font-weight: 800; font-size: 18px; }
   .rank__sub { font-size: 14px; opacity: .75; }
+  .final {
+    display: grid; gap: 12px; padding: 18px; border-radius: 16px;
+    background: var(--accent); color: #182027;
+  }
+  .final h3 { margin: 0; font-size: 22px; font-weight: 800; line-height: 1.15; }
+  .final__total { font-family: var(--font-mono); font-weight: 700; font-size: 14px; }
+  .final .btn-dark { background: #182027; color: #fff; }
+  .final .btn-ghost { color: #182027; box-shadow: inset 0 0 0 2px rgba(24, 32, 39, .35); }
+  .next { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: 14px; background: var(--bg); }
+  .next p { font-weight: 700; }
   .kit { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
   .kit li { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 10px; font-size: 15px; }
   .kit li::before { content: ""; width: 10px; height: 10px; margin-top: 7px; background: var(--accent); border-radius: 2px; }
@@ -391,6 +401,19 @@
       <div class="rank">
         <span class="rank__score" id="rankScore">100</span>
         <div><div class="rank__title" id="rankTitle"></div><div class="rank__sub" id="rankSub"></div></div>
+      </div>
+      <div class="next" id="nextBox">
+        <p id="nextText"></p>
+        <button class="btn btn-dark" id="nextCaseBtn" type="button">Следующее дело</button>
+      </div>
+      <div class="final" id="finalBox" hidden>
+        <p class="final__total" id="finalTotal"></p>
+        <h3>Все дела закрыты. Новых дел пока нет</h3>
+        <p id="finalText"></p>
+        <div class="row">
+          <button class="btn btn-dark" id="orderBtn" type="button">Заказать расчёт</button>
+          <button class="btn btn-ghost" id="replayTopBtn" type="button">Пройти снова</button>
+        </div>
       </div>
       <div>
         <p style="font-weight:800;margin-bottom:8px">Что вошло в комплект</p>
@@ -663,7 +686,7 @@
 
   const $ = (id) => document.getElementById(id);
   const screens = ["s-intro", "s-pick", "s-inspect", "s-solve", "s-result"];
-  let state = { score: 100, caseIdx: 0, found: new Set(), q: 0, answeredWrong: false, done: new Set() };
+  let state = { score: 100, caseIdx: 0, found: new Set(), q: 0, answeredWrong: false, done: new Set(), scores: {} };
 
   function show(id, stage) {
     for (const s of screens) $(s).hidden = s !== id;
@@ -807,7 +830,10 @@
   function showResult() {
     const c = CASES[state.caseIdx];
     state.done.add(c.id);
+    state.scores[c.id] = state.score;
     const rank = RANKS.find((r) => state.score >= r.min);
+    const left = CASES.filter((x) => !state.done.has(x.id));
+    const allDone = left.length === 0;
     $("resultKicker").textContent = `${c.name} · дело № ТБ-${String(412 + state.caseIdx).padStart(4, "0")}`;
     $("rankScore").textContent = state.score;
     $("rankTitle").textContent = rank.title;
@@ -816,6 +842,22 @@
     $("f-need").value = c.need;
     $("f-obj").value = c.obj;
     $("f-comment").value = `Прошёл игру «Дело о незащищённом объекте» (${c.name}, ${state.score} баллов). Интересует комплект:\n` + c.clues.map((cl) => "— " + cl.kit).join("\n");
+
+    $("nextBox").hidden = allDone;
+    $("finalBox").hidden = !allDone;
+    if (!allDone) {
+      $("nextText").textContent = `Осталось ${left.length === 1 ? "одно дело" : left.length + " дела"}: ${left.map((x) => x.name.toLowerCase()).join(", ")}`;
+      $("againBtn").textContent = "Выбрать другое дело";
+    } else {
+      const total = CASES.reduce((sum, x) => sum + (state.scores[x.id] || 0), 0);
+      const max = CASES.length * 100;
+      const finalRank = RANKS.find((r) => total / CASES.length >= r.min);
+      $("finalTotal").textContent = `Итог: ${total} из ${max} баллов · ${finalRank.title}`;
+      $("finalText").textContent = "Вы разобрали подстанцию, кровлю и склад. Следующее дело — ваш объект: пришлите размеры, и менеджер посчитает трос, сетку и крепёж за час в рабочее время.";
+      $("againBtn").textContent = "Пройти все дела заново";
+      $("f-comment").value = `Прошёл все дела в игре «Дело о незащищённом объекте»: ${total} из ${max} баллов. Хочу расчёт для своего объекта.`;
+      $("f-need").value = "Пока не знаю, нужна консультация";
+    }
     $("leadStatus").textContent = ""; $("leadStatus").className = "lead-status";
     $("leadTg").hidden = true;
     show("s-result", "Закрыто");
@@ -859,7 +901,21 @@
 
   $("startBtn").addEventListener("click", renderPick);
   $("toSolveBtn").addEventListener("click", () => { state.q = 0; renderQuestion(); });
-  $("againBtn").addEventListener("click", renderPick);
+  function replay() {
+    state.done = new Set(); state.scores = {};
+    renderPick();
+  }
+  function nextCase() {
+    const i = CASES.findIndex((x) => !state.done.has(x.id));
+    if (i >= 0) startCase(i); else replay();
+  }
+  $("againBtn").addEventListener("click", () => (state.done.size === CASES.length ? replay() : renderPick()));
+  $("nextCaseBtn").addEventListener("click", nextCase);
+  $("replayTopBtn").addEventListener("click", replay);
+  $("orderBtn").addEventListener("click", () => {
+    $("lead").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    $("f-size").focus({ preventScroll: true });
+  });
 })();
 </script>
 </body>
