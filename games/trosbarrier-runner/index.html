@@ -55,7 +55,7 @@
   #game {
     display: block; width: 100%; height: auto; aspect-ratio: 320 / 208; max-width: 100%;
     image-rendering: pixelated; image-rendering: crisp-edges;
-    border-radius: 4px; background: #5ea8d6; touch-action: none;
+    border-radius: 4px; background: #1b2850; touch-action: none;
   }
 
   /* Sound toggle, sits over the right end of the HUD strip */
@@ -172,7 +172,7 @@
 
     <div class="overlay" id="ov-intro">
       <div class="card">
-        <p class="kicker">8-бит платформер</p>
+        <p class="kicker">Новогодний 8-бит платформер</p>
         <h2>Собери комплект и закрой подстанцию</h2>
         <p>Бегите через промзону и собирайте детали: бухты троса, сетку, талрепы и зажимы. Бейте снизу по ящикам «?». Экскаваторы останавливайте прыжком сверху, а погрузчики обходите. И не падайте в ямы. В конце над подстанцией соберётся купол из того, что вы нашли.</p>
         <div class="parts" id="introParts"></div>
@@ -244,9 +244,9 @@
       "....kssk....",
     ],
     body: [
-      "..kwwyywwk..",
-      ".kwwwyywwwk.",
-      ".kwwwyywwwk.",
+      "..krrrrrrk..",
+      ".krrwyywwwk.",
+      ".kwrwyywwwk.",
       "kswwwyywwwsk",
       "ksgwwyywwgsk",
       ".kwwwwywwwk.",
@@ -421,13 +421,20 @@
     let ac = null, master, musicBus, sfxBus, noiseBuf, timer = null, step = 0, nextT = 0;
     let muted = false;
     try { muted = localStorage.getItem("tb-runner-muted") === "1"; } catch (_) {}
-    const BPM = 150, EIGHTH = 60 / BPM / 2;
+    const BPM = 168, EIGHTH = 60 / BPM / 2;
     const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
-    // Original loop, 4 bars of eighth notes (MIDI numbers, 0 = rest)
-    const LEAD = [76,79,84,79, 76,79,81,79,  77,81,84,81, 77,76,74,0,  76,79,84,79, 76,79,81,83,  84,83,81,79, 77,74,72,0,
-                  72,0,76,0, 79,0,76,79,  77,0,81,0, 84,83,81,0,  79,0,76,0, 72,74,76,79,  77,76,74,71, 72,0,0,0];
-    const BASS = [48,60,48,60, 48,60,48,60,  53,65,53,65, 55,67,55,67,  48,60,48,60, 48,60,48,60,  53,65,55,67, 48,60,48,0,
-                  45,57,45,57, 48,60,48,60,  53,65,53,65, 55,67,55,67,  45,57,45,57, 48,60,48,60,  53,65,55,67, 48,48,48,0];
+    // "В лесу родилась ёлочка" (L. Bekman, public domain) as [MIDI note, length in eighths]; 0 = rest
+    const TUNE = [
+      [72,2],[81,2],[81,2],[79,2],[81,2],[77,2],[72,2],[72,2],
+      [72,2],[81,2],[81,2],[82,2],[79,2],[84,4],[0,2],
+      [84,2],[86,2],[86,2],[82,2],[82,2],[81,2],[79,2],[77,2],
+      [77,2],[81,2],[81,2],[79,2],[81,2],[77,4],[0,2],
+    ];
+    const STEPS = TUNE.reduce((n, [, l]) => n + l, 0);
+    const LEAD = Array(STEPS).fill(0), LEN = Array(STEPS).fill(0);
+    TUNE.reduce((i, [m, l]) => { LEAD[i] = m; LEN[i] = l; return i + l; }, 0);
+    // Oom-pah bass, one chord root per bar: F F F C | Bb F C F
+    const BASS = [41, 41, 41, 48, 46, 41, 48, 41].flatMap((r) => [r, r + 12, r + 7, r + 12, r, r + 12, r + 7, r + 12]);
 
     function init() {
       if (ac) return true;
@@ -456,8 +463,8 @@
     }
     function schedule() {
       while (nextT < ac.currentTime + 0.15) {
-        const i = step % LEAD.length;
-        if (LEAD[i]) tone(musicBus, "square", mtof(LEAD[i]), 0, nextT, EIGHTH * 0.85, 0.55);
+        const i = step % STEPS;
+        if (LEAD[i]) tone(musicBus, "square", mtof(LEAD[i]), 0, nextT, EIGHTH * LEN[i] * 0.88, 0.5);
         if (BASS[i]) tone(musicBus, "triangle", mtof(BASS[i]), 0, nextT, EIGHTH * 0.9, 1);
         hat(nextT, i % 2 ? 0.25 : 0.5);
         nextT += EIGHTH; step++;
@@ -781,7 +788,7 @@
     const score = sumGot() * 100 + stomps * 200 + (win ? hearts * 200 + Math.max(0, Math.round(150 - timeT)) * 5 : 0);
     $("endKicker").textContent = win ? `Время ${Math.round(timeT)} с · ${score} очков` : `${score} очков`;
     $("endTitle").textContent = win
-      ? (share === 1 ? "Полный комплект! Подстанция закрыта" : "Подстанция закрыта куполом")
+      ? (share === 1 ? "Полный комплект! С Новым годом!" : "Подстанция под куполом. С Новым годом!")
       : "Game over: жизни закончились";
     $("stars").innerHTML = win ? [0, 1, 2].map((i) => `<span class="${i < stars ? "" : "off"}">★</span>`).join("") : "";
     $("endText").textContent = win
@@ -837,34 +844,88 @@
     ctx.fillStyle = color; ctx.fillText(str, x, y);
   }
 
-  function drawBackground() {
-    // banded 8-bit sky
-    const bands = ["#5ea8d6", "#6fb4de", "#82c0e4", "#97cce9", "#aed8ee"];
-    bands.forEach((c, i) => R(0, i * 30, VW, 30, c));
-    R(0, 150, VW, VH - 150, "#aed8ee");
-    // clouds
-    const co = Math.floor(-(cam * 0.1) % 400);
-    for (let k = -1; k < 3; k++) {
-      const x = co + k * 400;
-      for (const [cx, cy] of [[40, 30], [210, 50], [330, 22]]) {
-        R(x + cx, cy, 30, 6, "#ffffff"); R(x + cx + 6, cy - 4, 18, 4, "#ffffff"); R(x + cx + 4, cy + 6, 22, 2, "#d8ecf6");
+  /* Winter evening: stars, moon, snowy skyline with lit windows, fir trees with garlands, falling snow */
+  const SNOW = "#f4f8fa", SNOW_SH = "#b9d3e3";
+  const LIGHTS = ["#ff5a5a", "#f2b705", "#5ad2ff", "#7ee2a8"];
+  const STARS = Array.from({ length: 46 }, (_, i) => [(i * 73 + 11) % VW, 20 + ((i * 37) % 96), i % 4]);
+  const FLAKES = Array.from({ length: 90 }, (_, i) => ({ x: (i * 97) % VW, y: (i * 53) % VH, v: 12 + (i % 5) * 6, s: i % 7 === 0 ? 2 : 1, ph: i }));
+
+  function drawFir(x, base, h, seed, lit) {
+    R(x - 1, base - 3, 3, 3, "#4a3423");
+    const tierH = Math.round(h / 2), top0 = base - 3 - h;
+    for (let t = 0; t < 3; t++) {
+      const top = top0 + t * Math.round(h / 4), maxHalf = Math.round(h * (0.16 + t * 0.09));
+      for (let r = 0; r < tierH; r++) {
+        const half = Math.round(((r + 1) / tierH) * maxHalf);
+        R(x - half, top + r, half * 2 + 1, 1, r % 4 === 3 ? "#2a7350" : "#1d5a3e");
+        if (r % 2 === 0) R(x - half, top + r, 1, 1, SNOW);                  // snow on the left slope
+      }
+      R(x - maxHalf, top + tierH - 1, maxHalf + 1, 1, SNOW);                // snow on the tier's lower edge
+    }
+    R(x, top0 - 1, 1, 2, SNOW);
+    if (lit) {
+      for (let i = 0; i < 7; i++) {
+        const ly = top0 + 5 + Math.round(i * (h - 8) / 7), spread = Math.max(1, Math.round((ly - top0) * 0.35));
+        const lx = x + (((i * 5 + seed) % (spread * 2 + 1)) - spread);
+        R(lx, ly, 1, 1, LIGHTS[(i + seed + (frameN >> 4)) % 4]);
       }
     }
-    // far skyline
+  }
+  function drawStar(x, y) { R(x - 1, y, 3, 1, "#f2b705"); R(x, y - 1, 1, 3, "#f2b705"); R(x, y, 1, 1, "#fff2b0"); }
+
+  function drawBackground() {
+    const bands = ["#141d3a", "#1a2649", "#203058", "#283b69", "#31477a"];
+    bands.forEach((c, i) => R(0, i * 30, VW, 30, c));
+    R(0, 150, VW, VH - 150, "#3a5288");
+    for (const [sx, sy, k] of STARS) {
+      const tw = (frameN >> 5) % 4 === k;
+      R(sx, sy, 1, 1, tw ? "#ffffff" : "#8fa6d6");
+      if (tw && k === 0) { R(sx - 1, sy, 3, 1, "#c9d6f2"); R(sx, sy - 1, 1, 3, "#c9d6f2"); }
+    }
+    // moon
+    const mx = Math.round(250 - cam * 0.02);
+    R(mx, 26, 10, 14, "#f4f1d8"); R(mx - 2, 28, 14, 10, "#f4f1d8"); R(mx + 2, 30, 3, 3, "#d9d3b0"); R(mx + 7, 35, 2, 2, "#d9d3b0");
+    // far skyline with snow on roofs and lit windows
     const o1 = Math.floor(-(cam * 0.25) % 160);
     for (let k = -1; k < 4; k++) {
       const x = o1 + k * 160;
-      R(x + 6, 110, 34, 66, "#7fa9c2"); R(x + 46, 128, 50, 48, "#7fa9c2"); R(x + 104, 92, 18, 84, "#7fa9c2"); R(x + 110, 74, 6, 18, "#7fa9c2"); R(x + 128, 120, 26, 56, "#7fa9c2");
-      for (let wy = 116; wy < 170; wy += 8) R(x + 12, wy, 3, 3, "#9cc2d6");
+      for (const [bx, by, bw] of [[6, 110, 34], [46, 128, 50], [104, 92, 18], [128, 120, 26]]) {
+        R(x + bx, by, bw, 176 - by, "#24335c"); R(x + bx, by - 1, bw, 2, SNOW_SH);
+        for (let wy = by + 5; wy < 168; wy += 7) for (let wx = bx + 3; wx < bx + bw - 3; wx += 6) {
+          if (((wx * 7 + wy * 3 + k * 11) % 5) < 2) R(x + wx, wy, 2, 3, "#f2c94c");
+        }
+      }
+      R(x + 110, 74, 6, 18, "#24335c"); R(x + 110, 73, 6, 1, SNOW_SH);
     }
-    // near hangars + pylons
+    // near hangars with snowy roofs + pylons
     const o2 = Math.floor(-(cam * 0.5) % 200);
     for (let k = -1; k < 3; k++) {
       const x = o2 + k * 200;
-      R(x + 10, 140, 76, 36, "#6a95ad");
-      for (let i = 0; i < 38; i++) R(x + 10 + i, 140 - Math.floor(i / 3), 76 - i * 2, 1, "#6a95ad");
-      R(x + 110, 150, 48, 26, "#6a95ad");
-      pixLine(x + 176, 176, x + 184, 110, "#6a95ad"); pixLine(x + 192, 176, x + 184, 110, "#6a95ad"); pixLine(x + 176, 122, x + 192, 122, "#6a95ad");
+      R(x + 10, 140, 76, 36, "#2d406f");
+      for (let i = 0; i < 38; i++) { R(x + 10 + i, 140 - Math.floor(i / 3), 76 - i * 2, 1, "#2d406f"); R(x + 10 + i, 140 - Math.floor(i / 3) - 1, 1, 1, SNOW); R(x + 85 - i, 140 - Math.floor(i / 3) - 1, 1, 1, SNOW); }
+      R(x + 110, 150, 48, 26, "#2d406f"); R(x + 110, 149, 48, 2, SNOW);
+      pixLine(x + 176, 176, x + 184, 110, "#2d406f"); pixLine(x + 192, 176, x + 184, 110, "#2d406f"); pixLine(x + 176, 122, x + 192, 122, "#2d406f");
+    }
+    // fir trees, closest layer
+    const o3 = Math.floor(-(cam * 0.7) % 240);
+    for (let k = -1; k < 3; k++) {
+      const x = o3 + k * 240;
+      drawFir(x + 30, 176, 34, 1, true); drawFir(x + 52, 176, 24, 2, false);
+      drawFir(x + 120, 176, 44, 3, true); drawFir(x + 190, 176, 28, 4, false); drawFir(x + 206, 176, 36, 5, true);
+    }
+    // snowdrifts along the horizon
+    for (let i = 0; i < VW; i += 8) R(i, 174 - ((i + Math.floor(cam * 0.7)) % 24 < 12 ? 1 : 0), 8, 2, SNOW_SH);
+  }
+
+  function drawSnowfall(dt) {
+    for (const f of FLAKES) {
+      if (!reduceMotion) {
+        f.y += f.v * dt; f.ph += dt * 2;
+        f.x += Math.sin(f.ph + f.v) * 6 * dt - (mode === "play" ? P.vx * 0.15 * dt : 0);
+        if (f.y > VH) { f.y = 16; f.x = Math.random() * VW; }
+        if (f.x < 0) f.x += VW; if (f.x > VW) f.x -= VW;
+      }
+      R(f.x, f.y, f.s, f.s, f.s > 1 ? SNOW : "#dbe8f2");
     }
   }
 
@@ -879,22 +940,25 @@
       if (v === "#") {
         const top = !L.tiles[ty - 1]?.[tx];
         R(x, y, T, T, "#7d8a92");
-        if (top) { R(x, y, T, 2, "#3d4b55"); R(x, y + 2, T, 1, "#a9b6bd"); if (tx % 3 === 0) R(x + 4, y, 6, 1, "#f2b705"); }
+        if (top) { R(x, y, T, 3, SNOW); R(x, y + 3, T, 1, SNOW_SH); if (tx % 2) R(x + 4, y - 1, 6, 1, SNOW); }
         R(x + ((tx * 5) % 11), y + 6 + ((tx * 3) % 7), 2, 1, "#66737b");
         R(x + ((tx * 7 + 4) % 13), y + 11, 1, 1, "#66737b");
       } else if (v === "=") {
         for (let i = 0; i < T; i++) R(x + i, y, 1, 3, ((i + tx * 2) >> 2) % 2 ? "#10171c" : "#f2b705");
         R(x, y + 3, T, 3, "#4d5d68"); R(x, y + 3, T, 1, "#7d8f9a");
         pixLine(x + 1, y + 11, x + 7, y + 6, "#3d4b55"); pixLine(x + 8, y + 6, x + 14, y + 11, "#3d4b55"); R(x, y + 11, T, 1, "#3d4b55");
+        R(x, y, T, 1, SNOW); R(x + ((tx * 5) % 9), y - 1, 6, 1, SNOW);
       } else if (v === "B") {
         R(x, y, T, T, "#7c5a2f"); R(x + 1, y + 1, T - 2, T - 2, "#c08a4a");
         R(x + 1, y + 5, T - 2, 1, "#7c5a2f"); R(x + 1, y + 10, T - 2, 1, "#7c5a2f");
         R(x + 3, y + 2, 1, 1, "#e0b070"); R(x + 10, y + 7, 1, 1, "#e0b070");
+        if (!L.tiles[ty - 1]?.[tx]) { R(x, y, T, 2, SNOW); R(x + 3, y - 1, 8, 1, SNOW); }
       } else if (v === "D") {
         R(x, y, T, T, "#10171c"); R(x + 1, y + 1, 3, T - 2, "#3c6d8f"); R(x + T - 4, y + 1, 3, T - 2, "#3c6d8f");
         R(x + 4, y + 3, T - 8, T - 6, "#b9c6cd");
         for (let i = 5; i < T - 4; i += 2) R(x + i, y + 3, 1, T - 6, "#7d8f9a");
         R(x + 1, y + 1, 3, 1, "#5d8fb0"); R(x + T - 4, y + 1, 3, 1, "#5d8fb0");
+        if (!L.tiles[ty - 1]?.[tx]) { R(x, y, T, 2, SNOW); R(x + 2, y - 1, 10, 1, SNOW); }
       } else if (v === "?" || v === "U") {
         const yy = y + by;
         R(x, yy, T, T, "#10171c");
@@ -902,6 +966,7 @@
         R(x + 1, yy + 1, T - 2, 1, v === "?" ? "#ffd95a" : "#9fb0bd");
         for (const [a, b] of [[2, 2], [13, 2], [2, 13], [13, 13]]) R(x + a, yy + b, 1, 1, "#10171c");
         if (v === "?" && (frameN >> 4) % 4 !== 3) ctx.drawImage(spr("q"), x + 5, yy + 4);
+        R(x, yy - 1, T, 2, SNOW); R(x + 4, yy - 2, 7, 1, SNOW);
       }
     }
   }
@@ -920,8 +985,11 @@
     if (gx > VW + 160) return;
     for (let i = 0; i <= 10; i++) R(gx - 10 + i * 12, base - 14, 1, 14, "#7d8f9a");
     R(gx - 10, base - 12, 121, 1, "#7d8f9a"); R(gx - 10, base - 6, 121, 1, "#7d8f9a");
+    R(gx - 10, base - 15, 121, 1, SNOW);
+    for (let i = 0; i < 40; i++) { const lx = gx - 8 + i * 3; R(lx, base - 13 + (i % 4 === 1 || i % 4 === 2 ? 1 : 0), 1, 1, LIGHTS[(i + (frameN >> 4)) % 4]); }
+    drawFir(gx + 128, base, 56, 7, true); drawStar(gx + 128, base - 62);
     // transformer
-    R(gx + 10, base - 36, 36, 36, "#10171c"); R(gx + 11, base - 35, 34, 35, "#6b7b86");
+    R(gx + 10, base - 36, 36, 36, "#10171c"); R(gx + 11, base - 35, 34, 35, "#6b7b86"); R(gx + 10, base - 37, 36, 2, SNOW);
     for (let i = 0; i < 6; i++) R(gx + 13 + i * 5, base - 31, 3, 28, "#a9b7bf");
     for (const ix of [15, 25, 35]) { R(gx + ix, base - 44, 4, 8, "#c9a227"); R(gx + ix, base - 44, 4, 1, "#10171c"); }
     // portal
@@ -969,7 +1037,7 @@
     const X = (dx, w) => (flip ? x + f.w - dx - w : x + dx);
     R(X(2, 20), y + 8, 20, 9, "#10171c"); R(X(3, 18), y + 9, 18, 7, "#e06200"); R(X(3, 18), y + 9, 18, 1, "#ff8a3d");
     R(X(5, 1), y, 1, 9, "#10171c"); R(X(15, 1), y, 1, 9, "#10171c"); R(X(5, 11), y, 11, 1, "#10171c");
-    R(X(7, 7), y + 2, 7, 5, "#9fd0e8");
+    R(X(7, 7), y + 2, 7, 5, "#9fd0e8"); R(X(5, 11), y - 1, 11, 1, SNOW);
     R(X(22, 2), y - 2, 2, 20, "#4d5d68"); R(X(22, 6), y + 17, 6, 2, "#4d5d68");
     R(X(8, 2), y - 2, 2, 2, (frameN >> 3) % 2 ? "#f2b705" : "#ffe27a");
     for (const wx of [4, 15]) { R(X(wx, 5), y + 16, 5, 5, "#10171c"); R(X(wx + 2, 1), y + 18, 1, 1, "#7d8f9a"); }
@@ -994,7 +1062,7 @@
     for (let i = 1 + ph; i < 19; i += 3) R(X(i, 1), y + 12, 1, 3, "#10171c");
     // body + cab
     R(X(2, 15), y + 5, 15, 6, "#10171c"); R(X(3, 13), y + 6, 13, 4, "#f2b705"); R(X(3, 13), y + 6, 13, 1, "#ffd95a");
-    R(X(3, 8), y, 8, 6, "#10171c"); R(X(4, 6), y + 1, 6, 5, "#f2b705"); R(X(6, 3), y + 1, 3, 3, "#9fd0e8");
+    R(X(3, 8), y, 8, 6, "#10171c"); R(X(4, 6), y + 1, 6, 5, "#f2b705"); R(X(6, 3), y + 1, 3, 3, "#9fd0e8"); R(X(3, 8), y - 1, 8, 1, SNOW);
     R(X(13, 1), y - 3, 1, 3, "#4d5d68");
     // boom, stick and bucket at the front
     const fx0 = flip ? x + e.w - 16 : x + 16, sgn = flip ? -1 : 1;
@@ -1064,7 +1132,7 @@
     drawBackground(); drawCheckpoints(); drawGoal(); drawTiles(); drawItems();
     for (const f of L.forklifts) drawForklift(f);
     for (const e of L.excavators) drawExcavator(e);
-    drawPlayer(); drawFx(dt); drawHud();
+    drawPlayer(); drawSnowfall(dt); drawFx(dt); drawHud();
   }
 
   /* ---------- Loop ---------- */
