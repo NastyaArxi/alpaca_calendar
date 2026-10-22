@@ -64,6 +64,25 @@
     padding-block: 16px 40px;
   }
   .app { max-width: 760px; margin: 0 auto; display: grid; gap: 16px; }
+  /* Two columns on wide screens so each step fits one screen; one column on phones */
+  .split, .split__main, .split__side, .side-head, .side-rest { display: grid; gap: 16px; align-content: start; min-width: 0; }
+  @media (max-width: 979px) {
+    .split__side { display: contents; }
+    .side-head { order: 1; } .split__main { order: 2; } .side-rest { order: 3; }
+  }
+  @media (min-width: 980px) {
+    .app { max-width: 1240px; }
+    .split { grid-template-columns: minmax(0, 1.55fr) minmax(330px, 1fr); gap: 28px; }
+    #s-solve .split { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); }
+    #s-result .split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+    #s-result .split__main { gap: 12px; }
+    #s-result .split__main > .say { display: none; }   /* the form column carries the manager's promise on wide screens */
+    #s-result .rank { padding: 10px 14px; }
+    #s-result .disclaimer { font-size: 12px; padding: 8px 10px; }
+    .lead-promise { display: block !important; }
+    .scene { max-height: calc(100dvh - 170px); }
+    .side-head h2 { font-size: 28px; }
+  }
   [hidden] { display: none !important; }
 
   /* Top bar */
@@ -171,7 +190,7 @@
   .say__name { display: block; font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; }
 
   /* Solutions */
-  .question { display: grid; gap: 12px; }
+  .question { display: grid; gap: 12px; align-content: start; }
   .q-count { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--muted); }
   .options { display: grid; gap: 10px; }
   .opt {
@@ -364,36 +383,50 @@
 
     <!-- 3. Inspect -->
     <section class="screen" id="s-inspect" hidden>
-      <p class="kicker" id="inspectKicker">Шаг 2 из 3 · осмотр</p>
-      <h2 id="inspectTitle"></h2>
-      <p class="muted" id="inspectBrief"></p>
-      <div class="scene-wrap" id="sceneWrap"></div>
-      <div class="say">
-        <div class="say__avatar"><svg viewBox="45 20 110 110" aria-hidden="true"><use href="#manager" width="200" height="240"/></svg></div>
-        <p class="say__bubble" id="inspectSay" aria-live="polite"></p>
+      <div class="split">
+        <div class="split__main"><div class="scene-wrap" id="sceneWrap"></div></div>
+        <div class="split__side">
+          <div class="side-head">
+            <p class="kicker" id="inspectKicker">Шаг 2 из 3 · осмотр</p>
+            <h2 id="inspectTitle"></h2>
+            <p class="muted" id="inspectBrief"></p>
+          </div>
+          <div class="side-rest">
+            <div class="say">
+              <div class="say__avatar"><svg viewBox="45 20 110 110" aria-hidden="true"><use href="#manager" width="200" height="240"/></svg></div>
+              <p class="say__bubble" id="inspectSay" aria-live="polite"></p>
+            </div>
+            <ul class="clues" id="clueList"></ul>
+            <div class="row"><button class="btn btn-main" id="toSolveBtn" type="button" hidden>Перейти к решениям</button></div>
+          </div>
+        </div>
       </div>
-      <ul class="clues" id="clueList"></ul>
-      <div class="row"><button class="btn btn-main" id="toSolveBtn" type="button" hidden>Перейти к решениям</button></div>
     </section>
 
     <!-- 4. Solve -->
     <section class="screen" id="s-solve" hidden>
-      <p class="kicker">Шаг 3 из 3 · решение</p>
-      <div class="question">
-        <span class="q-count" id="qCount"></span>
-        <h2 id="qTitle"></h2>
-        <p class="muted" id="qText"></p>
-        <div class="options" id="options"></div>
+      <div class="split">
+        <div class="question">
+          <p class="kicker">Шаг 3 из 3 · решение</p>
+          <span class="q-count" id="qCount"></span>
+          <h2 id="qTitle"></h2>
+          <p class="muted" id="qText"></p>
+        </div>
+        <div class="split__side" style="display:grid">
+          <div class="options" id="options"></div>
+          <div class="say" id="solveSayWrap" hidden>
+            <div class="say__avatar"><svg viewBox="45 20 110 110" aria-hidden="true"><use href="#manager" width="200" height="240"/></svg></div>
+            <p class="say__bubble" id="solveSay" aria-live="polite"></p>
+          </div>
+          <div class="row"><button class="btn btn-main" id="nextQBtn" type="button" hidden>Дальше</button></div>
+        </div>
       </div>
-      <div class="say" id="solveSayWrap" hidden>
-        <div class="say__avatar"><svg viewBox="45 20 110 110" aria-hidden="true"><use href="#manager" width="200" height="240"/></svg></div>
-        <p class="say__bubble" id="solveSay" aria-live="polite"></p>
-      </div>
-      <div class="row"><button class="btn btn-main" id="nextQBtn" type="button" hidden>Дальше</button></div>
     </section>
 
     <!-- 5. Result + lead -->
     <section class="screen" id="s-result" hidden>
+      <div class="split">
+      <div class="split__main">
       <div class="result-head">
         <p class="kicker" id="resultKicker"></p>
         <h2>Дело закрыто</h2>
@@ -426,9 +459,14 @@
         <div class="say__avatar"><svg viewBox="45 20 110 110" aria-hidden="true"><use href="#manager" width="200" height="240"/></svg></div>
         <p class="say__bubble"><span class="say__name">Владислав, менеджер</span>«Пришлите размеры и фото объекта — вернусь с расчётом троса, сетки и крепежа в течение часа».</p>
       </div>
+      <div class="row">
+        <button class="btn btn-ghost" id="againBtn" type="button">Взять другое дело</button>
+      </div>
+      </div>
 
       <form class="lead" id="lead" novalidate>
         <h3>Получить расчёт для своего объекта</h3>
+        <p class="lead-promise muted" style="display:none;margin:-6px 0 0;font-size:14px">Владислав пришлёт расчёт троса, сетки и крепежа в течение часа в рабочее время.</p>
         <div class="lead-grid">
           <label>Что нужно
             <select name="need" id="f-need">
@@ -457,9 +495,6 @@
         <p class="lead-status" id="leadStatus" role="status" aria-live="polite"></p>
         <p class="lead-note">Не указывайте лишних персональных данных, если они не нужны для расчёта. Отправляя заявку, вы соглашаетесь с <a href="https://trosbarrier.ru/privacy/" target="_blank" rel="noopener">политикой конфиденциальности</a>.</p>
       </form>
-
-      <div class="row">
-        <button class="btn btn-ghost" id="againBtn" type="button">Взять другое дело</button>
       </div>
     </section>
   </article>

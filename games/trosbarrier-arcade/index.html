@@ -78,7 +78,7 @@
   /* Tension gauge (talrep) */
   .gauge { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 14px; background: var(--panel); border-radius: 14px; box-shadow: inset 0 0 0 1px var(--line); }
   .gauge__scale { position: relative; height: 34px; border-radius: 8px; overflow: hidden;
-    background: linear-gradient(90deg, #8fa1ab 0 35%, #2e8b57 35% 80%, #c4421a 80% 100%); }
+    background: linear-gradient(90deg, #8fa1ab 0 30%, #2e8b57 30% 82%, #c4421a 82% 100%); }
   .gauge__labels { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: .05em; }
   .gauge__labels span:nth-child(2) { margin-left: 8%; }
   .needle { position: absolute; top: -4px; bottom: -4px; width: 6px; margin-left: -3px; background: var(--accent); border: 2px solid #182027; border-radius: 3px; left: 0; }
@@ -253,11 +253,11 @@
 <script>
 (() => {
   const LEVELS = [
-    { name: "Навес над погрузкой", cols: 3, rows: 2, time: 60, rope: 130, speed: 0.75 },
-    { name: "Кровля цеха",         cols: 4, rows: 3, time: 100, rope: 230, speed: 1.1 },
+    { name: "Навес над погрузкой", cols: 3, rows: 2, time: 60, rope: 130, speed: 0.35 },
+    { name: "Кровля цеха",         cols: 4, rows: 3, time: 100, rope: 230, speed: 0.5 },
   ];
   const SEG_M = 6;              // metres of rope per span between posts
-  const SLACK = 0.35, SNAP = 0.80;
+  const SLACK = 0.30, SNAP = 0.82;
   const LEAD_URL = "https://trosbarrier.ru/#lead";
   const TELEGRAM = "https://t.me/Galkin_Vlad";
   const DETECTIVE_URL = "../trosbarrier-detective/";
