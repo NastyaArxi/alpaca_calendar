@@ -261,7 +261,7 @@
 </head>
 <body>
 
-<!-- Manager portrait (stylized from the photo on the site): used full-size on the intro and cropped in the avatar -->
+<!-- Manager portrait (stylized: light hair, shirt and tie in brand yellow): used full-size on the intro and cropped in the avatar -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
     <pattern id="rib" width="6" height="10" patternUnits="userSpaceOnUse">
@@ -271,44 +271,45 @@
       <path d="M0 3H10" stroke="#ffffff" stroke-opacity=".07" stroke-width="1.6"/>
     </pattern>
     <symbol id="manager" viewBox="0 0 200 240">
-      <!-- torso: navy ribbed turtleneck -->
-      <path d="M30 240 L36 156 Q42 128 80 118 L120 118 Q158 128 164 156 L170 240 Z" fill="#1b2232"/>
-      <path d="M30 240 L36 156 Q42 128 80 118 L120 118 Q158 128 164 156 L170 240 Z" fill="url(#rib)"/>
-      <!-- neck + collar -->
-      <rect x="89" y="96" width="22" height="22" fill="#d9a48b"/>
-      <path d="M80 112 Q100 104 120 112 L122 128 Q100 136 78 128 Z" fill="#20283a"/>
-      <path d="M80 112 Q100 104 120 112 L122 128 Q100 136 78 128 Z" fill="url(#ribH)"/>
-      <!-- crossed arms: back arm, then front arm with the hand on the elbow -->
-      <path d="M38 196 Q40 172 70 170 L150 168 Q166 170 164 186 Q160 200 140 200 L60 206 Q40 208 38 196 Z" fill="#232b3f" stroke="#10151f" stroke-width="2"/>
-      <path d="M38 196 Q40 172 70 170 L150 168 Q166 170 164 186 Q160 200 140 200 L60 206 Q40 208 38 196 Z" fill="url(#ribH)"/>
-      <path d="M44 214 Q44 192 74 190 L132 186 Q150 186 150 198 Q150 212 132 214 L64 222 Q44 224 44 214 Z" fill="#1e2637" stroke="#10151f" stroke-width="2"/>
-      <path d="M44 214 Q44 192 74 190 L132 186 Q150 186 150 198 Q150 212 132 214 L64 222 Q44 224 44 214 Z" fill="url(#ribH)"/>
-      <!-- right hand resting on the left forearm, thin silver chain -->
-      <path d="M128 186 Q146 176 158 180 Q166 184 160 192 Q154 202 140 204 Q128 204 126 196 Z" fill="#e3b29a"/>
-      <path d="M146 182 Q156 177 162 182" stroke="#c8937b" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-      <path d="M126 190 Q128 199 131 205" stroke="#c9d1d6" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <!-- left hand peeking under the arm -->
-      <path d="M56 168 Q58 156 66 158 Q70 162 68 172 Z" fill="#e3b29a"/>
+      <!-- arms down along the body, light shirt sleeves -->
+      <path d="M56 132 Q36 140 34 186 L32 222 L47 224 L50 186 Q52 164 58 154 Z" fill="#e8f0f6" stroke="#8fa1ab" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M144 132 Q164 140 166 186 L168 222 L153 224 L150 186 Q148 164 142 154 Z" fill="#e8f0f6" stroke="#8fa1ab" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M32 216 L47 218 M168 216 L153 218" stroke="#8fa1ab" stroke-width="2"/>
+      <ellipse cx="39.5" cy="231" rx="8" ry="10" fill="#e8b9a0" stroke="#c48f78" stroke-width="1.5"/>
+      <ellipse cx="160.5" cy="231" rx="8" ry="10" fill="#e8b9a0" stroke="#c48f78" stroke-width="1.5"/>
+      <!-- torso: shirt -->
+      <path d="M52 240 L52 152 Q56 128 84 118 L116 118 Q144 128 148 152 L148 240 Z" fill="#e8f0f6" stroke="#8fa1ab" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M100 190 V240" stroke="#a9b7bf" stroke-width="1.5"/>
+      <circle cx="100" cy="206" r="1.8" fill="#a9b7bf"/><circle cx="100" cy="224" r="1.8" fill="#a9b7bf"/>
+      <!-- neck -->
+      <rect x="89" y="96" width="22" height="26" fill="#dca58c"/>
+      <!-- collar -->
+      <path d="M84 116 L100 128 L91 140 L80 122 Z" fill="#ffffff" stroke="#8fa1ab" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M116 116 L100 128 L109 140 L120 122 Z" fill="#ffffff" stroke="#8fa1ab" stroke-width="2" stroke-linejoin="round"/>
+      <!-- tie in the brand yellow -->
+      <path d="M95 126 L105 126 L103.5 136 L96.5 136 Z" fill="#e0a100" stroke="#b88400" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M96.5 136 L103.5 136 L109 184 L100 196 L91 184 Z" fill="#f2b705" stroke="#b88400" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M95 150 L106 146 M94 164 L107 160 M93 178 L108 174" stroke="#b88400" stroke-width="1.5" opacity=".55"/>
       <!-- ears -->
       <ellipse cx="69" cy="70" rx="6" ry="9" fill="#dca58c"/>
       <ellipse cx="131" cy="70" rx="6" ry="9" fill="#dca58c"/>
-      <!-- head -->
-      <path d="M70 62 Q70 30 100 28 Q130 30 130 62 L129 82 Q126 104 100 110 Q74 104 71 82 Z" fill="#e8b9a0"/>
-      <!-- hair: short, darker on top, faded sides -->
-      <path d="M69 64 Q66 34 92 26 Q112 20 126 32 Q134 42 131 64 Q128 50 122 44 Q104 38 84 44 Q74 48 69 64 Z" fill="#1d1c22"/>
-      <path d="M69 64 Q68 54 72 50 L74 66 Z M131 64 Q132 54 128 50 L126 66 Z" fill="#3a3a42" opacity=".75"/>
+      <!-- head, clean-shaven -->
+      <path d="M70 62 Q70 30 100 28 Q130 30 130 62 L129 82 Q126 104 100 110 Q74 104 71 82 Z" fill="#e8b9a0" stroke="#c48f78" stroke-width="1.5"/>
+      <!-- light hair with a side part -->
+      <path d="M68 66 Q63 34 92 25 Q114 19 128 32 Q136 42 132 66 Q129 50 122 45 Q110 40 98 44 Q90 38 82 44 Q72 50 68 66 Z" fill="#d8b46e" stroke="#a9833f" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M86 30 Q104 26 120 36 M80 38 Q92 32 104 34" stroke="#f0d79c" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M98 44 Q96 34 90 28" stroke="#a9833f" stroke-width="1.5" fill="none" stroke-linecap="round"/>
       <!-- brows + eyes -->
-      <path d="M80 60 Q88 56 95 59" stroke="#232025" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <path d="M105 59 Q112 56 120 60" stroke="#232025" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="88" cy="68" rx="3.4" ry="2.6" fill="#2a2a30"/>
-      <ellipse cx="112" cy="68" rx="3.4" ry="2.6" fill="#2a2a30"/>
-      <!-- nose -->
+      <path d="M80 60 Q88 56 95 59" stroke="#9c7a43" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M105 59 Q112 56 120 60" stroke="#9c7a43" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="88" cy="68" rx="3.4" ry="2.8" fill="#2a2a30"/>
+      <ellipse cx="112" cy="68" rx="3.4" ry="2.8" fill="#2a2a30"/>
+      <circle cx="89.2" cy="67" r="1" fill="#fff"/><circle cx="113.2" cy="67" r="1" fill="#fff"/>
+      <!-- nose, cheeks, smile -->
       <path d="M100 68 Q98 80 96 83 Q100 86 104 83" stroke="#c48f78" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <!-- short beard + moustache -->
-      <path d="M71 78 Q72 104 100 112 Q128 104 129 78 Q126 94 114 96 Q100 92 86 96 Q74 94 71 78 Z" fill="#2a2426" opacity=".85"/>
-      <path d="M89 90 Q100 85 111 90 Q100 88 89 90 Z" fill="#2a2426" stroke="#2a2426" stroke-width="2" stroke-linejoin="round"/>
-      <!-- slight smile -->
-      <path d="M92 95 Q100 99 108 95" stroke="#b0705c" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <ellipse cx="80" cy="84" rx="6" ry="3.5" fill="#e59a86" opacity=".35"/>
+      <ellipse cx="120" cy="84" rx="6" ry="3.5" fill="#e59a86" opacity=".35"/>
+      <path d="M90 93 Q100 100 110 93" stroke="#a9604c" stroke-width="2.4" fill="none" stroke-linecap="round"/>
     </symbol>
   </defs>
 </svg>
