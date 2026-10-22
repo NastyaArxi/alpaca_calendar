@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#182027">
+<title>Собери комплект</title>
+<meta name="description" content="8-битный платформер ТросБарьер: соберите трос, сетку, талрепы и зажимы и закройте подстанцию куполом">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Layout: brand bar, the pixel game screen (320×208 upscaled), a gamepad under it on phones.
+     Landscape phones: the screen fills the viewport and the gamepad floats over its corners.
+     Page colors from trosbarrier.ru: graphite #182027, signal yellow #f2b705, orange #e06200, light #eef2f4. */
+  :root {
+    --bg: #eef2f4;
+    --panel: #ffffff;
+    --ink: #182027;
+    --muted: #4d5d68;
+    --line: rgba(24, 32, 39, .14);
+    --accent: #f2b705;
+    --accent-deep: #c98f00;
+    --orange: #e06200;
+    --pixel: "Press Start 2P", "Courier New", monospace;
+    --font: "Inter", "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #0f1418; --panel: #182027; --ink: #eef2f4; --muted: #a3b2bb; --line: rgba(238, 242, 244, .14); color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --bg: #0f1418; --panel: #182027; --ink: #eef2f4; --muted: #a3b2bb; --line: rgba(238, 242, 244, .14); color-scheme: dark; }
+
+  * { box-sizing: border-box; }
+  html, body { min-height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--font); font-size: 16px; line-height: 1.5;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 14px 24px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body.playing { overscroll-behavior: none; }
+  [hidden] { display: none !important; }
+  .app { max-width: 960px; margin: 0 auto; display: grid; gap: 12px; }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; color: inherit; text-decoration: none; font-weight: 800; font-size: 18px; }
+  .title { margin: 0; font-family: var(--pixel); font-weight: 400; font-size: clamp(13px, 3.4vw, 20px); line-height: 1.3; }
+
+  /* Game screen: a chunky "console" bezel */
+  .screen {
+    position: relative; padding: 8px; border-radius: 14px; background: #182027;
+    box-shadow: inset 0 0 0 3px #2b3943, 0 18px 40px -24px rgba(0, 0, 0, .7);
+  }
+  #game {
+    display: block; width: 100%; height: auto; aspect-ratio: 320 / 208; max-width: 100%;
+    image-rendering: pixelated; image-rendering: crisp-edges;
+    border-radius: 4px; background: #5ea8d6; touch-action: none;
+  }
+
+  /* Sound toggle, sits over the right end of the HUD strip */
+  .sound {
+    position: absolute; top: 12px; right: 12px; z-index: 6;
+    width: 40px; height: 32px; padding: 0; border: 0; border-radius: 6px;
+    background: #10171c; color: #f2b705; box-shadow: 0 0 0 2px #2b3943;
+    display: grid; place-items: center; cursor: pointer;
+  }
+  .sound svg { width: 22px; height: 22px; image-rendering: pixelated; }
+  .sound[aria-pressed="false"] { color: #7d8f9a; }
+  @media (pointer: coarse) and (orientation: landscape) and (max-height: 560px) {
+    .sound { top: max(8px, env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); width: 48px; height: 40px; }
+  }
+
+  /* Gamepad */
+  .pad { display: flex; justify-content: space-between; align-items: center; gap: 16px; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+  .pad__dir { display: flex; gap: 10px; }
+  .ctl {
+    width: 76px; height: 76px; border-radius: 18px; border: 0; padding: 0;
+    background: #2b3943; color: #eef2f4; font-family: var(--pixel); font-size: 20px;
+    box-shadow: inset 0 -5px 0 #10171c, 0 0 0 3px #182027;
+    touch-action: none; display: grid; place-items: center;
+  }
+  .ctl.on { transform: translateY(3px); box-shadow: inset 0 -2px 0 #10171c, 0 0 0 3px #182027; background: #3d4f5c; }
+  .ctl--jump { width: 104px; height: 104px; border-radius: 50%; background: var(--accent); color: #182027; font-size: 11px; box-shadow: inset 0 -6px 0 var(--accent-deep), 0 0 0 3px #182027; }
+  .ctl--jump.on { background: #ffcb2e; box-shadow: inset 0 -2px 0 var(--accent-deep), 0 0 0 3px #182027; }
+  .keys { margin: 0; font-size: 13px; color: var(--muted); }
+  .keys kbd { font-family: var(--font); font-weight: 700; font-size: 12px; padding: 3px 6px; border-radius: 4px; box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); }
+  .rotate { margin: 0; font-size: 13px; color: var(--muted); text-align: center; }
+  @media (hover: hover) and (pointer: fine) { .pad, .rotate { display: none; } }
+  @media (pointer: coarse) { .keys { display: none; } }
+
+  /* Landscape phone: game fills the screen, pad floats over the corners */
+  @media (pointer: coarse) and (orientation: landscape) and (max-height: 560px) {
+    body { padding: 0; }
+    .app { max-width: none; gap: 0; }
+    .bar, .rotate { display: none; }
+    .screen { border-radius: 0; padding: 0; background: #000; box-shadow: none; height: 100dvh; display: grid; place-items: center; }
+    #game { width: auto; height: 100dvh; max-width: 100vw; border-radius: 0; }
+    .pad { position: fixed; inset: auto 0 0 0; padding: 0 max(16px, env(safe-area-inset-right, 0px)) max(14px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); pointer-events: none; z-index: 10; }
+    .pad .ctl { pointer-events: auto; opacity: .6; width: 64px; height: 64px; }
+    .pad .ctl--jump { width: 84px; height: 84px; }
+  }
+
+  /* Overlays */
+  button, .btn { font: inherit; font-weight: 700; border: 0; cursor: pointer; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn { font-family: var(--pixel); font-weight: 400; font-size: 11px; line-height: 1.4; padding: 14px 16px; text-align: center; }
+  .btn-main { background: var(--accent); color: #182027; box-shadow: inset 0 -4px 0 var(--accent-deep); }
+  .btn-dark { background: #182027; color: #fff; box-shadow: inset 0 -4px 0 #000; }
+  .btn-ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px var(--line); }
+  button:focus-visible, .btn:focus-visible, a:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+  .overlay { position: absolute; inset: 0; display: grid; place-items: center; padding: 12px; background: rgba(15, 20, 24, .55); z-index: 5; }
+  .card {
+    width: min(560px, 100%); max-height: 100%; overflow: auto;
+    background: var(--panel); color: var(--ink); border-radius: 6px; padding: 18px; display: grid; gap: 12px;
+    box-shadow: 0 0 0 4px #182027, 0 0 0 7px var(--accent), 0 20px 50px -20px rgba(0, 0, 0, .7);
+  }
+  .card h2 { margin: 0; font-family: var(--pixel); font-weight: 400; font-size: clamp(13px, 3.2vw, 17px); line-height: 1.5; }
+  .card p { margin: 0; }
+  .kicker { font-family: var(--pixel); font-size: 9px; letter-spacing: .04em; color: var(--orange); }
+  .parts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .part { display: grid; justify-items: center; gap: 4px; padding: 10px 4px; border-radius: 6px; background: var(--bg); text-align: center; }
+  .part canvas { width: 36px; height: 36px; image-rendering: pixelated; }
+  .part b { font-family: var(--pixel); font-weight: 400; font-size: 11px; }
+  .part span { font-size: 12px; color: var(--muted); font-weight: 600; line-height: 1.2; }
+  .stars { font-family: var(--pixel); font-size: 22px; letter-spacing: 6px; color: var(--accent); line-height: 1; }
+  .stars .off { color: var(--line); }
+  .say { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 10px; align-items: start; }
+  .say__avatar { width: 48px; height: 48px; border-radius: 6px; background: var(--accent); overflow: hidden; box-shadow: 0 0 0 2px #182027; }
+  .say__avatar canvas { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+  .say__bubble { margin: 0; padding: 10px 12px; border-radius: 6px; background: #182027; color: #eef2f4; font-size: 14px; }
+  .say__name { display: block; font-family: var(--pixel); font-size: 8px; color: var(--accent); margin-bottom: 4px; }
+  .note { font-size: 12px; color: var(--muted); }
+  .controls-help { font-size: 13px; color: var(--muted); }
+
+  @media (max-width: 600px), (pointer: coarse) and (orientation: landscape) and (max-height: 560px) {
+    .overlay { position: fixed; z-index: 20; }
+    .parts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (pointer: coarse) and (orientation: landscape) and (max-height: 560px) {
+    .parts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="bar">
+    <a class="brand" href="https://trosbarrier.ru/" aria-label="ТросБарьер — на главную">
+      <svg viewBox="0 0 40 40" width="32" height="32" aria-hidden="true">
+        <defs><linearGradient id="lgLight" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2b705"/><stop offset="1" stop-color="#e0a100"/></linearGradient></defs>
+        <rect x="2" y="2" width="36" height="36" rx="10" fill="#1c252c" stroke="url(#lgLight)" stroke-width="2"/>
+        <g stroke="#8fa1ab" stroke-width="1.1" opacity=".5"><path d="M10 14 H30 M10 20 H30 M10 26 H30"/><path d="M14 10 V30 M20 10 V30 M26 10 V30"/></g>
+        <path d="M8 26 Q20 8 32 26" fill="none" stroke="url(#lgLight)" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="20" cy="16" r="2" fill="#ffcd2e"/>
+      </svg>
+      <span>ТросБарьер</span>
+    </a>
+    <h1 class="title">Собери комплект</h1>
+  </div>
+
+  <div class="screen" id="screen">
+    <button class="sound" id="soundBtn" type="button" aria-pressed="true" aria-label="Звук включён. Нажмите, чтобы выключить (клавиша M)">
+      <svg viewBox="0 0 11 11" aria-hidden="true" shape-rendering="crispEdges">
+        <path fill="currentColor" d="M0 4h2v3H0zM2 3h1v5H2zM3 2h1v7H3zM4 1h1v9H4z"/>
+        <g id="waves" fill="currentColor"><path d="M6 4h1v3H6zM8 2h1v1H8zM9 3h1v5H9zM8 8h1v1H8z"/></g>
+        <g id="cross" fill="currentColor" hidden><path d="M6 3h1v1H6zM7 4h1v1H7zM8 5h1v1H8zM9 6h1v1H9zM10 7h1v1h-1zM10 3h1v1h-1zM9 4h1v1H9zM7 6h1v1H7zM6 7h1v1H6z"/></g>
+      </svg>
+    </button>
+    <canvas id="game" width="320" height="208" aria-label="8-битный уровень: промзона. Соберите детали и дойдите до подстанции."></canvas>
+
+    <div class="overlay" id="ov-intro">
+      <div class="card">
+        <p class="kicker">8-бит платформер</p>
+        <h2>Собери комплект и закрой подстанцию</h2>
+        <p>Бегите через промзону и собирайте детали: бухты троса, сетку, талрепы и зажимы. Бейте снизу по ящикам «?». Не попадайтесь под погрузчики и не падайте в ямы. В конце над подстанцией соберётся купол из того, что вы нашли.</p>
+        <div class="parts" id="introParts"></div>
+        <p class="controls-help" id="controlsHelp"></p>
+        <div class="say">
+          <div class="say__avatar" data-face></div>
+          <p class="say__bubble"><span class="say__name">Владислав</span>Каску надел, список деталей взял. Помогите собрать всё до последнего зажима!</p>
+        </div>
+        <div class="row"><button class="btn btn-main" id="startBtn" type="button">▶ Старт</button></div>
+      </div>
+    </div>
+
+    <div class="overlay" id="ov-end" hidden>
+      <div class="card">
+        <p class="kicker" id="endKicker"></p>
+        <h2 id="endTitle"></h2>
+        <div class="stars" id="stars" aria-hidden="true"></div>
+        <p id="endText"></p>
+        <div class="parts" id="endParts"></div>
+        <div class="say">
+          <div class="say__avatar" data-face></div>
+          <p class="say__bubble" id="endSay"></p>
+        </div>
+        <div class="row" id="endBtns"></div>
+        <p class="note">В игре детали лежат на дороге, а в жизни комплект считают под проект объекта. Ни одно средство не даёт полной гарантии.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="pad" id="pad">
+    <div class="pad__dir">
+      <button class="ctl" type="button" data-key="left" aria-label="Влево">◀</button>
+      <button class="ctl" type="button" data-key="right" aria-label="Вправо">▶</button>
+    </div>
+    <button class="ctl ctl--jump" type="button" data-key="jump" aria-label="Прыжок">ПРЫЖОК</button>
+  </div>
+  <p class="rotate">Поверните телефон горизонтально — экран станет больше</p>
+  <p class="keys"><kbd>←</kbd> <kbd>→</kbd> бег · <kbd>ПРОБЕЛ</kbd> прыжок · держите дольше — прыжок выше · <kbd>M</kbd> звук</p>
+</div>
+
+<script>
+(() => {
+  const LEAD_URL = "https://trosbarrier.ru/#lead";
+  const TELEGRAM = "https://t.me/Galkin_Vlad";
+  const ARCADE_URL = "../trosbarrier-arcade/";
+
+  /* ---------- Screen and physics, all in game pixels ---------- */
+  const T = 16, VW = 320, VH = 208, ROWS = 13;
+  const GRAV = 900, JUMP_V = -330, JUMP_CUT = -130, RUN = 105, ACC = 800, FRICTION = 900, MAX_FALL = 450;
+
+  /* ---------- Palette (8-bit style, brand colors included) ---------- */
+  const PAL = {
+    k: "#10171c", y: "#f2b705", Y: "#c98f00", s: "#f3bc9c", S: "#c98a6c", h: "#e8c070",
+    w: "#f4f8fa", g: "#9fb0bd", b: "#36424c", o: "#e06200", r: "#b03a1a", l: "#d7e0e5",
+    m: "#7d8f9a", d: "#3d4b55", n: "#c08a4a", N: "#7c5a2f", B: "#3c6d8f", c: "#9fd0e8", G: "#2e8b57", W: "#ffffff",
+  };
+
+  /* ---------- Sprites: one character per pixel ---------- */
+  const SPR = {
+    head: [
+      "....kkkk....",
+      "...kyyyyk...",
+      "..kyyWyyyk..",
+      ".kkkkkkkkkk.",
+      "..khsssssk..",
+      "..khssskSk..",
+      "..kssssssk..",
+      "...kssSsk...",
+      "....kssk....",
+    ],
+    body: [
+      "..kwwyywwk..",
+      ".kwwwyywwwk.",
+      ".kwwwyywwwk.",
+      "kswwwyywwwsk",
+      "ksgwwyywwgsk",
+      ".kwwwwywwwk.",
+      ".kgwwwwwwgk.",
+    ],
+    legsStand: [
+      "..kbbbbbbk..",
+      "..kbbkkbbk..",
+      "..kbbk.kbbk.",
+      "..kbbk.kbbk.",
+      "..kkkk.kkkk.",
+      ".kkkkk..kkkk",
+    ],
+    legsRun1: [
+      "..kbbbbbbk..",
+      ".kbbbkkbbbk.",
+      ".kbbk..kbbk.",
+      "kbbk....kbbk",
+      "kkkk....kkkk",
+      "............",
+    ],
+    legsRun2: [
+      "..kbbbbbbk..",
+      "...kbbbbk...",
+      "...kbkkbk...",
+      "...kbk.kbk..",
+      "..kkkk.kkk..",
+      "............",
+    ],
+    legsJump: [
+      "..kbbbbbbk..",
+      "..kbbkkbbbk.",
+      ".kbbk..kbbk.",
+      ".kkkk...kbbk",
+      "........kkkk",
+      "............",
+    ],
+    rope: [
+      "...kkkkkk...",
+      "..kmllllmk..",
+      ".kmlmmmmlmk.",
+      "kmlmkkkkmlmk",
+      "kmlmk..kmlmk",
+      "kmlmk..kmlmk",
+      "kmlmk..kmlmk",
+      "kmlmkkkkmlmk",
+      ".kmlmmmmlmk.",
+      "..kmllllmk..",
+      "...kkkkkk...",
+    ],
+    mesh: [
+      "kkkkkkkkkkkk",
+      "kyykyykyykyk",
+      "kyykyykyykyk",
+      "kkkkkkkkkkkk",
+      "kyykyykyykyk",
+      "kyykyykyykyk",
+      "kkkkkkkkkkkk",
+      "kyykyykyykyk",
+      "kyykyykyykyk",
+      "kkkkkkkkkkkk",
+    ],
+    turn: [
+      "....kkkk....",
+      "...kllllk...",
+      ".ooklmmlkoo.",
+      "o.oklmmlko.o",
+      ".ooklmmlkoo.",
+      "...kllllk...",
+      "....kkkk....",
+    ],
+    clamp: [
+      "...kkkkkk...",
+      "..kllllllk..",
+      ".kllkkkkllk.",
+      ".klk....klk.",
+      ".klk....klk.",
+      "kooooooooook",
+      "kooooooooook",
+      ".klk....klk.",
+      ".kkk....kkk.",
+    ],
+    heart: [
+      ".rr.rr.",
+      "rWrrrrr",
+      "rrrrrrr",
+      ".rrrrr.",
+      "..rrr..",
+      "...r...",
+    ],
+    heartOff: [
+      ".kk.kk.",
+      "k..k..k",
+      "k.....k",
+      ".k...k.",
+      "..k.k..",
+      "...k...",
+    ],
+    cone: [
+      "...oo...",
+      "...oo...",
+      "..owwo..",
+      "..oooo..",
+      ".oooooo.",
+      ".wwwwww.",
+      "oooooooo",
+      "kkkkkkkk",
+    ],
+    q: [
+      ".kkkk.",
+      "kk..kk",
+      "....kk",
+      "...kk.",
+      "..kk..",
+      "..kk..",
+      "......",
+      "..kk..",
+    ],
+    face: [
+      "....kkkkkkkk....",
+      "...kyyyyyyyyk...",
+      "..kyyyWWyyyyyk..",
+      "..kyyyyyyyyyyk..",
+      ".kkkkkkkkkkkkkk.",
+      "..khhsssssssshk.",
+      "..khsssssssssk..",
+      "..ksskksssksskk.",
+      "..ksssssssssssk.",
+      "..ksSssssssssSk.",
+      "..kssssSSsssssk.",
+      "...ksskkkkkssk..",
+      "....kssssssssk..",
+      ".....kkssssk....",
+      "...kwwwyywwwk...",
+      "..kwwwwyywwwwk..",
+    ],
+  };
+  const PARTS = {
+    rope:  { name: "Трос" },
+    mesh:  { name: "Сетка" },
+    turn:  { name: "Талрепы" },
+    clamp: { name: "Зажимы" },
+  };
+  const ORDER = ["rope", "mesh", "turn", "clamp"];
+
+  // Pre-render every sprite (and its mirror) to small canvases
+  const cache = {};
+  function bake(rows, flip) {
+    const h = rows.length, w = Math.max(...rows.map((r) => r.length));
+    const c = document.createElement("canvas"); c.width = w; c.height = h;
+    const g = c.getContext("2d");
+    rows.forEach((row, y) => [...row].forEach((ch, x) => {
+      if (ch === "." || !PAL[ch]) return;
+      g.fillStyle = PAL[ch]; g.fillRect(flip ? w - 1 - x : x, y, 1, 1);
+    }));
+    return c;
+  }
+  function spr(name, flip = false) {
+    const k = name + (flip ? "<" : ">");
+    return cache[k] || (cache[k] = bake(SPR[name], flip));
+  }
+
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled = false;
+  const $ = (id) => document.getElementById(id);
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const coarse = matchMedia("(pointer: coarse)").matches;
+
+  /* ---------- 8-bit sound: Web Audio square/triangle/noise, no files ---------- */
+  const Sound = (() => {
+    let ac = null, master, musicBus, sfxBus, noiseBuf, timer = null, step = 0, nextT = 0;
+    let muted = false;
+    try { muted = localStorage.getItem("tb-runner-muted") === "1"; } catch (_) {}
+    const BPM = 150, EIGHTH = 60 / BPM / 2;
+    const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
+    // Original loop, 4 bars of eighth notes (MIDI numbers, 0 = rest)
+    const LEAD = [76,79,84,79, 76,79,81,79,  77,81,84,81, 77,76,74,0,  76,79,84,79, 76,79,81,83,  84,83,81,79, 77,74,72,0,
+                  72,0,76,0, 79,0,76,79,  77,0,81,0, 84,83,81,0,  79,0,76,0, 72,74,76,79,  77,76,74,71, 72,0,0,0];
+    const BASS = [48,60,48,60, 48,60,48,60,  53,65,53,65, 55,67,55,67,  48,60,48,60, 48,60,48,60,  53,65,55,67, 48,60,48,0,
+                  45,57,45,57, 48,60,48,60,  53,65,53,65, 55,67,55,67,  45,57,45,57, 48,60,48,60,  53,65,55,67, 48,48,48,0];
+
+    function init() {
+      if (ac) return true;
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return false;
+      ac = new AC();
+      master = ac.createGain(); master.gain.value = muted ? 0 : 1; master.connect(ac.destination);
+      musicBus = ac.createGain(); musicBus.gain.value = 0.11; musicBus.connect(master);
+      sfxBus = ac.createGain(); sfxBus.gain.value = 0.22; sfxBus.connect(master);
+      noiseBuf = ac.createBuffer(1, ac.sampleRate * 0.2, ac.sampleRate);
+      const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      return true;
+    }
+    function tone(bus, type, f0, f1, t, dur, vol = 1) {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = type; o.frequency.setValueAtTime(f0, t);
+      if (f1 && f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+      g.gain.setValueAtTime(vol, t); g.gain.setValueAtTime(vol, t + dur * 0.7); g.gain.linearRampToValueAtTime(0, t + dur);
+      o.connect(g); g.connect(bus); o.start(t); o.stop(t + dur + 0.02);
+    }
+    function hat(t, vol) {
+      const src = ac.createBufferSource(), g = ac.createGain(), hp = ac.createBiquadFilter();
+      src.buffer = noiseBuf; hp.type = "highpass"; hp.frequency.value = 6000;
+      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+      src.connect(hp); hp.connect(g); g.connect(musicBus); src.start(t); src.stop(t + 0.06);
+    }
+    function schedule() {
+      while (nextT < ac.currentTime + 0.15) {
+        const i = step % LEAD.length;
+        if (LEAD[i]) tone(musicBus, "square", mtof(LEAD[i]), 0, nextT, EIGHTH * 0.85, 0.55);
+        if (BASS[i]) tone(musicBus, "triangle", mtof(BASS[i]), 0, nextT, EIGHTH * 0.9, 1);
+        hat(nextT, i % 2 ? 0.25 : 0.5);
+        nextT += EIGHTH; step++;
+      }
+    }
+    return {
+      get muted() { return muted; },
+      startMusic() {
+        if (!init()) return;
+        ac.resume?.();
+        if (timer) return;
+        step = 0; nextT = ac.currentTime + 0.05;
+        timer = setInterval(schedule, 30); schedule();
+      },
+      stopMusic() { if (timer) { clearInterval(timer); timer = null; } },
+      setMuted(m) {
+        muted = m;
+        try { localStorage.setItem("tb-runner-muted", m ? "1" : "0"); } catch (_) {}
+        if (ac) master.gain.setTargetAtTime(m ? 0 : 1, ac.currentTime, 0.02);
+      },
+      sfx(name) {
+        if (!ac || muted) return;
+        const t = ac.currentTime;
+        switch (name) {
+          case "jump":   tone(sfxBus, "square", 280, 720, t, 0.12, 0.6); break;
+          case "pickup": tone(sfxBus, "square", mtof(83), 0, t, 0.06, 0.6); tone(sfxBus, "square", mtof(88), 0, t + 0.06, 0.14, 0.6); break;
+          case "bump":   tone(sfxBus, "square", 160, 110, t, 0.09, 0.8); break;
+          case "hurt":   tone(sfxBus, "sawtooth", 420, 90, t, 0.35, 0.5); break;
+          case "check":  [72, 76, 79, 84].forEach((m, i) => tone(sfxBus, "square", mtof(m), 0, t + i * 0.07, 0.08, 0.5)); break;
+          case "win":    [72, 76, 79, 84, 79, 84, 88].forEach((m, i) => tone(sfxBus, "square", mtof(m), 0, t + i * 0.12, i === 6 ? 0.6 : 0.11, 0.55));
+                         [48, 55, 60].forEach((m, i) => tone(sfxBus, "triangle", mtof(m), 0, t + i * 0.24, 0.24, 0.9)); break;
+          case "over":   [67, 63, 60, 55].forEach((m, i) => tone(sfxBus, "square", mtof(m), 0, t + i * 0.18, 0.17, 0.5)); break;
+        }
+      },
+      pause() { if (ac && ac.state === "running") ac.suspend(); },
+      resume() { if (ac && ac.state === "suspended") ac.resume(); },
+    };
+  })();
+
+  function renderSoundBtn() {
+    const b = $("soundBtn"), on = !Sound.muted;
+    b.setAttribute("aria-pressed", String(on));
+    b.setAttribute("aria-label", on ? "Звук включён. Нажмите, чтобы выключить (клавиша M)" : "Звук выключен. Нажмите, чтобы включить (клавиша M)");
+    b.querySelector("#waves").toggleAttribute("hidden", !on);
+    b.querySelector("#cross").toggleAttribute("hidden", on);
+  }
+  function toggleSound() {
+    Sound.setMuted(!Sound.muted);
+    if (!Sound.muted && (mode === "play" || mode === "finish")) Sound.startMusic();
+    renderSoundBtn();
+  }
+  $("soundBtn").addEventListener("click", toggleSound);
+  addEventListener("keydown", (e) => { if (e.code === "KeyM" && !e.repeat) toggleSound(); });
+  document.addEventListener("visibilitychange", () => (document.hidden ? Sound.pause() : Sound.resume()));
+  renderSoundBtn();
+
+  /* ---------- Level: built from simple commands so it is easy to edit ---------- */
+  function buildLevel() {
+    const W = 108;
+    const tiles = Array.from({ length: ROWS }, () => Array(W).fill(0));
+    const items = [], forklifts = [], checkpoints = [];
+    const set = (x, y, v) => { if (y >= 0 && y < ROWS && x >= 0 && x < W) tiles[y][x] = v; };
+    const ground = (x1, x2) => { for (let x = x1; x <= x2; x++) { set(x, 11, "#"); set(x, 12, "#"); } };
+    const plat = (x, y, len) => { for (let i = 0; i < len; i++) set(x + i, y, "="); };
+    const box = (x, y) => set(x, y, "B");
+    const drum = (x, y) => set(x, y, "D");
+    const qbox = (x, y, type) => { set(x, y, "?"); items.push({ x: x * T + T / 2, y: y * T + T / 2, type, hidden: true, box: [x, y] }); };
+    const item = (x, y, type) => items.push({ x: x * T + T / 2, y: y * T + T / 2, type });
+    const row = (x, y, n, type) => { for (let i = 0; i < n; i++) item(x + i, y, type); };
+    const fork = (x1, x2) => forklifts.push({ x: x1 * T, y: 11 * T - 22, w: 28, h: 22, min: x1 * T, max: x2 * T, dir: 1, speed: 34 });
+    const check = (x) => checkpoints.push({ x: x * T, hit: false });
+
+    // 1. Yard
+    ground(0, 14);
+    row(5, 10, 3, "rope");
+    qbox(9, 7, "turn");
+    plat(11, 8, 3); row(11, 7, 3, "mesh");
+    // pit 15-16
+    ground(17, 34);
+    drum(20, 10); drum(22, 10); drum(22, 9); item(22, 8, "clamp"); item(20, 9, "clamp");
+    fork(24, 32);
+    plat(27, 7, 4); row(27, 6, 4, "rope");
+    check(33);
+    // pit 35-37 with an arc of parts over it
+    item(35, 8, "rope"); item(36, 7, "turn"); item(37, 8, "rope");
+    // 2. Warehouse
+    ground(38, 60);
+    qbox(41, 7, "mesh"); qbox(42, 7, "clamp"); qbox(43, 7, "turn");
+    box(46, 10); box(47, 10); box(47, 9); item(47, 8, "clamp");
+    plat(50, 8, 3); item(50, 7, "turn");
+    plat(54, 5, 3); row(54, 4, 3, "mesh");
+    fork(52, 59);
+    check(60);
+    // pit 61-63
+    ground(64, 80);
+    drum(66, 10); drum(67, 10); drum(68, 10); drum(68, 9); drum(67, 9); drum(68, 8);
+    item(66, 9, "clamp"); item(67, 8, "rope"); item(68, 7, "rope");
+    plat(71, 7, 5); item(71, 6, "rope"); item(72, 6, "mesh"); item(73, 6, "turn"); item(74, 6, "mesh"); item(75, 6, "clamp");
+    fork(70, 79);
+    // pit 81-82
+    // 3. Substation
+    ground(83, W - 1);
+    qbox(85, 7, "rope"); qbox(86, 7, "mesh");
+    check(88);
+    plat(90, 9, 2); plat(92, 7, 2); item(93, 6, "turn"); item(90, 8, "clamp");
+    for (let y = 0; y < 11; y++) set(W - 1, y, "#");
+    return { W, tiles, items, forklifts, checkpoints, goalX: 97 * T, startX: 2 * T };
+  }
+  const solid = (v) => v === "#" || v === "=" || v === "B" || v === "D" || v === "?" || v === "U";
+
+  /* ---------- State ---------- */
+  let L, P, cam = 0, mode = "intro", got, totals, hearts, timeT, fx, lastCheck, finishT, frameN = 0;
+  const keys = { left: false, right: false, jump: false };
+  let jumpHeld = false, jumpBuffer = 0;
+
+  function reset() {
+    L = buildLevel();
+    totals = { rope: 0, mesh: 0, turn: 0, clamp: 0 };
+    for (const it of L.items) totals[it.type]++;
+    got = { rope: 0, mesh: 0, turn: 0, clamp: 0 };
+    hearts = 3; timeT = 0; fx = []; finishT = 0;
+    lastCheck = L.startX;
+    spawn(L.startX);
+  }
+  function spawn(x) {
+    P = { x, y: 11 * T - 22, w: 10, h: 22, vx: 0, vy: 0, onGround: false, face: 1, coyote: 0, inv: 0, step: 0 };
+    cam = Math.max(0, x - VW / 3);
+  }
+
+  /* ---------- Input: keyboard + on-screen pad (multi-touch) ---------- */
+  const KEYMAP = { ArrowLeft: "left", KeyA: "left", ArrowRight: "right", KeyD: "right", Space: "jump", ArrowUp: "jump", KeyW: "jump", KeyZ: "jump" };
+  addEventListener("keydown", (e) => {
+    const k = KEYMAP[e.code];
+    if (!k) return;
+    if (mode === "play") e.preventDefault();
+    if (k === "jump" && !keys.jump) jumpBuffer = 0.12;
+    keys[k] = true;
+  });
+  addEventListener("keyup", (e) => { const k = KEYMAP[e.code]; if (k) keys[k] = false; });
+  document.querySelectorAll(".ctl").forEach((b) => {
+    const k = b.dataset.key;
+    const on = (e) => {
+      e.preventDefault();
+      if (k === "jump" && !keys.jump) jumpBuffer = 0.12;
+      keys[k] = true; b.classList.add("on");
+      try { b.setPointerCapture(e.pointerId); } catch (_) {}
+      if (navigator.vibrate && k === "jump") { try { navigator.vibrate(8); } catch (_) {} }
+    };
+    const off = (e) => { e.preventDefault(); keys[k] = false; b.classList.remove("on"); };
+    b.addEventListener("pointerdown", on);
+    b.addEventListener("pointerup", off);
+    b.addEventListener("pointercancel", off);
+    b.addEventListener("lostpointercapture", off);
+    b.addEventListener("contextmenu", (e) => e.preventDefault());
+  });
+  // Tapping the screen itself also jumps (handy in landscape)
+  canvas.addEventListener("pointerdown", (e) => { if (mode === "play" && e.pointerType === "touch") { e.preventDefault(); jumpBuffer = 0.12; } });
+  // Stop double-tap zoom and rubber-band scrolling while playing on phones
+  document.addEventListener("touchmove", (e) => { if (mode === "play" && e.target.closest(".pad, #game")) e.preventDefault(); }, { passive: false });
+  document.addEventListener("dblclick", (e) => { if (e.target.closest(".pad, #game")) e.preventDefault(); });
+  addEventListener("blur", () => { keys.left = keys.right = keys.jump = false; document.querySelectorAll(".ctl.on").forEach((b) => b.classList.remove("on")); });
+
+  /* ---------- Physics ---------- */
+  const tileAt = (tx, ty) => {
+    if (ty >= ROWS || ty < 0) return 0;
+    if (tx < 0) return "#";
+    if (tx >= L.W) return "#";
+    return L.tiles[ty][tx];
+  };
+  function moveX(dx) {
+    P.x += dx;
+    const top = Math.floor(P.y / T), bot = Math.floor((P.y + P.h - 1) / T);
+    if (dx > 0) {
+      const tx = Math.floor((P.x + P.w) / T);
+      for (let ty = top; ty <= bot; ty++) if (solid(tileAt(tx, ty))) { P.x = tx * T - P.w - 0.01; P.vx = 0; break; }
+    } else if (dx < 0) {
+      const tx = Math.floor(P.x / T);
+      for (let ty = top; ty <= bot; ty++) if (solid(tileAt(tx, ty))) { P.x = (tx + 1) * T + 0.01; P.vx = 0; break; }
+    }
+  }
+  function moveY(dy) {
+    P.y += dy;
+    const l = Math.floor(P.x / T), r = Math.floor((P.x + P.w - 1) / T);
+    P.onGround = false;
+    if (dy > 0) {
+      const ty = Math.floor((P.y + P.h) / T);
+      for (let tx = l; tx <= r; tx++) if (solid(tileAt(tx, ty))) { P.y = ty * T - P.h; P.vy = 0; P.onGround = true; break; }
+    } else if (dy < 0) {
+      const ty = Math.floor(P.y / T);
+      const cx = Math.floor((P.x + P.w / 2) / T);
+      for (const tx of [cx, l, r].filter((v, i, a) => a.indexOf(v) === i)) {
+        if (solid(tileAt(tx, ty))) { P.y = (ty + 1) * T; P.vy = 20; bump(tx, ty); break; }
+      }
+    }
+  }
+  function bump(tx, ty) {
+    if (L.tiles[ty]?.[tx] !== "?") return;
+    L.tiles[ty][tx] = "U";
+    Sound.sfx("bump");
+    const it = L.items.find((i) => i.box && i.box[0] === tx && i.box[1] === ty);
+    if (it) { it.hidden = false; collect(it, true); }
+    fx.push({ type: "bump", tx, ty, t: 0 });
+  }
+  function collect(it, fromBox) {
+    if (it.taken) return;
+    it.taken = true;
+    got[it.type]++;
+    Sound.sfx("pickup");
+    fx.push({ type: "pickup", x: it.x, y: fromBox ? it.y - T : it.y, part: it.type, t: 0 });
+  }
+  function hurt(fell) {
+    if (P.inv > 0 && !fell) return;
+    hearts--;
+    fx.push({ type: "flash", t: 0 });
+    Sound.sfx("hurt");
+    if (hearts <= 0) return gameOver();
+    if (fell) { spawn(lastCheck); P.inv = 1.2; }
+    else { P.inv = 1.5; P.vy = -190; P.vx = -P.face * 110; }
+  }
+
+  function update(dt) {
+    timeT += dt;
+    const dir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
+    if (dir) { P.vx += dir * ACC * dt; P.face = dir; }
+    else { const f = FRICTION * dt; P.vx = Math.abs(P.vx) <= f ? 0 : P.vx - Math.sign(P.vx) * f; }
+    P.vx = Math.max(-RUN, Math.min(RUN, P.vx));
+    P.coyote = P.onGround ? 0.09 : Math.max(0, P.coyote - dt);
+    jumpBuffer = Math.max(0, jumpBuffer - dt);
+    if (jumpBuffer > 0 && P.coyote > 0) { P.vy = JUMP_V; P.coyote = 0; jumpBuffer = 0; P.onGround = false; jumpHeld = true; Sound.sfx("jump"); }
+    if (!keys.jump && jumpHeld && P.vy < JUMP_CUT) P.vy = JUMP_CUT;
+    if (!keys.jump) jumpHeld = false;
+    P.vy = Math.min(P.vy + GRAV * dt, MAX_FALL);
+
+    moveX(P.vx * dt);
+    moveY(P.vy * dt);
+    if (P.x < 0) P.x = 0;
+    P.inv = Math.max(0, P.inv - dt);
+    P.step += Math.abs(P.vx) * dt;
+
+    if (P.y > VH + 20) return hurt(true);
+
+    for (const it of L.items) {
+      if (it.taken || it.hidden) continue;
+      if (Math.abs(P.x + P.w / 2 - it.x) < P.w / 2 + 6 && Math.abs(P.y + P.h / 2 - it.y) < P.h / 2 + 6) collect(it);
+    }
+    for (const f of L.forklifts) {
+      if (P.x < f.x + f.w - 3 && P.x + P.w > f.x + 3 && P.y < f.y + f.h && P.y + P.h > f.y + 4) {
+        P.face = P.x + P.w / 2 < f.x + f.w / 2 ? 1 : -1; hurt(false);
+      }
+    }
+    for (const c of L.checkpoints) if (!c.hit && P.x > c.x) { c.hit = true; lastCheck = c.x; Sound.sfx("check"); fx.push({ type: "check", x: c.x, t: 0 }); }
+    if (P.x > L.goalX) finish();
+  }
+  function moveForklifts(dt) {
+    for (const f of L.forklifts) {
+      f.x += f.dir * f.speed * dt;
+      if (f.x < f.min) { f.x = f.min; f.dir = 1; }
+      if (f.x > f.max) { f.x = f.max; f.dir = -1; }
+    }
+  }
+  function follow(dt, target) {
+    cam += (target - cam) * Math.min(1, dt * 6);
+    cam = Math.max(0, Math.min(cam, L.W * T - VW));
+  }
+
+  /* ---------- End states ---------- */
+  const sumGot = () => ORDER.reduce((s, t) => s + got[t], 0);
+  const sumAll = () => ORDER.reduce((s, t) => s + totals[t], 0);
+  function finish() {
+    mode = "finish"; finishT = 0;
+    Sound.stopMusic(); Sound.sfx("win");
+    keys.left = keys.right = keys.jump = false;
+    setTimeout(() => showEnd(true), reduceMotion ? 300 : 2600);
+  }
+  function gameOver() { mode = "over"; Sound.stopMusic(); Sound.sfx("over"); setTimeout(() => showEnd(false), 600); }
+
+  function partTile(t, value) {
+    const d = document.createElement("div"); d.className = "part";
+    const c = document.createElement("canvas"); c.width = 12; c.height = 12;
+    const g = c.getContext("2d"); const s = spr(t); g.drawImage(s, Math.floor((12 - s.width) / 2), Math.floor((12 - s.height) / 2));
+    d.append(c);
+    if (value) { const b = document.createElement("b"); b.textContent = value; d.append(b); }
+    const sp = document.createElement("span"); sp.textContent = PARTS[t].name; d.append(sp);
+    return d;
+  }
+  function showEnd(win) {
+    document.body.classList.remove("playing");
+    const share = sumGot() / sumAll();
+    const stars = !win ? 0 : share >= 0.9 && hearts === 3 ? 3 : share >= 0.6 ? 2 : 1;
+    const score = sumGot() * 100 + (win ? hearts * 200 + Math.max(0, Math.round(150 - timeT)) * 5 : 0);
+    $("endKicker").textContent = win ? `Время ${Math.round(timeT)} с · ${score} очков` : `${score} очков`;
+    $("endTitle").textContent = win
+      ? (share === 1 ? "Полный комплект! Подстанция закрыта" : "Подстанция закрыта куполом")
+      : "Game over: жизни закончились";
+    $("stars").innerHTML = win ? [0, 1, 2].map((i) => `<span class="${i < stars ? "" : "off"}">★</span>`).join("") : "";
+    $("endText").textContent = win
+      ? `Собрано ${sumGot()} из ${sumAll()} деталей. ${share === 1 ? "Ничего не пропустили." : "Часть деталей осталась на дороге, поэтому купол вышел не таким плотным."}`
+      : `Вы собрали ${sumGot()} из ${sumAll()} деталей, но до подстанции не дошли.`;
+    const parts = $("endParts"); parts.innerHTML = "";
+    for (const t of ORDER) parts.append(partTile(t, `${got[t]}/${totals[t]}`));
+    $("endSay").innerHTML = `<span class="say__name">Владислав</span>`;
+    $("endSay").append(win
+      ? "В жизни бегать по промзоне не нужно: пришлите размеры объекта, и я соберу комплект троса, сетки, талрепов и зажимов за час."
+      : "Ничего, попробуйте ещё раз. А реальный комплект я посчитаю без погрузчиков — пришлите размеры объекта.");
+    const btns = $("endBtns"); btns.innerHTML = "";
+    const add = (label, cls, fn, href) => {
+      const el = document.createElement(href ? "a" : "button");
+      el.className = "btn " + cls; el.textContent = label;
+      if (href) { el.href = href; el.target = "_blank"; el.rel = "noopener"; } else { el.type = "button"; el.addEventListener("click", fn); }
+      btns.append(el); return el;
+    };
+    if (win) {
+      add("Заказать расчёт", "btn-main", null, LEAD_URL).focus();
+      add("Telegram", "btn-dark", null, TELEGRAM);
+      add("↻ Ещё раз", "btn-ghost", start);
+      add("Натяни трос", "btn-ghost", null, ARCADE_URL);
+    } else {
+      add("↻ Ещё раз", "btn-main", start).focus();
+      add("Заказать расчёт", "btn-ghost", null, LEAD_URL);
+    }
+    $("ov-end").hidden = false;
+  }
+
+  function start() {
+    reset();
+    $("ov-intro").hidden = true;
+    $("ov-end").hidden = true;
+    mode = "play";
+    document.body.classList.add("playing");
+    Sound.stopMusic(); Sound.startMusic();
+    if (coarse) $("screen").scrollIntoView({ block: "start", behavior: "auto" });
+  }
+  $("startBtn").addEventListener("click", start);
+
+  /* ---------- Drawing (whole pixels only) ---------- */
+  const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); };
+  function pixLine(x0, y0, x1, y1, c) {
+    x0 = Math.round(x0); y0 = Math.round(y0); x1 = Math.round(x1); y1 = Math.round(y1);
+    const dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1, dy = -Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+    let err = dx + dy; ctx.fillStyle = c;
+    for (;;) { ctx.fillRect(x0, y0, 1, 1); if (x0 === x1 && y0 === y1) break; const e2 = 2 * err; if (e2 >= dy) { err += dy; x0 += sx; } if (e2 <= dx) { err += dx; y0 += sy; } }
+  }
+  function text(str, x, y, color, align = "left") {
+    ctx.font = "8px 'Press Start 2P', monospace"; ctx.textAlign = align; ctx.textBaseline = "top";
+    ctx.fillStyle = "#10171c"; ctx.fillText(str, x + 1, y + 1);
+    ctx.fillStyle = color; ctx.fillText(str, x, y);
+  }
+
+  function drawBackground() {
+    // banded 8-bit sky
+    const bands = ["#5ea8d6", "#6fb4de", "#82c0e4", "#97cce9", "#aed8ee"];
+    bands.forEach((c, i) => R(0, i * 30, VW, 30, c));
+    R(0, 150, VW, VH - 150, "#aed8ee");
+    // clouds
+    const co = Math.floor(-(cam * 0.1) % 400);
+    for (let k = -1; k < 3; k++) {
+      const x = co + k * 400;
+      for (const [cx, cy] of [[40, 30], [210, 50], [330, 22]]) {
+        R(x + cx, cy, 30, 6, "#ffffff"); R(x + cx + 6, cy - 4, 18, 4, "#ffffff"); R(x + cx + 4, cy + 6, 22, 2, "#d8ecf6");
+      }
+    }
+    // far skyline
+    const o1 = Math.floor(-(cam * 0.25) % 160);
+    for (let k = -1; k < 4; k++) {
+      const x = o1 + k * 160;
+      R(x + 6, 110, 34, 66, "#7fa9c2"); R(x + 46, 128, 50, 48, "#7fa9c2"); R(x + 104, 92, 18, 84, "#7fa9c2"); R(x + 110, 74, 6, 18, "#7fa9c2"); R(x + 128, 120, 26, 56, "#7fa9c2");
+      for (let wy = 116; wy < 170; wy += 8) R(x + 12, wy, 3, 3, "#9cc2d6");
+    }
+    // near hangars + pylons
+    const o2 = Math.floor(-(cam * 0.5) % 200);
+    for (let k = -1; k < 3; k++) {
+      const x = o2 + k * 200;
+      R(x + 10, 140, 76, 36, "#6a95ad");
+      for (let i = 0; i < 38; i++) R(x + 10 + i, 140 - Math.floor(i / 3), 76 - i * 2, 1, "#6a95ad");
+      R(x + 110, 150, 48, 26, "#6a95ad");
+      pixLine(x + 176, 176, x + 184, 110, "#6a95ad"); pixLine(x + 192, 176, x + 184, 110, "#6a95ad"); pixLine(x + 176, 122, x + 192, 122, "#6a95ad");
+    }
+  }
+
+  function drawTiles() {
+    const x0 = Math.max(0, Math.floor(cam / T)), x1 = Math.min(L.W - 1, x0 + Math.ceil(VW / T) + 1);
+    for (let ty = 0; ty < ROWS; ty++) for (let tx = x0; tx <= x1; tx++) {
+      const v = L.tiles[ty][tx];
+      if (!v) continue;
+      const x = Math.round(tx * T - cam), y = ty * T;
+      let by = 0;
+      for (const f of fx) if (f.type === "bump" && f.tx === tx && f.ty === ty) by = -Math.round(Math.sin(Math.min(1, f.t / 0.2) * Math.PI) * 4);
+      if (v === "#") {
+        const top = !L.tiles[ty - 1]?.[tx];
+        R(x, y, T, T, "#7d8a92");
+        if (top) { R(x, y, T, 2, "#3d4b55"); R(x, y + 2, T, 1, "#a9b6bd"); if (tx % 3 === 0) R(x + 4, y, 6, 1, "#f2b705"); }
+        R(x + ((tx * 5) % 11), y + 6 + ((tx * 3) % 7), 2, 1, "#66737b");
+        R(x + ((tx * 7 + 4) % 13), y + 11, 1, 1, "#66737b");
+      } else if (v === "=") {
+        for (let i = 0; i < T; i++) R(x + i, y, 1, 3, ((i + tx * 2) >> 2) % 2 ? "#10171c" : "#f2b705");
+        R(x, y + 3, T, 3, "#4d5d68"); R(x, y + 3, T, 1, "#7d8f9a");
+        pixLine(x + 1, y + 11, x + 7, y + 6, "#3d4b55"); pixLine(x + 8, y + 6, x + 14, y + 11, "#3d4b55"); R(x, y + 11, T, 1, "#3d4b55");
+      } else if (v === "B") {
+        R(x, y, T, T, "#7c5a2f"); R(x + 1, y + 1, T - 2, T - 2, "#c08a4a");
+        R(x + 1, y + 5, T - 2, 1, "#7c5a2f"); R(x + 1, y + 10, T - 2, 1, "#7c5a2f");
+        R(x + 3, y + 2, 1, 1, "#e0b070"); R(x + 10, y + 7, 1, 1, "#e0b070");
+      } else if (v === "D") {
+        R(x, y, T, T, "#10171c"); R(x + 1, y + 1, 3, T - 2, "#3c6d8f"); R(x + T - 4, y + 1, 3, T - 2, "#3c6d8f");
+        R(x + 4, y + 3, T - 8, T - 6, "#b9c6cd");
+        for (let i = 5; i < T - 4; i += 2) R(x + i, y + 3, 1, T - 6, "#7d8f9a");
+        R(x + 1, y + 1, 3, 1, "#5d8fb0"); R(x + T - 4, y + 1, 3, 1, "#5d8fb0");
+      } else if (v === "?" || v === "U") {
+        const yy = y + by;
+        R(x, yy, T, T, "#10171c");
+        R(x + 1, yy + 1, T - 2, T - 2, v === "?" ? "#f2b705" : "#7d8f9a");
+        R(x + 1, yy + 1, T - 2, 1, v === "?" ? "#ffd95a" : "#9fb0bd");
+        for (const [a, b] of [[2, 2], [13, 2], [2, 13], [13, 13]]) R(x + a, yy + b, 1, 1, "#10171c");
+        if (v === "?" && (frameN >> 4) % 4 !== 3) ctx.drawImage(spr("q"), x + 5, yy + 4);
+      }
+    }
+  }
+
+  function drawCheckpoints() {
+    for (const c of L.checkpoints) {
+      const x = Math.round(c.x - cam); if (x < -20 || x > VW + 20) continue;
+      R(x, 150, 1, 26, "#4d5d68");
+      R(x + 1, 150, 8, 5, c.hit ? "#2e8b57" : "#9fb0bd"); R(x + 1, 155, 5, 1, c.hit ? "#2e8b57" : "#9fb0bd");
+      ctx.drawImage(spr("cone"), x - 4, 168);
+    }
+  }
+
+  function drawGoal() {
+    const gx = Math.round(L.goalX - cam + 20), base = 176;
+    if (gx > VW + 160) return;
+    for (let i = 0; i <= 10; i++) R(gx - 10 + i * 12, base - 14, 1, 14, "#7d8f9a");
+    R(gx - 10, base - 12, 121, 1, "#7d8f9a"); R(gx - 10, base - 6, 121, 1, "#7d8f9a");
+    // transformer
+    R(gx + 10, base - 36, 36, 36, "#10171c"); R(gx + 11, base - 35, 34, 35, "#6b7b86");
+    for (let i = 0; i < 6; i++) R(gx + 13 + i * 5, base - 31, 3, 28, "#a9b7bf");
+    for (const ix of [15, 25, 35]) { R(gx + ix, base - 44, 4, 8, "#c9a227"); R(gx + ix, base - 44, 4, 1, "#10171c"); }
+    // portal
+    R(gx + 60, base - 60, 3, 60, "#6b7b86"); R(gx + 100, base - 60, 3, 60, "#6b7b86"); R(gx + 60, base - 60, 43, 3, "#6b7b86");
+    pixLine(gx + 63, base - 52, gx + 100, base - 52, "#4d5d68");
+    // sign
+    R(gx - 34, base - 36, 30, 16, "#10171c"); R(gx - 20, base - 20, 2, 20, "#4d5d68");
+    ctx.font = "8px 'Press Start 2P', monospace"; ctx.textAlign = "center"; ctx.textBaseline = "top"; ctx.fillStyle = "#f2b705";
+    ctx.fillText("ПС", gx - 19, base - 32);
+
+    if (mode === "finish" || mode === "done") {
+      const k = reduceMotion ? 1 : Math.min(1, finishT / 1.8);
+      const share = sumGot() / sumAll();
+      const cx = gx + 55, r = 76;
+      const col = "#10171c", mesh = share > .6 ? "#f2b705" : "#c98f00";
+      // dome outline, drawn pixel by pixel and rising with k
+      for (let a = 0; a <= 180; a += 0.6) {
+        const rad = Math.PI + (a / 180) * Math.PI;
+        const px = cx + Math.cos(rad) * r, py = base + Math.sin(rad) * r;
+        if (base - py <= r * k) { R(px, py, 2, 2, col); }
+      }
+      const n = 3 + Math.round(9 * share);
+      for (let i = 1; i < n; i++) {
+        const rad = Math.PI + (Math.PI * i) / n;
+        const ex = cx + Math.cos(rad) * r, ey = base + Math.sin(rad) * r;
+        const ty = Math.max(ey, base - r * k);
+        const t = (base - ty) / (base - ey || 1);
+        pixLine(cx, base, cx + (ex - cx) * t, base + (ey - base) * t, mesh);
+      }
+      for (let j = 1; j < n / 2; j++) {
+        const rr = (r * j) / (n / 2);
+        for (let a = 0; a <= 180; a += 2) {
+          const rad = Math.PI + (a / 180) * Math.PI;
+          const py = base + Math.sin(rad) * rr;
+          if (base - py <= r * k) R(cx + Math.cos(rad) * rr, py, 1, 1, mesh);
+        }
+      }
+    }
+  }
+
+  function drawForklift(f) {
+    const x = Math.round(f.x - cam), y = Math.round(f.y);
+    if (x < -40 || x > VW + 40) return;
+    const flip = f.dir < 0;
+    const X = (dx, w) => (flip ? x + f.w - dx - w : x + dx);
+    R(X(2, 20), y + 8, 20, 9, "#10171c"); R(X(3, 18), y + 9, 18, 7, "#e06200"); R(X(3, 18), y + 9, 18, 1, "#ff8a3d");
+    R(X(5, 1), y, 1, 9, "#10171c"); R(X(15, 1), y, 1, 9, "#10171c"); R(X(5, 11), y, 11, 1, "#10171c");
+    R(X(7, 7), y + 2, 7, 5, "#9fd0e8");
+    R(X(22, 2), y - 2, 2, 20, "#4d5d68"); R(X(22, 6), y + 17, 6, 2, "#4d5d68");
+    R(X(8, 2), y - 2, 2, 2, (frameN >> 3) % 2 ? "#f2b705" : "#ffe27a");
+    for (const wx of [4, 15]) { R(X(wx, 5), y + 16, 5, 5, "#10171c"); R(X(wx + 2, 1), y + 18, 1, 1, "#7d8f9a"); }
+  }
+
+  function drawItems() {
+    for (const it of L.items) {
+      if (it.taken || it.hidden) continue;
+      const x = Math.round(it.x - cam); if (x < -12 || x > VW + 12) continue;
+      const bob = reduceMotion ? 0 : ((frameN >> 4) % 2);
+      const s = spr(it.type);
+      ctx.drawImage(s, x - (s.width >> 1), Math.round(it.y - (s.height >> 1)) - bob);
+    }
+  }
+
+  function drawPlayer() {
+    if (P.inv > 0 && (frameN >> 2) % 2 && mode === "play") return;
+    const flip = P.face < 0;
+    const x = Math.round(P.x - cam) - 1, y = Math.round(P.y);
+    const moving = Math.abs(P.vx) > 15 && P.onGround;
+    let legs = "legsStand";
+    if (!P.onGround) legs = "legsJump";
+    else if (moving) legs = (Math.floor(P.step / 6) % 2) ? "legsRun1" : "legsRun2";
+    const bodyBob = moving && legs === "legsRun2" ? 1 : 0;
+    ctx.drawImage(spr("head", flip), x, y + bodyBob - 1);
+    ctx.drawImage(spr("body", flip), x, y + 8 + bodyBob);
+    ctx.drawImage(spr(legs, flip), x, y + 15 + (legs === "legsStand" ? 1 : 0));
+  }
+
+  function drawFx(dt) {
+    fx = fx.filter((f) => (f.t += dt) < (f.type === "check" ? 1.2 : f.type === "bump" ? 0.25 : f.type === "flash" ? 0.25 : 0.9));
+    for (const f of fx) {
+      if (f.type === "pickup") {
+        const k = f.t / 0.9, x = Math.round(f.x - cam), y = Math.round(f.y - k * 22);
+        if ((frameN >> 1) % 2 || k < 0.5) { const s = spr(f.part); ctx.drawImage(s, x - (s.width >> 1), y - (s.height >> 1)); }
+        text("+1", x, y - 16, "#ffffff", "center");
+      } else if (f.type === "check") {
+        text("ТОЧКА!", Math.round(f.x - cam), 136 - Math.round(f.t * 10), "#7ee2a8", "center");
+      } else if (f.type === "flash") {
+        ctx.fillStyle = "rgba(176,58,26,.35)"; ctx.fillRect(0, 0, VW, VH);
+      }
+    }
+  }
+
+  function drawHud() {
+    R(0, 0, VW, 15, "rgba(16,23,28,.78)");
+    for (let i = 0; i < 3; i++) ctx.drawImage(spr(i < hearts ? "heart" : "heartOff"), 4 + i * 9, 4);
+    let x = 36;
+    for (const t of ORDER) {
+      const s = spr(t);
+      ctx.drawImage(s, x, 2 + Math.floor((12 - s.height) / 2));
+      text(`${got[t]}/${totals[t]}`, x + 14, 4, got[t] === totals[t] ? "#f2b705" : "#eef2f4");
+      x += 14 + `${got[t]}/${totals[t]}`.length * 8 + 6;
+    }
+    // route progress to the substation
+    const k = Math.min(1, P.x / L.goalX);
+    R(0, 15, VW, 2, "#10171c"); R(0, 15, Math.round(VW * k), 2, "#f2b705");
+  }
+
+  function drawScene(dt) {
+    drawBackground(); drawCheckpoints(); drawGoal(); drawTiles(); drawItems();
+    for (const f of L.forklifts) drawForklift(f);
+    drawPlayer(); drawFx(dt); drawHud();
+  }
+
+  /* ---------- Loop ---------- */
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.033, (now - last) / 1000); last = now; frameN++;
+    if (!document.hidden) {
+      if (mode === "play") { moveForklifts(dt); update(dt); follow(dt, P.x - VW / 3); }
+      else if (mode === "finish") {
+        finishT += dt;
+        P.vx = 45; P.face = 1; P.vy = Math.min(P.vy + GRAV * dt, MAX_FALL); moveX(P.vx * dt); moveY(P.vy * dt); P.step += P.vx * dt;
+        follow(dt * 0.4, L.W * T - VW);
+        if (finishT > 3) mode = "done";
+      } else if (mode === "intro") { moveForklifts(dt); cam = (Math.sin(now / 6000) * 0.5 + 0.5) * 220; }
+      else if (mode === "done") { finishT += dt; }
+      drawScene(dt);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // Intro + avatar art
+  for (const t of ORDER) $("introParts").append(partTile(t));
+  document.querySelectorAll("[data-face]").forEach((el) => {
+    const c = document.createElement("canvas"); c.width = 16; c.height = 16; c.getContext("2d").drawImage(spr("face"), 0, 0); el.append(c);
+  });
+  $("controlsHelp").textContent = coarse
+    ? "Управление: кнопки ◀ ▶ под игрой, «Прыжок» справа. Держите прыжок дольше — прыгнете выше. Можно тапнуть по экрану."
+    : "Управление: ← → или A D — бег, пробел, ↑ или W — прыжок. Держите прыжок дольше — прыгнете выше.";
+
+  reset();
+  if (document.fonts && document.fonts.load) document.fonts.load("8px 'Press Start 2P'").catch(() => {});
+  requestAnimationFrame(frame);
+
+  // Test hook for automated checks: open the page with #debug
+  if (location.hash === "#debug") window.__game = { get P() { return P; }, get L() { return L; }, get mode() { return mode; }, got: () => got };
+})();
+</script>
+</body>
+</html>
