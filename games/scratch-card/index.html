@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Постриги альпаку</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Скретч-карта с альпакой: сотри шерсть и узнай свой приз">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Layout: one centered column; the card is a wool-covered alpaca you "shear" to reveal the prize */
+  :root {
+    --bg: #ece7f6;
+    --bg-deep: #ddd4ef;
+    --fg: #23204a;
+    --muted: #625d8a;
+    --card: #ffffff;
+    --wool: #f6efe3;
+    --wool-shade: #e3d6c1;
+    --accent: #d93a72;      /* pompom pink, from Andean tassels */
+    --accent-2: #f2b631;    /* saffron thread */
+    --line: rgba(35, 32, 74, .12);
+    --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+    --font-body: "Manrope", "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17152e; --bg-deep: #211e40; --fg: #f1edff; --muted: #a9a3d0;
+      --card: #24214a; --wool: #efe6d6; --wool-shade: #cdbfa6;
+      --accent: #ff5a8f; --accent-2: #ffc845; --line: rgba(241, 237, 255, .14);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17152e; --bg-deep: #211e40; --fg: #f1edff; --muted: #a9a3d0;
+    --card: #24214a; --wool: #efe6d6; --wool-shade: #cdbfa6;
+    --accent: #ff5a8f; --accent-2: #ffc845; --line: rgba(241, 237, 255, .14);
+    color-scheme: dark;
+  }
+
+  html, body { min-height: 100%; }
+  body {
+    background:
+      radial-gradient(1200px 600px at 50% -10%, var(--bg-deep), transparent 70%),
+      var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 32px 48px;
+  }
+  .wrap {
+    max-width: 440px;
+    margin: 0 auto;
+    display: grid;
+    gap: 20px;
+    justify-items: center;
+    text-align: center;
+  }
+  .eyebrow {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(28px, 8vw, 40px);
+    line-height: 1.05;
+    margin: 6px 0 0;
+    text-wrap: balance;
+  }
+  .lead { margin: 10px 0 0; color: var(--muted); max-width: 34ch; }
+
+  /* Card */
+  .stage { position: relative; width: 100%; max-width: 360px; padding-top: 70px; }
+  .alpaca-head {
+    position: absolute;
+    top: 0; left: 50%;
+    width: 150px;
+    transform: translateX(-50%);
+    z-index: 3;
+    pointer-events: none;
+    transition: transform .5s cubic-bezier(.3,1.6,.5,1);
+  }
+  .stage.revealed .alpaca-head { transform: translateX(-50%) translateY(-8px) rotate(-4deg); }
+  .card {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    max-width: 100%;
+    border-radius: 28px;
+    background: var(--card);
+    box-shadow: 0 2px 0 var(--line), 0 24px 60px -24px rgba(35, 20, 80, .45);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .prize {
+    position: absolute; inset: 0;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 10px;
+    padding: 28px 22px;
+    background:
+      repeating-linear-gradient(135deg, transparent 0 14px, color-mix(in srgb, var(--accent-2) 14%, transparent) 14px 16px),
+      var(--card);
+  }
+  .prize__label { font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0; }
+  .prize__title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(34px, 11vw, 52px);
+    line-height: 1;
+    color: var(--accent);
+    margin: 0;
+  }
+  .prize__text { margin: 0; color: var(--fg); max-width: 26ch; font-weight: 600; }
+  .code {
+    margin-top: 8px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 6px 6px 16px;
+    border: 2px dashed var(--accent);
+    border-radius: 14px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: .06em;
+    font-variant-numeric: tabular-nums;
+  }
+  .code[hidden] { display: none !important; }
+  canvas.scratch {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    touch-action: none;
+    cursor: grab;
+    z-index: 2;
+    transition: opacity .6s ease;
+  }
+  canvas.scratch:active { cursor: grabbing; }
+  .stage.revealed canvas.scratch { opacity: 0; pointer-events: none; }
+
+  /* Progress */
+  .meter { width: 100%; max-width: 360px; display: grid; gap: 6px; }
+  .meter__row { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .meter__bar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+  .meter__fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-2), var(--accent)); border-radius: inherit; transition: width .2s ease; }
+
+  /* Buttons */
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  button {
+    font: inherit;
+    font-weight: 700;
+    border: 0;
+    border-radius: 14px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: transform .12s ease, background-color .2s ease;
+  }
+  button:active { transform: translateY(1px) scale(.98); }
+  button:focus-visible { outline: 3px solid var(--accent-2); outline-offset: 3px; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-ghost { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 2px var(--line); }
+  .btn-copy { padding: 8px 12px; border-radius: 10px; font-size: 13px; background: var(--accent); color: #fff; font-family: var(--font-body); letter-spacing: 0; }
+
+  .note { font-size: 12px; color: var(--muted); margin: 0; max-width: 36ch; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 20; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .alpaca-head, canvas.scratch, .meter__fill { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<main class="wrap">
+  <header>
+    <p class="eyebrow">Альпака-календарь · мини-игра</p>
+    <h1>Постриги альпаку</h1>
+    <p class="lead">Под густой шерстью спрятан приз. Сотри шерсть пальцем или мышкой.</p>
+  </header>
+
+  <div class="stage" id="stage">
+    <svg class="alpaca-head" viewBox="0 0 150 110" aria-hidden="true">
+      <!-- ears -->
+      <path d="M44 34 C38 10 46 2 54 6 C60 10 60 26 58 38 Z" fill="var(--wool-shade)"/>
+      <path d="M106 34 C112 10 104 2 96 6 C90 10 90 26 92 38 Z" fill="var(--wool-shade)"/>
+      <path d="M48 32 C45 16 49 10 53 12 C56 15 56 26 55 34 Z" fill="var(--accent)" opacity=".55"/>
+      <path d="M102 32 C105 16 101 10 97 12 C94 15 94 26 95 34 Z" fill="var(--accent)" opacity=".55"/>
+      <!-- head -->
+      <ellipse cx="75" cy="66" rx="36" ry="40" fill="var(--wool)"/>
+      <!-- fluffy fringe -->
+      <g fill="var(--wool)">
+        <circle cx="54" cy="34" r="12"/><circle cx="66" cy="27" r="13"/><circle cx="80" cy="26" r="13"/>
+        <circle cx="94" cy="33" r="12"/><circle cx="73" cy="36" r="12"/>
+      </g>
+      <!-- pompom -->
+      <circle cx="75" cy="18" r="7" fill="var(--accent)"/>
+      <circle cx="75" cy="18" r="3" fill="var(--accent-2)"/>
+      <!-- eyes -->
+      <ellipse cx="62" cy="62" rx="5" ry="6" fill="#23204a"/>
+      <ellipse cx="88" cy="62" rx="5" ry="6" fill="#23204a"/>
+      <circle cx="63.6" cy="60" r="1.7" fill="#fff"/>
+      <circle cx="89.6" cy="60" r="1.7" fill="#fff"/>
+      <!-- cheeks -->
+      <ellipse cx="54" cy="76" rx="6" ry="4" fill="var(--accent)" opacity=".35"/>
+      <ellipse cx="96" cy="76" rx="6" ry="4" fill="var(--accent)" opacity=".35"/>
+      <!-- muzzle -->
+      <ellipse cx="75" cy="84" rx="16" ry="12" fill="var(--wool-shade)"/>
+      <path d="M70 80 Q75 84 80 80" stroke="#23204a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      <path d="M75 83 L75 88 M69 90 Q75 95 81 90" stroke="#23204a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    </svg>
+
+    <div class="card">
+      <div class="prize" id="prize" aria-live="polite">
+        <p class="prize__label">Твой приз</p>
+        <p class="prize__title" id="prizeTitle">−15%</p>
+        <p class="prize__text" id="prizeText">на всё в магазине до конца месяца</p>
+        <div class="code" id="codeBox">
+          <span id="codeText">ALPACA15</span>
+          <button class="btn-copy" id="copyBtn" type="button">Скопировать</button>
+        </div>
+      </div>
+      <canvas class="scratch" id="scratch" aria-label="Шерсть альпаки. Проведи по ней, чтобы открыть приз." role="img"></canvas>
+    </div>
+  </div>
+
+  <div class="meter" aria-hidden="true">
+    <div class="meter__row"><span>Шерсти состригли</span><span id="pct">0%</span></div>
+    <div class="meter__bar"><div class="meter__fill" id="fill"></div></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-ghost" id="revealBtn" type="button">Открыть сразу</button>
+    <button class="btn-primary" id="againBtn" type="button">Новая карта</button>
+  </div>
+
+  <p class="note">Демо: призы и промокоды примерные, выпадают случайно и нигде не сохраняются.</p>
+  <p class="sr-only" id="status" aria-live="polite"></p>
+</main>
+
+<canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
+
+<script>
+(() => {
+  const PRIZES = [
+    { w: 30, title: "−10%",      text: "на следующий заказ",                     code: "ALPACA10" },
+    { w: 20, title: "−15%",      text: "на всё в магазине до конца месяца",      code: "ALPACA15" },
+    { w: 15, title: "Доставка",  text: "бесплатная, при любой сумме заказа",     code: "LAMAGO" },
+    { w: 10, title: "Подарок",   text: "плюшевая альпака к заказу от 3000 ₽",    code: "FLUFFY" },
+    { w:  5, title: "−30%",      text: "редкая удача: скидка на одну позицию",   code: "WOOL30" },
+    { w: 20, title: "Почти!",    text: "в этот раз пусто, но альпака стала стройнее. Попробуй ещё", code: null },
+  ];
+  const REVEAL_AT = 0.55;
+
+  const stage = document.getElementById("stage");
+  const canvas = document.getElementById("scratch");
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  const $ = (id) => document.getElementById(id);
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  let revealed = false, drawing = false, last = null, moves = 0, dpr = 1;
+
+  function pickPrize() {
+    const total = PRIZES.reduce((s, p) => s + p.w, 0);
+    let r = Math.random() * total;
+    for (const p of PRIZES) { if ((r -= p.w) < 0) return p; }
+    return PRIZES[0];
+  }
+
+  function setPrize(p) {
+    $("prizeTitle").textContent = p.title;
+    $("prizeText").textContent = p.text;
+    $("codeBox").hidden = !p.code;
+    $("codeText").textContent = p.code || "";
+    $("copyBtn").textContent = "Скопировать";
+  }
+
+  // Wool texture: layered curls in two wool tones
+  function paintWool() {
+    const rect = canvas.getBoundingClientRect();
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    const W = canvas.width, H = canvas.height;
+    const css = getComputedStyle(document.documentElement);
+    const wool = css.getPropertyValue("--wool").trim() || "#f6efe3";
+    const shade = css.getPropertyValue("--wool-shade").trim() || "#e3d6c1";
+    const ink = css.getPropertyValue("--fg").trim() || "#23204a";
+
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = wool;
+    ctx.fillRect(0, 0, W, H);
+
+    const r0 = 16 * dpr;
+    for (let y = -r0; y < H + r0; y += r0 * 0.9) {
+      for (let x = -r0; x < W + r0; x += r0 * 1.05) {
+        const jx = x + (Math.random() - .5) * r0 * .6 + ((y / r0) % 2 ? r0 * .5 : 0);
+        const jy = y + (Math.random() - .5) * r0 * .5;
+        const r = r0 * (0.75 + Math.random() * 0.45);
+        ctx.fillStyle = shade;
+        ctx.beginPath(); ctx.arc(jx + r * .18, jy + r * .22, r, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = wool;
+        ctx.beginPath(); ctx.arc(jx, jy, r * .92, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = shade; ctx.lineWidth = 1.6 * dpr; ctx.lineCap = "round";
+        ctx.beginPath(); ctx.arc(jx, jy, r * .45, Math.PI * .9, Math.PI * 1.9); ctx.stroke();
+      }
+    }
+
+    // Label on the wool
+    ctx.fillStyle = ink;
+    ctx.globalAlpha = .85;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = `800 ${Math.round(22 * dpr)}px Unbounded, "Arial Black", sans-serif`;
+    ctx.fillText("Сотри шерсть", W / 2, H / 2 - 14 * dpr);
+    ctx.font = `600 ${Math.round(14 * dpr)}px Manrope, system-ui, sans-serif`;
+    ctx.fillText("✂  проведи пальцем  ✂", W / 2, H / 2 + 18 * dpr);
+    ctx.globalAlpha = 1;
+  }
+
+  function scratchLine(a, b) {
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.lineWidth = 46 * dpr;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+  }
+
+  function pointFrom(e) {
+    const r = canvas.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * dpr, y: (e.clientY - r.top) * dpr };
+  }
+
+  function clearedShare() {
+    const { width: W, height: H } = canvas;
+    const data = ctx.getImageData(0, 0, W, H).data;
+    const step = 8; let clear = 0, total = 0;
+    for (let y = 0; y < H; y += step) {
+      for (let x = 0; x < W; x += step) {
+        total++;
+        if (data[(y * W + x) * 4 + 3] < 128) clear++;
+      }
+    }
+    return clear / total;
+  }
+
+  function updateMeter() {
+    if (revealed) return;
+    const share = clearedShare();
+    const pct = Math.min(100, Math.round(share * 100));
+    $("pct").textContent = pct + "%";
+    $("fill").style.width = pct + "%";
+    if (share >= REVEAL_AT) reveal();
+  }
+
+  function reveal() {
+    if (revealed) return;
+    revealed = true;
+    stage.classList.add("revealed");
+    $("pct").textContent = "100%";
+    $("fill").style.width = "100%";
+    const title = $("prizeTitle").textContent;
+    $("status").textContent = "Приз открыт: " + title + ". " + $("prizeText").textContent;
+    if (!$("codeBox").hidden) confetti();
+  }
+
+  canvas.addEventListener("pointerdown", (e) => {
+    if (revealed) return;
+    drawing = true; last = pointFrom(e);
+    canvas.setPointerCapture(e.pointerId);
+    scratchLine(last, { x: last.x + .1, y: last.y + .1 });
+  });
+  canvas.addEventListener("pointermove", (e) => {
+    if (!drawing || revealed) return;
+    const p = pointFrom(e);
+    scratchLine(last, p); last = p;
+    if (++moves % 8 === 0) updateMeter();
+  });
+  const stop = () => { if (drawing) { drawing = false; updateMeter(); } };
+  canvas.addEventListener("pointerup", stop);
+  canvas.addEventListener("pointercancel", stop);
+
+  $("revealBtn").addEventListener("click", reveal);
+  $("againBtn").addEventListener("click", newCard);
+
+  $("copyBtn").addEventListener("click", () => {
+    const code = $("codeText").textContent;
+    const done = () => { $("copyBtn").textContent = "Скопировано"; };
+    const fallback = () => {
+      const range = document.createRange();
+      range.selectNodeContents($("codeText"));
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+      $("copyBtn").textContent = "Выделено";
+    };
+    try { navigator.clipboard.writeText(code).then(done, fallback); } catch (_) { fallback(); }
+  });
+
+  function newCard() {
+    revealed = false; moves = 0;
+    stage.classList.remove("revealed");
+    $("pct").textContent = "0%";
+    $("fill").style.width = "0%";
+    $("status").textContent = "";
+    // Swap the prize only after the wool is back, so the old one never flashes
+    paintWool();
+    setPrize(pickPrize());
+  }
+
+  // Confetti in the alpaca's tassel colors
+  function confetti() {
+    if (reduceMotion) return;
+    const c = $("confetti"), g = c.getContext("2d");
+    const css = getComputedStyle(document.documentElement);
+    const colors = [css.getPropertyValue("--accent"), css.getPropertyValue("--accent-2"), css.getPropertyValue("--wool"), "#5fc4b0"].map(s => s.trim());
+    c.width = innerWidth; c.height = innerHeight;
+    const parts = Array.from({ length: 120 }, () => ({
+      x: innerWidth / 2 + (Math.random() - .5) * 120, y: innerHeight * .4,
+      vx: (Math.random() - .5) * 12, vy: -Math.random() * 12 - 4,
+      s: 5 + Math.random() * 6, r: Math.random() * 6, vr: (Math.random() - .5) * .3,
+      c: colors[(Math.random() * colors.length) | 0],
+    }));
+    let t = 0;
+    (function frame() {
+      g.clearRect(0, 0, c.width, c.height);
+      for (const p of parts) {
+        p.vy += .35; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.vx *= .99;
+        g.save(); g.translate(p.x, p.y); g.rotate(p.r);
+        g.fillStyle = p.c; g.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2);
+        g.restore();
+      }
+      if (++t < 140) requestAnimationFrame(frame); else g.clearRect(0, 0, c.width, c.height);
+    })();
+  }
+
+  // Repaint wool on resize (keeps progress only if already revealed)
+  let resizeTimer;
+  addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => { if (!revealed) { paintWool(); updateMeter(); } }, 150);
+  });
+
+  setPrize(pickPrize());
+  paintWool();
+  // Repaint once fonts arrive so the label uses Unbounded
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (!revealed && moves === 0) paintWool(); });
+})();
+</script>
+</body>
+</html>
