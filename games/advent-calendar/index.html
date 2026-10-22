@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Альпака-адвент</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Адвент-календарь с альпакой: 31 окошко до Нового года с подарками, фактами и заданиями">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Layout: header, demo-date bar, then a 4-column wall of wool "doors" in shuffled order; day 31 is the wide final door */
+  :root {
+    --bg: #e9e6f5;
+    --bg-deep: #d6d0ee;
+    --fg: #23204a;
+    --muted: #625d8a;
+    --panel: #ffffff;
+    --wool: #f6efe3;
+    --wool-shade: #e3d6c1;
+    --wool-ink: #23204a;   /* text on wool stays dark in both themes */
+    --inside: #2c2858;
+    --inside-fg: #f6efe3;
+    --accent: #d93a72;
+    --accent-2: #f2b631;
+    --mint: #2f9e8b;
+    --line: rgba(35, 32, 74, .12);
+    --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+    --font-body: "Manrope", "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141229; --bg-deep: #201d42; --fg: #f1edff; --muted: #a9a3d0;
+      --panel: #221f46; --wool: #efe6d6; --wool-shade: #cdbfa6;
+      --inside: #35306e; --inside-fg: #f1edff;
+      --accent: #ff5a8f; --accent-2: #ffc845; --mint: #5fd0bb; --line: rgba(241, 237, 255, .14);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141229; --bg-deep: #201d42; --fg: #f1edff; --muted: #a9a3d0;
+    --panel: #221f46; --wool: #efe6d6; --wool-shade: #cdbfa6;
+    --inside: #35306e; --inside-fg: #f1edff;
+    --accent: #ff5a8f; --accent-2: #ffc845; --mint: #5fd0bb; --line: rgba(241, 237, 255, .14);
+    color-scheme: dark;
+  }
+
+  html, body { min-height: 100%; }
+  body {
+    background:
+      radial-gradient(1000px 520px at 50% -8%, var(--bg-deep), transparent 70%),
+      var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 28px 48px;
+  }
+  .wrap { max-width: 560px; margin: 0 auto; display: grid; gap: 20px; position: relative; z-index: 1; }
+
+  header { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: end; }
+  .eyebrow { margin: 0; font-weight: 700; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+  h1 { margin: 6px 0 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(28px, 8vw, 42px); line-height: 1.02; text-wrap: balance; }
+  .lead { margin: 10px 0 0; color: var(--muted); max-width: 40ch; }
+  .alpaca { width: 92px; height: auto; }
+
+  /* Date bar */
+  .datebar {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px;
+    padding: 12px 14px;
+    border-radius: 18px;
+    background: var(--panel);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+  .datebar__text { margin: 0; font-size: 14px; color: var(--muted); min-width: 0; }
+  .datebar__text b { color: var(--fg); }
+  .stepper { display: flex; align-items: center; gap: 6px; }
+  .stepper output {
+    min-width: 7.5em; text-align: center;
+    font-family: var(--font-display); font-weight: 700; font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+  .demo-tag { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+
+  button { font: inherit; font-weight: 700; border: 0; cursor: pointer; border-radius: 12px; }
+  button:focus-visible { outline: 3px solid var(--accent-2); outline-offset: 3px; }
+  .icon-btn { width: 34px; height: 34px; background: var(--bg); color: var(--fg); box-shadow: inset 0 0 0 1.5px var(--line); font-size: 18px; line-height: 1; }
+  .icon-btn:disabled { opacity: .35; cursor: default; }
+
+  /* Progress */
+  .progress { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 13px; color: var(--muted); font-weight: 600; }
+  .progress strong { font-family: var(--font-display); font-size: 15px; color: var(--fg); font-variant-numeric: tabular-nums; }
+  .link-btn { background: none; color: var(--muted); padding: 4px 0; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
+
+  /* Door wall */
+  .wall {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-flow: dense;
+    gap: 10px;
+  }
+  .cell {
+    position: relative;
+    aspect-ratio: 1;
+    max-width: 100%;
+    perspective: 700px;
+  }
+  .cell--wide { grid-column: span 2; aspect-ratio: auto; }
+  .cell--tall { grid-row: span 2; aspect-ratio: auto; }
+  .inside {
+    position: absolute; inset: 0;
+    border-radius: 16px;
+    background: var(--inside);
+    color: var(--inside-fg);
+    display: grid; place-content: center; justify-items: center; gap: 2px;
+    padding: 8px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .inside__kind { font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-2); }
+  .inside__title { font-family: var(--font-body); font-weight: 700; font-size: clamp(12px, 3.4vw, 15px); line-height: 1.15; hyphens: auto; }
+  .door {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    padding: 0;
+    border-radius: 16px;
+    background: var(--wool);
+    color: var(--wool-ink);
+    transform-origin: left center;
+    transform-style: preserve-3d;
+    transition: transform .7s cubic-bezier(.2,.8,.2,1), opacity .7s ease;
+    box-shadow: inset 0 -4px 0 var(--wool-shade), 0 6px 14px -8px rgba(20, 10, 60, .5);
+    overflow: hidden;
+    display: grid; place-items: center;
+  }
+  .door::before {
+    /* wool curls */
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 20% 22%, var(--wool-shade) 0 3px, transparent 4px),
+      radial-gradient(circle at 74% 30%, var(--wool-shade) 0 2.5px, transparent 3.5px),
+      radial-gradient(circle at 40% 78%, var(--wool-shade) 0 3px, transparent 4px),
+      radial-gradient(circle at 82% 80%, var(--wool-shade) 0 2px, transparent 3px);
+    background-size: 46px 46px;
+    opacity: .9;
+  }
+  .door__num {
+    position: relative;
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(22px, 7vw, 34px);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .cell--wide .door__num { font-size: clamp(30px, 10vw, 48px); }
+  .door__knob {
+    position: absolute; right: 9px; top: 50%;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent); transform: translateY(-50%);
+  }
+  .door__note { position: absolute; left: 0; right: 0; bottom: 7px; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .door:hover { transform: rotateY(-12deg); }
+  .cell.is-locked .door { color: color-mix(in srgb, var(--wool-ink) 40%, var(--wool)); }
+  .cell.is-locked .door:hover { transform: none; }
+  .cell.is-today .door { box-shadow: inset 0 -4px 0 var(--wool-shade), 0 0 0 3px var(--accent), 0 8px 18px -6px var(--accent); }
+  .cell.is-open .door { transform: rotateY(-108deg); opacity: 0; pointer-events: none; }
+  .cell.is-open .inside { cursor: pointer; }
+  .cell.shake .door { animation: shake .4s; }
+  @keyframes shake { 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 12px; color: var(--muted); margin: 0; padding: 0; list-style: none; }
+  .legend li { display: flex; align-items: center; gap: 6px; }
+  .swatch { width: 12px; height: 12px; border-radius: 4px; background: var(--wool); box-shadow: inset 0 0 0 1px var(--line); }
+  .swatch--today { box-shadow: 0 0 0 2px var(--accent); }
+  .swatch--open { background: var(--inside); }
+  .note { font-size: 12px; color: var(--muted); margin: 0; }
+
+  /* Toast */
+  .toast {
+    position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    transform: translate(-50%, 20px); opacity: 0;
+    max-width: calc(100% - 32px);
+    background: var(--fg); color: var(--bg);
+    padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: 14px;
+    transition: opacity .25s ease, transform .25s ease;
+    z-index: 30; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  /* Dialog */
+  dialog {
+    width: min(420px, calc(100% - 32px));
+    border: 0; padding: 0; border-radius: 24px;
+    background: var(--panel); color: var(--fg);
+    box-shadow: 0 30px 80px -20px rgba(10, 5, 40, .6);
+  }
+  dialog::backdrop { background: rgba(14, 12, 34, .55); }
+  .dlg { padding: 26px 22px 22px; display: grid; gap: 12px; text-align: center; justify-items: center; }
+  .dlg__day { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .dlg__kind { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; background: var(--accent-2); color: #23204a; }
+  .dlg__kind[data-kind="fact"] { background: var(--mint); color: #fff; }
+  .dlg__kind[data-kind="task"] { background: var(--accent); color: #fff; }
+  .dlg__title { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 26px; line-height: 1.1; text-wrap: balance; }
+  .dlg__text { margin: 0; max-width: 34ch; }
+  .code {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 6px 6px 16px;
+    border: 2px dashed var(--accent); border-radius: 14px;
+    font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: .06em;
+  }
+  .btn-copy { padding: 8px 12px; border-radius: 10px; font-size: 13px; background: var(--accent); color: #fff; }
+  .btn-close { margin-top: 4px; padding: 12px 22px; border-radius: 14px; background: var(--fg); color: var(--bg); }
+
+  .snow { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+
+  @media (max-width: 380px) {
+    .wall { gap: 8px; }
+    .alpaca { width: 70px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .door, .toast { transition: none; }
+    .cell.shake .door { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas class="snow" id="snow" aria-hidden="true"></canvas>
+
+<main class="wrap">
+  <header>
+    <div>
+      <p class="eyebrow">Альпака-календарь · мини‑игра</p>
+      <h1>Альпака-адвент</h1>
+      <p class="lead">31 окошко до Нового года. Каждый день открывается одно: подарок, факт об альпаках или маленькое задание.</p>
+    </div>
+    <svg class="alpaca" viewBox="0 0 150 130" aria-hidden="true">
+      <path d="M44 40 C38 16 46 8 54 12 C60 16 60 32 58 44 Z" fill="var(--wool-shade)"/>
+      <path d="M106 40 C112 16 104 8 96 12 C90 16 90 32 92 44 Z" fill="var(--wool-shade)"/>
+      <ellipse cx="75" cy="72" rx="36" ry="40" fill="var(--wool)"/>
+      <g fill="var(--wool)"><circle cx="54" cy="40" r="12"/><circle cx="66" cy="33" r="13"/><circle cx="80" cy="32" r="13"/><circle cx="94" cy="39" r="12"/><circle cx="73" cy="42" r="12"/></g>
+      <!-- winter hat -->
+      <path d="M46 34 Q75 -6 104 34 Z" fill="var(--accent)"/>
+      <rect x="42" y="30" width="66" height="10" rx="5" fill="var(--wool-shade)"/>
+      <circle cx="75" cy="10" r="7" fill="var(--wool)"/>
+      <ellipse cx="62" cy="68" rx="5" ry="6" fill="#23204a"/><ellipse cx="88" cy="68" rx="5" ry="6" fill="#23204a"/>
+      <circle cx="63.6" cy="66" r="1.7" fill="#fff"/><circle cx="89.6" cy="66" r="1.7" fill="#fff"/>
+      <ellipse cx="54" cy="82" rx="6" ry="4" fill="var(--accent)" opacity=".35"/><ellipse cx="96" cy="82" rx="6" ry="4" fill="var(--accent)" opacity=".35"/>
+      <ellipse cx="75" cy="90" rx="16" ry="12" fill="var(--wool-shade)"/>
+      <path d="M70 86 Q75 90 80 86" stroke="#23204a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      <path d="M75 89 L75 94 M69 96 Q75 101 81 96" stroke="#23204a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      <!-- scarf -->
+      <path d="M44 104 Q75 118 106 104 L106 114 Q75 128 44 114 Z" fill="var(--mint)"/>
+    </svg>
+  </header>
+
+  <section class="datebar" aria-label="Дата">
+    <p class="datebar__text" id="dateText"></p>
+    <div class="stepper" id="stepper">
+      <button class="icon-btn" id="prevDay" type="button" aria-label="Предыдущий день">‹</button>
+      <output id="dayOut" aria-live="polite"></output>
+      <button class="icon-btn" id="nextDay" type="button" aria-label="Следующий день">›</button>
+    </div>
+  </section>
+
+  <div class="progress">
+    <span>Открыто <strong id="openedCount">0 из 31</strong></span>
+    <button class="link-btn" id="resetBtn" type="button">Закрыть все окошки</button>
+  </div>
+
+  <div class="wall" id="wall" role="list" lang="ru"></div>
+
+  <ul class="legend">
+    <li><span class="swatch swatch--today"></span>Сегодняшнее окошко</li>
+    <li><span class="swatch"></span>Ещё закрыто</li>
+    <li><span class="swatch swatch--open"></span>Открыто, нажми, чтобы перечитать</li>
+  </ul>
+  <p class="note">Демо: подарки и промокоды примерные. Открытые окошки запоминаются только в этом браузере.</p>
+</main>
+
+<dialog id="dlg" aria-labelledby="dlgTitle">
+  <div class="dlg">
+    <p class="dlg__day" id="dlgDay"></p>
+    <span class="dlg__kind" id="dlgKind"></span>
+    <h2 class="dlg__title" id="dlgTitle"></h2>
+    <p class="dlg__text" id="dlgText"></p>
+    <div class="code" id="dlgCode">
+      <span id="dlgCodeText"></span>
+      <button class="btn-copy" id="copyBtn" type="button">Скопировать</button>
+    </div>
+    <button class="btn-close" id="closeBtn" type="button">Закрыть</button>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  // kind: gift | fact | task. "short" is what shows inside the opened door.
+  const DAYS = {
+     1: { kind: "gift", short: "−10%",        title: "Скидка 10% на старт", text: "Декабрь начинается. Держи скидку на любой заказ до 7 декабря.", code: "ADVENT10" },
+     2: { kind: "fact", short: "Анды",         title: "Альпаки родом из Анд", text: "Их одомашнили около 6000 лет назад на высокогорьях Перу, Боливии и Чили." },
+     3: { kind: "task", short: "Прогулка",     title: "20 минут на воздухе", text: "Альпаки весь день гуляют по пастбищу. Выйди сегодня на короткую прогулку." },
+     4: { kind: "fact", short: "22 цвета",     title: "22 оттенка шерсти", text: "Шерсть альпак бывает 22 природных цветов: от белого до чёрного, через бежевый, рыжий и серый." },
+     5: { kind: "gift", short: "Доставка",     title: "Бесплатная доставка", text: "На любой заказ до 10 декабря, без минимальной суммы.", code: "LAMAGO" },
+     6: { kind: "fact", short: "Без ланолина", title: "Тёплая и не колется", text: "В шерсти альпак почти нет ланолина, поэтому вещи из неё реже вызывают аллергию." },
+     7: { kind: "task", short: "Список",       title: "Список подарков", text: "Запиши, кому и что хочешь подарить на Новый год. До праздника ещё 24 дня." },
+     8: { kind: "fact", short: "Криа",         title: "Малыш альпаки — криа", text: "Так называют детёныша. Он встаёт на ноги уже через час после рождения." },
+     9: { kind: "gift", short: "Обои",         title: "Зимние обои с альпакой", text: "Новые обои для телефона. Введи код на сайте, чтобы скачать их.", code: "WALLPAPER" },
+    10: { kind: "fact", short: "Гудят",        title: "Альпаки гудят", text: "Они общаются тихим гудением. Мама гудит малышу, а встревоженная альпака гудит громче." },
+    11: { kind: "task", short: "Открытка",     title: "Подпиши открытку", text: "Напиши тёплую открытку человеку, с которым давно не говорил." },
+    12: { kind: "gift", short: "−15%",         title: "Скидка 15%", text: "Середина пути. Скидка действует до 18 декабря.", code: "ALPACA15" },
+    13: { kind: "fact", short: "Стадо",        title: "Одной скучно", text: "Альпаки стадные животные. Одна альпака тоскует, поэтому их держат минимум по трое." },
+    14: { kind: "fact", short: "Уакайя и сури", title: "Две породы", text: "У уакайи шерсть пушистая, как плюш. У сури длинная, она свисает шелковистыми прядями." },
+    15: { kind: "task", short: "Чай",          title: "Чайная пауза", text: "Завари что-нибудь тёплое и 10 минут ничего не делай. Альпака одобряет." },
+    16: { kind: "gift", short: "Стикеры",      title: "Стикерпак с альпакой", text: "12 зимних стикеров для мессенджеров. Код активирует набор.", code: "STICKERS" },
+    17: { kind: "fact", short: "Мягкие лапы",  title: "Мягкие подушечки", text: "У альпак на лапах мягкие подушечки, а не копыта. Они почти не портят траву на пастбище." },
+    18: { kind: "fact", short: "Зубы",         title: "Без верхних резцов", text: "Сверху у альпак нет передних зубов, только твёрдая пластина. Траву они срезают нижними резцами." },
+    19: { kind: "task", short: "Плейлист",     title: "Новогодний плейлист", text: "Собери 10 песен, под которые будешь наряжать ёлку." },
+    20: { kind: "gift", short: "Подарок",      title: "Плюшевая альпака", text: "В подарок к заказу от 3000 ₽ до 25 декабря.", code: "FLUFFY" },
+    21: { kind: "fact", short: "Стрижка",      title: "Стрижка раз в год", text: "С одной альпаки за стрижку получают примерно 2–5 кг шерсти. Хватит на несколько свитеров." },
+    22: { kind: "fact", short: "Плюются",      title: "Плюются, но не в людей", text: "Обычно альпаки плюются друг в друга, когда спорят из-за еды. В человека редко и случайно." },
+    23: { kind: "task", short: "Ёлка",         title: "Время ёлки", text: "Если ёлка ещё не наряжена, сегодня самое время." },
+    24: { kind: "gift", short: "−20%",         title: "Скидка 20%", text: "Последние подарки ещё можно успеть заказать. Код действует до 28 декабря.", code: "SNOW20" },
+    25: { kind: "fact", short: "15–20 лет",    title: "Живут долго", text: "Альпаки живут 15–20 лет, примерно как кошки." },
+    26: { kind: "fact", short: "Ламы",         title: "Ламы крупнее", text: "Ламы почти вдвое крупнее альпак. Их даже ставят охранять стада овец от лис." },
+    27: { kind: "task", short: "Итоги",        title: "Три лучших момента", text: "Вспомни три лучших момента этого года и запиши их." },
+    28: { kind: "gift", short: "Мини-игра",    title: "Скретч-карта", text: "Сыграй в «Постриги альпаку» и сотри шерсть, чтобы найти ещё один приз. Код открывает вторую попытку.", code: "SHEAR2" },
+    29: { kind: "fact", short: "Общий туалет", title: "Чистоплотные", text: "Всё стадо ходит в одно и то же место на пастбище. Поэтому за альпаками легко убирать." },
+    30: { kind: "task", short: "Желание",      title: "Загадай желание", text: "Напиши желание на бумажке и спрячь до следующего декабря." },
+    31: { kind: "gift", short: "Главный приз", title: "С Новым годом!", text: "Главный подарок календаря: скидка 30% на всё до 10 января. Спасибо, что открывал окошки вместе с альпакой.", code: "NEWYEAR30" },
+  };
+  // Shuffled order on the wall, like a paper advent calendar
+  const ORDER = [7, 18, 2, 25, 12, 31, 5, 21, 14, 9, 28, 1, 23, 16, 30, 4, 11, 26, 19, 8, 3, 24, 13, 29, 20, 6, 15, 27, 10, 22, 17];
+  const KIND_LABEL = { gift: "Подарок", fact: "Факт", task: "Задание" };
+  const MONTHS = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+  const STORE_KEY = "alpaca-advent-opened";
+
+  const $ = (id) => document.getElementById(id);
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Real calendar day: 1–31 in December, 0 before it, 32 after New Year (all open)
+  const now = new Date();
+  const realDay = now.getMonth() === 11 ? now.getDate() : (now.getMonth() === 0 && now.getDate() <= 14 ? 32 : 0);
+  const demo = realDay === 0;
+  let today = demo ? 12 : realDay;
+
+  let opened = new Set();
+  try { opened = new Set(JSON.parse(localStorage.getItem(STORE_KEY) || "[]")); } catch (_) {}
+  const save = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify([...opened])); } catch (_) {} };
+
+  function plural(n, one, few, many) {
+    const m10 = n % 10, m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return one;
+    if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+    return many;
+  }
+
+  function renderDate() {
+    if (demo) {
+      $("dateText").innerHTML = `Сегодня ${now.getDate()} ${MONTHS[now.getMonth()]}, календарь начнётся 1 декабря. <span class="demo-tag">Демо</span>: выбери, какой день представить.`;
+      $("dayOut").textContent = `${today} декабря`;
+      $("prevDay").disabled = today <= 1;
+      $("nextDay").disabled = today >= 31;
+    } else {
+      $("stepper").hidden = true;
+      $("dateText").innerHTML = realDay > 31
+        ? "Календарь закончился. Все окошки открыты для просмотра."
+        : `Сегодня <b>${realDay} декабря</b>. До Нового года ${32 - realDay} ${plural(32 - realDay, "день", "дня", "дней")}.`;
+    }
+  }
+
+  function buildWall() {
+    const wall = $("wall");
+    wall.innerHTML = "";
+    for (const day of ORDER) {
+      const d = DAYS[day];
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      cell.setAttribute("role", "listitem");
+      cell.dataset.day = day;
+      if (day === 31) cell.classList.add("cell--wide");
+      cell.innerHTML = `
+        <div class="inside">
+          <span class="inside__kind">${KIND_LABEL[d.kind]}</span>
+          <span class="inside__title">${d.short}</span>
+        </div>
+        <button class="door" type="button">
+          <span class="door__num">${day}</span>
+          <span class="door__knob"></span>
+          <span class="door__note"></span>
+        </button>`;
+      cell.querySelector(".door").addEventListener("click", () => tryOpen(cell, day));
+      cell.querySelector(".inside").addEventListener("click", () => opened.has(day) && showDay(day));
+      wall.appendChild(cell);
+    }
+    refresh();
+  }
+
+  function refresh() {
+    let count = 0;
+    for (const cell of $("wall").children) {
+      const day = +cell.dataset.day;
+      const isOpen = opened.has(day);
+      const locked = day > today;
+      if (isOpen) count++;
+      cell.classList.toggle("is-open", isOpen);
+      cell.classList.toggle("is-locked", locked && !isOpen);
+      cell.classList.toggle("is-today", day === today && !isOpen);
+      const door = cell.querySelector(".door");
+      cell.querySelector(".door__note").textContent = day === today && !isOpen ? "Сегодня" : "";
+      door.setAttribute("aria-label", isOpen ? `${day} декабря, открыто`
+        : locked ? `${day} декабря, закрыто` : `Открыть окошко ${day} декабря`);
+      door.tabIndex = isOpen ? -1 : 0;
+    }
+    $("openedCount").textContent = `${count} из 31`;
+  }
+
+  function tryOpen(cell, day) {
+    if (day > today) {
+      const wait = day - today;
+      toast(`Это окошко откроется через ${wait} ${plural(wait, "день", "дня", "дней")}`);
+      cell.classList.remove("shake"); void cell.offsetWidth; cell.classList.add("shake");
+      return;
+    }
+    opened.add(day); save();
+    refresh();
+    setTimeout(() => showDay(day), reduceMotion ? 0 : 550);
+  }
+
+  function showDay(day) {
+    const d = DAYS[day];
+    $("dlgDay").textContent = `${day} декабря`;
+    $("dlgKind").textContent = KIND_LABEL[d.kind];
+    $("dlgKind").dataset.kind = d.kind;
+    $("dlgTitle").textContent = d.title;
+    $("dlgText").textContent = d.text;
+    $("dlgCode").hidden = !d.code;
+    $("dlgCodeText").textContent = d.code || "";
+    $("copyBtn").textContent = "Скопировать";
+    const dlg = $("dlg");
+    if (typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open", "");
+    $("closeBtn").focus();
+  }
+  const closeDlg = () => { const dlg = $("dlg"); if (dlg.close) dlg.close(); else dlg.removeAttribute("open"); };
+  $("closeBtn").addEventListener("click", closeDlg);
+  $("dlg").addEventListener("click", (e) => { if (e.target === $("dlg")) closeDlg(); });
+
+  $("copyBtn").addEventListener("click", () => {
+    const code = $("dlgCodeText").textContent;
+    const fallback = () => {
+      const r = document.createRange(); r.selectNodeContents($("dlgCodeText"));
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      $("copyBtn").textContent = "Выделено";
+    };
+    try { navigator.clipboard.writeText(code).then(() => { $("copyBtn").textContent = "Скопировано"; }, fallback); } catch (_) { fallback(); }
+  });
+
+  $("prevDay").addEventListener("click", () => { if (today > 1) { today--; renderDate(); refresh(); } });
+  $("nextDay").addEventListener("click", () => { if (today < 31) { today++; renderDate(); refresh(); } });
+  $("resetBtn").addEventListener("click", () => { opened.clear(); save(); refresh(); toast("Все окошки снова закрыты"); });
+
+  let toastTimer;
+  function toast(msg) {
+    const t = $("toast");
+    t.textContent = msg; t.classList.add("show");
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+  }
+
+  // Gentle snowfall
+  function snow() {
+    if (reduceMotion) return;
+    const c = $("snow"), g = c.getContext("2d");
+    let flakes = [];
+    const resize = () => {
+      c.width = innerWidth; c.height = innerHeight;
+      flakes = Array.from({ length: Math.round(innerWidth / 14) }, () => ({
+        x: Math.random() * innerWidth, y: Math.random() * innerHeight,
+        r: 1 + Math.random() * 2.4, v: .3 + Math.random() * .7, s: Math.random() * 6.28,
+      }));
+    };
+    resize(); addEventListener("resize", resize);
+    (function frame() {
+      const col = getComputedStyle(document.documentElement).getPropertyValue("--wool-shade").trim();
+      g.clearRect(0, 0, c.width, c.height);
+      g.fillStyle = col; g.globalAlpha = .7;
+      for (const f of flakes) {
+        f.y += f.v; f.s += .01; f.x += Math.sin(f.s) * .3;
+        if (f.y > c.height + 4) { f.y = -4; f.x = Math.random() * c.width; }
+        g.beginPath(); g.arc(f.x, f.y, f.r, 0, Math.PI * 2); g.fill();
+      }
+      requestAnimationFrame(frame);
+    })();
+  }
+
+  renderDate();
+  buildWall();
+  snow();
+})();
+</script>
+</body>
+</html>
