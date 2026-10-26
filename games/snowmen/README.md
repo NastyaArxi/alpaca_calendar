@@ -4,7 +4,8 @@
 
 - `puzzle.js` — генератор (у каждой задачи ровно одно решение) и решатель
 - `levels.js` — пакет из 150 заранее посчитанных уровней (`node tools/make-levels.js 150`)
-- `platform.js` — SDK Яндекс Игр (реклама, сохранения); вне Яндекса игра работает автономно
+- `platform.js` — SDK площадок: ВКонтакте (VK Bridge) и Яндекс Игры (реклама, сохранения); вне площадок игра работает автономно
+- `vendor/vk-bridge-3.0.2.min.js` — VK Bridge (MIT), для сборки под ВКонтакте
 - `game.js`, `index.html`, `style.css` — интерфейс
 
-Проверка: `node tests/puzzle.test.js`. Архив для площадки: `./build.sh` → `dist/snowmen.zip`.
+Проверка: `node tests/puzzle.test.js`. Архивы: `./build.sh` → `dist/snowmen-vk.zip` и `dist/snowmen-yandex.zip`.

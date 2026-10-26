@@ -303,11 +303,10 @@
     });
   }
 
-  function copy(text, btn) {
-    const done = () => { btn.textContent = T.copied; };
-    try {
-      navigator.clipboard.writeText(text).then(done, () => { els.modalText.textContent = text; });
-    } catch (e) { done(); }
+  async function copy(text, btn) {
+    // если скопировать не вышло, показываем текст, чтобы его можно было выделить вручную
+    if (await Platform.copyText(text)) btn.textContent = T.copied;
+    else els.modalText.textContent = text;
   }
 
   // ---------- экраны ----------
