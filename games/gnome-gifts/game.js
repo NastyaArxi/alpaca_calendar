@@ -78,7 +78,27 @@
       } catch (e) {}
     },
     tap() { this.beep(520, 0.07, 'triangle'); this.beep(780, 0.08, 'triangle', 0.08, 0.05); },
-    drop() { const n = performance.now(); if (n - this.last < 60) return; this.last = n; this.beep(900 + Math.random() * 400, 0.04, 'square', 0.025); },
+    // мягкое «пу»: синус, плавно съезжающий вниз, без резкого начала и с приглушёнными верхами
+    drop() {
+      const n = performance.now();
+      if (n - this.last < 70 || !this.on || this.paused) return;
+      this.last = n;
+      try {
+        this.ctx = this.ctx || new (window.AudioContext || window.webkitAudioContext)();
+        const ctx = this.ctx, t = ctx.currentTime;
+        const o = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter();
+        const f0 = 360 + Math.random() * 140;
+        o.type = 'sine';
+        o.frequency.setValueAtTime(f0, t);
+        o.frequency.exponentialRampToValueAtTime(f0 * 0.62, t + 0.1);
+        f.type = 'lowpass'; f.frequency.value = 1100;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(0.07, t + 0.015);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
+        o.connect(f).connect(g).connect(ctx.destination);
+        o.start(t); o.stop(t + 0.15);
+      } catch (e) {}
+    },
     done() { [784, 1047, 1319].forEach((f, i) => this.beep(f, 0.12, 'triangle', 0.08, i * 0.07)); },
     win() { [523, 659, 784, 1047, 1319].forEach((f, i) => this.beep(f, 0.25, 'triangle', 0.1, i * 0.1)); },
     lose() { [300, 220].forEach((f, i) => this.beep(f, 0.3, 'sawtooth', 0.06, i * 0.18)); },
