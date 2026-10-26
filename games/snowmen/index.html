@@ -14,6 +14,7 @@
       <h1 data-i18n="title">Снеговички</h1>
       <p class="subtitle" data-i18n="subtitle">Логическая головоломка: по снеговику в каждый дворик</p>
       <button id="btn-play" class="btn primary"></button>
+      <button id="btn-calendar" class="btn calendar-btn"></button>
       <button id="btn-daily" class="btn"></button>
       <button id="btn-rules" class="btn ghost" data-i18n="rulesBtn">Как играть</button>
     </section>
@@ -36,6 +37,25 @@
       </div>
     </section>
 
+    <section id="screen-calendar" class="screen" hidden>
+      <header class="topbar">
+        <button id="btn-cal-home" class="icon-btn" aria-label="menu">←</button>
+        <div class="title-block">
+          <div data-i18n="calendar">Адвент-календарь</div>
+          <div id="cal-progress"></div>
+        </div>
+        <span></span>
+      </header>
+      <p id="cal-note"></p>
+      <div id="cal-wrap">
+        <div id="cal-grid"><canvas id="postcard"></canvas></div>
+      </div>
+      <div class="wardrobe">
+        <div class="wardrobe-title" data-i18n="wardrobe">Гардероб</div>
+        <div id="wardrobe"></div>
+      </div>
+    </section>
+
     <div id="modal" class="modal" hidden>
       <div class="modal-card">
         <div id="modal-art" class="menu-art small"></div>
@@ -47,6 +67,9 @@
   </div>
 
   <script src="levels.js"></script>
+  <script src="calendar-levels.js"></script>
+  <script src="figures.js"></script>
+  <script src="calendar.js"></script>
   <script src="puzzle.js"></script>
   <script src="platform.js"></script>
   <script src="game.js"></script>

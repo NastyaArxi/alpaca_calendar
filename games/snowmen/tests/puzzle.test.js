@@ -30,3 +30,12 @@ LEVELS.forEach((lv, i) => {
   check({ N: regions.length, regions, solution }, `pack ${i}`);
 });
 console.log(`ok: pack of ${LEVELS.length} levels`);
+
+// Задачи календаря: тоже по одному решению.
+const CALENDAR = require('../calendar-levels.js');
+assert.strictEqual(CALENDAR.length, 31);
+CALENDAR.forEach((lv, i) => {
+  const regions = lv.r.split('/').map(row => [...row].map(Number));
+  check({ N: regions.length, regions, solution: [...lv.s].map(Number) }, `calendar day ${i + 1}`);
+});
+console.log('ok: calendar of 31 days');

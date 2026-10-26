@@ -9,7 +9,7 @@ mkdir -p dist
 rm -f dist/*.zip
 python3 - <<'PY'
 import zipfile
-common = ['style.css', 'levels.js', 'puzzle.js', 'platform.js', 'game.js']
+common = ['style.css', 'levels.js', 'calendar-levels.js', 'figures.js', 'calendar.js', 'puzzle.js', 'platform.js', 'game.js']
 html = open('index.html', encoding='utf-8').read()
 variants = {
     'yandex': (html, []),

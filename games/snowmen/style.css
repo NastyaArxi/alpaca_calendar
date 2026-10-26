@@ -97,6 +97,53 @@ html, body {
 #modal-buttons { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 6px; }
 #modal-buttons .btn { min-width: 0; }
 
+/* ---------- адвент-календарь ---------- */
+.calendar-btn { background: #1f3f7a; color: #fff; box-shadow: 0 4px 0 #142a52; }
+#cal-progress { font-size: 13px; color: var(--muted); }
+#cal-note { margin: 6px 0; text-align: center; color: var(--berry); font-weight: bold; min-height: 1.2em; max-width: 34ch; }
+#cal-wrap { flex: 1 1 auto; min-height: 0; width: 100%; display: flex; align-items: center; justify-content: center; }
+#cal-grid {
+  position: relative; display: grid; gap: 0;
+  grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(7, 1fr);
+  border: 3px solid var(--ink); border-radius: 12px; overflow: hidden;
+  box-shadow: 0 8px 24px #22324a33;
+}
+#postcard { position: absolute; inset: 0; width: 100%; height: 100%; }
+.win {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid #ffffff55; font-weight: bold; font-size: 18px; color: var(--ink);
+  background: #f4f7fc; cursor: default; transition: background .4s, opacity .4s;
+}
+.win.locked { background: #dfe7f2; color: #9aa8bd; }
+.win.locked::after { content: "❄"; position: absolute; right: 4px; bottom: 2px; font-size: 11px; color: #b5c3d6; }
+.win.open { background: #fff; cursor: pointer; box-shadow: inset 0 0 0 3px var(--berry); }
+.win.today { animation: glow 1.2s ease-in-out infinite alternate; }
+.win.missed { background: #fff3f5; cursor: pointer; }
+.win.solved, .win.deco { background: transparent; color: transparent; border-color: #ffffff22; }
+.win.gift::before {
+  content: "🎁"; position: absolute; top: 2px; right: 3px; font-size: 13px;
+}
+.win.solved.gift { cursor: pointer; }
+@keyframes glow { to { box-shadow: inset 0 0 0 5px var(--berry); } }
+
+.wardrobe { width: 100%; margin-top: 8px; }
+.wardrobe-title { font-size: 13px; color: var(--muted); margin: 0 4px 4px; }
+#wardrobe { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 6px; }
+.fig {
+  flex: none; width: 52px; height: 60px; border-radius: 12px; background: var(--card); border: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  box-shadow: 0 3px 0 #c3d0e0; cursor: pointer; font: inherit; color: var(--muted);
+}
+.fig svg { width: 36px; height: 36px; }
+.fig small { font-size: 10px; }
+.fig.sel { box-shadow: inset 0 0 0 3px var(--pine), 0 3px 0 #c3d0e0; }
+.fig.locked { opacity: .45; cursor: default; }
+.fig.locked svg { filter: grayscale(1) brightness(1.4); }
+.modal-card .postcard-big { width: 100%; border-radius: 12px; }
+.greeting { font-size: 16px; color: var(--ink) !important; line-height: 1.45; }
+
 @media (prefers-reduced-motion: reduce) {
+  .win.today { animation: none; }
   .cell.snow svg, .cell.wrong, .board-done .cell.snow svg { animation: none; }
 }
