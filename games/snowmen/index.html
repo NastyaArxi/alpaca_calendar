@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Снеговички</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="/sdk.js"></script>
+</head>
+<body>
+  <div id="app">
+    <section id="screen-menu" class="screen">
+      <div id="menu-art" class="menu-art"></div>
+      <h1 data-i18n="title">Снеговички</h1>
+      <p class="subtitle" data-i18n="subtitle">Логическая головоломка: по снеговику в каждый дворик</p>
+      <button id="btn-play" class="btn primary"></button>
+      <button id="btn-daily" class="btn"></button>
+      <button id="btn-rules" class="btn ghost" data-i18n="rulesBtn">Как играть</button>
+    </section>
+
+    <section id="screen-game" class="screen" hidden>
+      <header class="topbar">
+        <button id="btn-home" class="icon-btn" aria-label="menu">←</button>
+        <div class="title-block">
+          <div id="level-label"></div>
+          <div id="timer">0:00</div>
+        </div>
+        <div id="hearts" aria-label="lives"></div>
+      </header>
+      <p id="hint-text" hidden></p>
+      <div id="board-wrap"><div id="board"></div></div>
+      <p class="legend" data-i18n="legend">Нажми — крестик, ещё раз — снеговик. Проведи пальцем, чтобы ставить крестики.</p>
+      <div class="tools">
+        <button id="btn-hint" class="btn small"><span data-i18n="hint">Подсказка</span> <i class="ad">▶</i></button>
+        <button id="btn-clear" class="btn small ghost" data-i18n="clear">Стереть крестики</button>
+      </div>
+    </section>
+
+    <div id="modal" class="modal" hidden>
+      <div class="modal-card">
+        <div id="modal-art" class="menu-art small"></div>
+        <h2 id="modal-title"></h2>
+        <p id="modal-text"></p>
+        <div id="modal-buttons"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="levels.js"></script>
+  <script src="puzzle.js"></script>
+  <script src="platform.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
