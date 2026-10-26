@@ -35,7 +35,7 @@
   };
 
   const SPEED = 16;       // клеток в секунду
-  const PER_BAG = 8;      // гномов одного подарка одновременно в пути
+  const PER_BAG = 11;     // гномов одного квадрата одновременно в пути
   const SEND_GAP = 60;    // мс между выходами гномов одного подарка
   const SKIN = '#ffd2a8';
 
@@ -545,11 +545,16 @@
     show('menu');
     els.play.innerHTML = `${T.play}<span class="sub">${T.level} ${save.level + 1}</span>`;
     $('howto').innerHTML = `<b>${T.howto}</b><ol>${[T.hint0, T.hint1, T.hint2].map(t => `<li>${t}</li>`).join('')}</ol>`;
+    // строчка разноцветных гномов, каждый несёт квадрат другого цвета
     const art = $('menu-art');
-    const ctx = drawToy(art, PICTURES[0], 170);
-    const colors = ['#ff3b3b', '#20b85a', '#2f6bff', '#ffd21f'];
-    const cw = parseFloat(art.style.width);
-    colors.forEach((c, i) => drawGnome(ctx, cw * (0.15 + i * 0.23), parseFloat(art.style.height) - 14, 26, c, i % 2 ? c : null));
+    const hats = ['r', 'o', 'y', 'g', 's', 'b', 'v', 'p'];
+    const cw = Math.min(340, window.innerWidth - 40), size = cw / hats.length * 1.15;
+    const ctx = setupCanvas(art, cw, size * 1.7);
+    hats.forEach((h, i) => {
+      const box = hats[(i + 3) % hats.length];
+      const x = cw * ((i + 0.5) / hats.length), y = size * 1.05 + (i % 2 ? size * 0.12 : 0);
+      drawGnome(ctx, x, y, size, PALETTE[h], PALETTE[box]);
+    });
   }
 
   function applyI18n() {
