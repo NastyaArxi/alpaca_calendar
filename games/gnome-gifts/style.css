@@ -146,7 +146,14 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .map-progress { width: 100%; display: flex; justify-content: space-between; margin: 14px 0 6px; font-size: 13px; font-weight: 800; color: #E6F2EC; }
 .bar { width: 100%; height: 8px; border-radius: 4px; background: rgba(255,255,255,.12); overflow: hidden; }
 .bar i { display: block; height: 100%; border-radius: 4px; background: var(--gold); }
-.map-list { width: 100%; flex: 1 1 auto; overflow-y: auto; padding: 16px 2px 24px; display: flex; flex-direction: column; gap: 20px; -webkit-overflow-scrolling: touch; }
+.map-list {
+  width: 100%; flex: 1 1 auto; overflow-y: auto; padding: 18px 6px 24px; display: flex; flex-direction: column; gap: 20px;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  /* мягкий край сверху: карточки уходят под полосу прогресса плавно */
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 16px);
+  mask-image: linear-gradient(180deg, transparent 0, #000 16px);
+}
+.map-list::-webkit-scrollbar { display: none; }
 .chapter-head { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; align-items: center; margin-bottom: 10px; }
 .ch-num { width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--gold); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; }
 .ch-title { font-size: 16px; font-weight: 900; }

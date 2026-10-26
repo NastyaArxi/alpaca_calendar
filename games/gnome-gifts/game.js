@@ -663,7 +663,11 @@
       }
       list.appendChild(sec);
     });
-    if (scrollToCurrent && currentEl) requestAnimationFrame(() => currentEl.scrollIntoView({ block: 'center' }));
+    // прокручиваем к началу главы с текущим уровнем, чтобы её заголовок был виден
+    if (scrollToCurrent && currentEl) {
+      const sec = currentEl.closest('section');
+      requestAnimationFrame(() => { list.scrollTop = sec.offsetTop - list.offsetTop - 12; });
+    } else list.scrollTop = 0;
   }
 
   function applyI18n() {
