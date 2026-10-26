@@ -58,12 +58,16 @@
     return layer;
   }
 
-  function difficulty(L) {
+  // Правила уровня из главы: ячейки, колонки и наибольший размер плитки.
+  // Внутри главы порядок подарков постепенно перемешивается сильнее.
+  function difficulty(L, chapter) {
+    const k = L % 12;
+    const top = chapter.maxTile;
     return {
-      slots: 5,
-      queues: 3,
-      jitter: Math.min(0.8 + L * 0.5, 6),
-      sizes: L < 2 ? [40, 60] : L < 6 ? [20, 30, 40, 60] : [12, 16, 20, 25, 30, 40]
+      slots: chapter.slots,
+      queues: chapter.queues,
+      jitter: Math.min(0.8 + Math.floor(L / 12) * 1.2 + k * 0.25, 7),
+      sizes: [Math.round(top * 0.4), Math.round(top * 0.6), Math.round(top * 0.8), top].filter(n => n >= 8)
     };
   }
 
@@ -78,8 +82,11 @@
       layers.sort((a, b) => a - b);
       let i = 0;
       while (i < layers.length) {
+        // не оставляем крошечных остатков и не превышаем наибольшую плитку главы
+        const left = layers.length - i, top = Math.max(...d.sizes);
         let n = d.sizes[Math.floor(rnd() * d.sizes.length)];
-        if (layers.length - i - n < 8) n = layers.length - i;
+        if (left <= n) n = left;
+        else if (left - n < 6) n = left <= top ? left : Math.ceil(left / 2);
         const part = layers.slice(i, i + n);
         bags.push({ color, n, key: part.reduce((a, b) => a + b, 0) / part.length });
         i += n;
@@ -139,8 +146,8 @@
     return false;
   }
 
-  function buildLevel(pic, L) {
-    const d = difficulty(L);
+  function buildLevel(pic, L, chapter) {
+    const d = difficulty(L, chapter);
     for (let attempt = 0; attempt < 80; attempt++) {
       const rnd = mulberry32(L * 7919 + 77 + attempt * 104729);
       const bags = makeBags(pic, d, rnd)

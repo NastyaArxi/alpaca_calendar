@@ -9,7 +9,8 @@ mkdir -p dist
 rm -f dist/*.zip
 python3 - <<'PY'
 import zipfile
-common = ['style.css', 'toys.js', 'engine.js', 'platform.js', 'game.js']
+import glob
+common = ['fonts.css', 'style.css', 'toys.js', 'engine.js', 'platform.js', 'game.js'] + sorted(glob.glob('fonts/*'))
 html = open('index.html', encoding='utf-8').read()
 variants = {
     'yandex': (html, []),

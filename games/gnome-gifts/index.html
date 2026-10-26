@@ -4,42 +4,93 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>Гномы и подарки</title>
+  <link rel="stylesheet" href="fonts.css">
   <link rel="stylesheet" href="style.css">
   <script src="/sdk.js"></script>
 </head>
 <body>
   <div id="app">
+    <div class="snow" aria-hidden="true"></div>
+    <div id="garland" class="garland" aria-hidden="true"></div>
+
+    <!-- 1 · Старт -->
     <section id="screen-menu" class="screen">
-      <canvas id="menu-art"></canvas>
-      <h1 data-i18n="title">Гномы и подарки</h1>
-      <p class="subtitle" data-i18n="subtitle">Помоги гномам Деда Мороза собрать игрушки в мешок</p>
-      <button id="btn-play" class="btn primary"></button>
-      <div id="howto" class="howto"></div>
+      <div id="menu-gnomes" class="gnome-row" aria-hidden="true"></div>
+      <h1 class="logo"><span class="logo-1" data-i18n="logo1">Гномы</span><span class="logo-2" data-i18n="logo2">и подарки</span></h1>
+      <p class="subtitle" data-i18n="subtitle">Помоги гномам Деда Мороза собрать игрушки в мешок до Нового года</p>
+      <button id="btn-play" class="btn-red"><b data-i18n="play">Играть</b><small id="play-sub"></small></button>
+      <div class="howto card">
+        <svg class="holly holly-tr" viewBox="0 0 58 40" aria-hidden="true"><path d="M6 22 C12 6 26 8 30 20 C22 18 14 26 6 22 Z" fill="#146B3C"/><path d="M52 20 C48 4 34 6 30 18 C38 16 46 24 52 20 Z" fill="#22A45D"/><circle cx="27" cy="24" r="5" fill="#C8102E"/><circle cx="35" cy="25" r="4.5" fill="#E5293F"/><circle cx="31" cy="31" r="4.5" fill="#B80D25"/></svg>
+        <h3 data-i18n="howto">Как играть</h3>
+        <ol id="howto-list"></ol>
+      </div>
+      <div class="forest" aria-hidden="true"><svg viewBox="0 0 390 80" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><path d="M-10 70 L5 22 L20 70 Z" fill="#062A20"/><path d="M-0 40.24 L5 22 L10 40.24 Q5 43.599999999999994 -0 40.24 Z" fill="#DDE9E6" opacity=".85"/><path d="M9 70 L25 20 L40 70 Z" fill="#062A20"/><path d="M19 39.0 L25 20 L31 39.0 Q25 42.5 19 39.0 Z" fill="#DDE9E6" opacity=".85"/><path d="M38 70 L50 31 L62 70 Z" fill="#062A20"/><path d="M45 45.82 L50 31 L54 45.82 Q50 48.55 45 45.82 Z" fill="#DDE9E6" opacity=".85"/><path d="M52 70 L69 15 L86 70 Z" fill="#062A20"/><path d="M63 35.9 L69 15 L75 35.9 Q69 39.75 63 35.9 Z" fill="#DDE9E6" opacity=".85"/><path d="M74 70 L89 21 L104 70 Z" fill="#062A20"/><path d="M83 39.620000000000005 L89 21 L94 39.620000000000005 Q89 43.05 83 39.620000000000005 Z" fill="#DDE9E6" opacity=".85"/><path d="M101 70 L113 31 L125 70 Z" fill="#062A20"/><path d="M108 45.82 L113 31 L117 45.82 Q113 48.55 108 45.82 Z" fill="#DDE9E6" opacity=".85"/><path d="M128 70 L145 16 L161 70 Z" fill="#062A20"/><path d="M139 36.52 L145 16 L151 36.52 Q145 40.3 139 36.52 Z" fill="#DDE9E6" opacity=".85"/><path d="M151 70 L163 31 L175 70 Z" fill="#062A20"/><path d="M159 45.82 L163 31 L168 45.82 Q163 48.55 159 45.82 Z" fill="#DDE9E6" opacity=".85"/><path d="M166 70 L181 19 L197 70 Z" fill="#062A20"/><path d="M176 38.379999999999995 L181 19 L187 38.379999999999995 Q181 41.95 176 38.379999999999995 Z" fill="#DDE9E6" opacity=".85"/><path d="M190 70 L203 30 L215 70 Z" fill="#062A20"/><path d="M198 45.2 L203 30 L207 45.2 Q203 48.0 198 45.2 Z" fill="#DDE9E6" opacity=".85"/><path d="M207 70 L220 30 L232 70 Z" fill="#062A20"/><path d="M215 45.2 L220 30 L224 45.2 Q220 48.0 215 45.2 Z" fill="#DDE9E6" opacity=".85"/><path d="M229 70 L245 19 L261 70 Z" fill="#062A20"/><path d="M239 38.379999999999995 L245 19 L250 38.379999999999995 Q245 41.95 239 38.379999999999995 Z" fill="#DDE9E6" opacity=".85"/><path d="M248 70 L265 14 L282 70 Z" fill="#062A20"/><path d="M259 35.28 L265 14 L271 35.28 Q265 39.199999999999996 259 35.28 Z" fill="#DDE9E6" opacity=".85"/><path d="M270 70 L284 25 L298 70 Z" fill="#062A20"/><path d="M279 42.1 L284 25 L289 42.1 Q284 45.25 279 42.1 Z" fill="#DDE9E6" opacity=".85"/><path d="M296 70 L314 12 L332 70 Z" fill="#062A20"/><path d="M307 34.04 L314 12 L320 34.04 Q314 38.099999999999994 307 34.04 Z" fill="#DDE9E6" opacity=".85"/><path d="M327 70 L339 31 L351 70 Z" fill="#062A20"/><path d="M334 45.82 L339 31 L343 45.82 Q339 48.55 334 45.82 Z" fill="#DDE9E6" opacity=".85"/><path d="M349 70 L366 14 L384 70 Z" fill="#062A20"/><path d="M360 35.28 L366 14 L373 35.28 Q366 39.199999999999996 360 35.28 Z" fill="#DDE9E6" opacity=".85"/><path d="M376 70 L388 31 L400 70 Z" fill="#062A20"/><path d="M384 45.82 L388 31 L393 45.82 Q388 48.55 384 45.82 Z" fill="#DDE9E6" opacity=".85"/><path d="M393 70 L405 31 L417 70 Z" fill="#062A20"/><path d="M400 45.82 L405 31 L409 45.82 Q405 48.55 400 45.82 Z" fill="#DDE9E6" opacity=".85"/><path d="M0 72 Q100 64 200 70 T390 68 V80 H0 Z" fill="#DDE9E6"/></svg></div>
     </section>
 
-    <section id="screen-game" class="screen" hidden>
-      <header class="topbar">
-        <button id="btn-home" class="icon-btn" aria-label="menu">⌂</button>
-        <div id="level-label"></div>
-        <button id="btn-sound" class="icon-btn" aria-label="sound">♪</button>
+    <!-- 2 · Карта уровней -->
+    <section id="screen-map" class="screen" hidden>
+      <header class="map-head">
+        <button id="btn-map-back" class="icon-btn" aria-label="back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <h2 data-i18n="levels">Уровни</h2>
+        <div class="stars-pill">★ <span id="stars-total">0</span></div>
       </header>
-      <div id="stage"><canvas id="board"></canvas></div>
+      <div class="map-progress"><span id="map-done"></span><span id="map-days"></span></div>
+      <div class="bar"><i id="map-bar"></i></div>
+      <div id="map-list" class="map-list"></div>
+    </section>
+
+    <!-- 3 · Уровень -->
+    <section id="screen-game" class="screen" hidden>
+      <header class="game-head">
+        <button id="btn-map" class="icon-btn" aria-label="levels"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></svg></button>
+        <div class="title">
+          <div id="level-label" class="pill-red"></div>
+          <div id="level-sub" class="level-sub"></div>
+        </div>
+        <button id="btn-sound" class="icon-btn" aria-label="music"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></button>
+      </header>
+      <div id="stage">
+        <div id="board-card" class="board-card">
+          <canvas id="board"></canvas>
+          <svg class="holly holly-tl" viewBox="0 0 58 40" aria-hidden="true"><path d="M6 22 C12 6 26 8 30 20 C22 18 14 26 6 22 Z" fill="#146B3C"/><path d="M52 20 C48 4 34 6 30 18 C38 16 46 24 52 20 Z" fill="#22A45D"/><circle cx="27" cy="24" r="5" fill="#C8102E"/><circle cx="35" cy="25" r="4.5" fill="#E5293F"/><circle cx="31" cy="31" r="4.5" fill="#B80D25"/></svg>
+        </div>
+      </div>
       <div id="sack" class="sack"></div>
-      <div id="slots"></div>
-      <div id="queues"></div>
+      <div id="slots" class="slots"></div>
+      <div id="queues" class="queues"></div>
       <div class="tools">
-        <button id="btn-slot" class="btn small"><span data-i18n="addSlot">+1 ячейка</span> <i class="ad">▶</i></button>
-        <button id="btn-restart" class="btn small ghost" data-i18n="restart">Заново</button>
+        <button id="btn-slot" class="btn-cream"><span data-i18n="addSlot">+1 ячейка</span><i class="play-ico" aria-hidden="true"></i></button>
+        <button id="btn-restart" class="link-gold" data-i18n="restart">Заново</button>
       </div>
     </section>
 
     <canvas id="fx"></canvas>
-    <div id="modal" class="modal" hidden>
-      <div class="modal-card">
-        <h2 id="modal-title"></h2>
-        <canvas id="modal-art"></canvas>
-        <p id="modal-text"></p>
-        <div id="modal-buttons"></div>
+
+    <!-- 7 · Победа -->
+    <div id="win" class="overlay overlay-win" hidden>
+      <div class="rays" aria-hidden="true"></div>
+      <div id="confetti" class="confetti" aria-hidden="true"></div>
+      <div class="card win-card">
+        <div id="win-gnomes" class="gnome-row on-card" aria-hidden="true"></div>
+        <div id="win-stars" class="stars"></div>
+        <div id="win-eyebrow" class="eyebrow"></div>
+        <h2 id="win-title"></h2>
+        <p id="win-text"></p>
+        <div class="toy-frame"><canvas id="win-toy"></canvas></div>
+        <button id="btn-next" class="btn-red wide"><b data-i18n="next">Дальше</b><small id="next-sub"></small></button>
+        <button id="btn-replay" class="link-red" data-i18n="replay">Сыграть ещё раз</button>
+      </div>
+    </div>
+
+    <!-- 8 · Ходов нет -->
+    <div id="lose" class="overlay overlay-lose" hidden>
+      <div class="card lose-card">
+        <div id="sad-gnome" class="sad-gnome" aria-hidden="true"></div>
+        <h2 data-i18n="loseTitle">Гномам нечего брать</h2>
+        <p data-i18n="loseText">Все ячейки заняты, а снаружи игрушки нет блоков нужных цветов.</p>
+        <div id="lose-slots" class="mini-tiles"></div>
+        <button id="btn-revive" class="btn-gold"><span><b data-i18n="addSlot">+1 ячейка</b><small data-i18n="forAd">за просмотр рекламы</small></span><i class="play-ico" aria-hidden="true"></i></button>
+        <div class="links"><button id="btn-lose-map" class="link-red" data-i18n="toLevels">К уровням</button><button id="btn-lose-restart" class="link-red" data-i18n="startOver">Начать заново</button></div>
       </div>
     </div>
   </div>

@@ -1,141 +1,42 @@
-// Игрушки-картинки. Каждая описана фигурами в системе координат SIZE×SIZE
-// и переводится в пиксели сетки GRID×GRID: клетка получает цвет последней фигуры, которая накрывает её центр.
+// Игрушки уровней из макета дизайнера (48 штук, от лёгких к сложным).
+// Формат строки: «название|ширина|высота|ряды», ряды через «/», внутри ряда «число+буква»
+// (например «6.9R» = 6 пустых клеток и 9 красных). Буквы — ключи PALETTE.
 (function (root) {
-  const SIZE = 22;   // координаты, в которых описаны фигуры
-  const GRID = 32;   // сколько клеток получается в картинке по стороне
-
-  // Яркая палитра: символ → цвет.
-  const PALETTE = {
-    r: '#ff3b3b', o: '#ff8c1a', y: '#ffd21f', l: '#9be22d', g: '#20b85a', t: '#14c2b3',
-    s: '#3ec3ff', b: '#2f6bff', v: '#8a4dff', p: '#ff6fb5', m: '#e0219c', n: '#a0622d',
-    w: '#ffffff', k: '#333344', e: '#ffd9b0'
+  // Палитра из UI-кита: [цвет, тень (темнее на 25%), цвет цифры на плитке]
+  const COLORS = {
+    R: ['#E8383D', '#B71F2B', '#FFFFFF'], r: ['#A61E2D', '#6E0F1C', '#FFFFFF'], O: ['#FF8A1F', '#D05F00', '#FFFFFF'], Y: ['#FFC928', '#D79A00', '#FFFFFF'],
+    G: ['#22A45D', '#157A42', '#FFFFFF'], g: ['#146B3C', '#0B4527', '#FFFFFF'], L: ['#8BD346', '#5E9E24', '#FFFFFF'], B: ['#3EC1F3', '#1F93C4', '#FFFFFF'],
+    U: ['#2F6BEB', '#1D47B0', '#FFFFFF'], N: ['#1F3C8F', '#12245A', '#FFFFFF'], V: ['#8B4DF0', '#5E2BC0', '#FFFFFF'], P: ['#FF6FB5', '#D9408C', '#FFFFFF'],
+    M: ['#D61A8C', '#9E0E66', '#FFFFFF'], S: ['#FFD3A8', '#E2A774', '#8A4E1E'], T: ['#9A5B2E', '#6B3D1D', '#FFFFFF'], t: ['#D39457', '#A86A31', '#FFFFFF'],
+    K: ['#2A2D3E', '#15172A', '#FFFFFF'], A: ['#9AA3B5', '#6E7689', '#FFFFFF'], W: ['#FFFFFF', '#C9D3E6', '#2A2D3E']
   };
+  const PALETTE = {}, SHADE = {}, INK = {};
+  Object.entries(COLORS).forEach(([k, [c, d, i]]) => { PALETTE[k] = c; SHADE[k] = d; INK[k] = i; });
 
-  // ---------- фигуры ----------
-  const rect = (x, y, w, h, c) => ({ c, hit: (px, py) => px >= x && px < x + w && py >= y && py < y + h });
-  const circle = (cx, cy, r, c) => ({ c, hit: (px, py) => (px - cx) ** 2 + (py - cy) ** 2 <= r * r });
-  const ellipse = (cx, cy, rx, ry, c) => ({ c, hit: (px, py) => ((px - cx) / rx) ** 2 + ((py - cy) / ry) ** 2 <= 1 });
-  const poly = (pts, c) => ({ c, hit: (px, py) => {
-    let inside = false;
-    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
-      const [xi, yi] = pts[i], [xj, yj] = pts[j];
-      if ((yi > py) !== (yj > py) && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) inside = !inside;
-    }
-    return inside;
-  } });
-  const line = (x1, y1, x2, y2, wdt, c) => ({ c, hit: (px, py) => {
-    const dx = x2 - x1, dy = y2 - y1, len2 = dx * dx + dy * dy;
-    const t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / len2));
-    return (px - x1 - t * dx) ** 2 + (py - y1 - t * dy) ** 2 <= (wdt / 2) ** 2;
-  } });
-  // часть круга между углами (в градусах, 0 = вправо, по часовой)
-  const sector = (cx, cy, r, a1, a2, c) => ({ c, hit: (px, py) => {
-    if ((px - cx) ** 2 + (py - cy) ** 2 > r * r) return false;
-    let a = (Math.atan2(py - cy, px - cx) * 180) / Math.PI; if (a < 0) a += 360;
-    return a1 <= a2 ? a >= a1 && a < a2 : a >= a1 || a < a2;
-  } });
+  const DATA = ["Машинка|22|14|22./6.9R7./6.RW2BRBW2BR6./5.RW3BR5BR5./4.2R4BR5B2R4./4.R5BR6BR4./22R/O19R2Y/O19W2Y/4R3K8R3K4R/3R2KW2K6R2KW2K3R/3.K3WK6.K3WK3./3.2KW2K6.2KW2K3./4.3K8.3K4.", "Леденец|14|22|14./4.2R3WR4./3.2R3W2RW3./2.2R3W2R3W2./2.R2W4.2WR2./2.3W4.W2R2./2.2WR4.2RW2./2.W2R4.R2W2./2.2R3W2R3W2./9.2WR2./9.W2R2./7.G.2RW.G/8.2GY2G./8.2GY2G./7.G.2WR.G/9.W2R2./9.2RW2./9.R2W2./9.3W2./9.2WR2./9.W2R2./9.2RW2.", "Мяч|16|16|7.2R7./4.8R4./3.RWR4Y3R3./2.RW2R4Y4R2./.RW4R2Y6R./.5RY2RY5R./.14W./16U/16U/.14W./.14R./.14R./2.4R4Y4R2./3.4R2Y4R3./4.3R2Y3R4./7.2R7.", "Звёздочка|19|19|19./9.Y9./9.Y9./9.W9./8.YWY8./8.YOY8./7.2YO2Y7./5.3Y3O3Y5./.3YW3Y3O7Y./2.2Y4O3Y4O2Y2./3.2Y2OYKYKY2O2Y3./4.2YOP3YPO2Y4./5.2YOYRYO2Y5./5.2Y5O2Y5./5.Y2O3Y2OY5./5.9Y5./4.4Y3.4Y4./4.2Y7.2Y4./19.", "Носок|16|22|2.10W4./2.2WY5WYW4./2.5WY4W4./2.10W4./3.8R5./3.8W5./3.8R5./3.8R5./3.8R5./3.8W5./3.8R5./3.8R5./3.8R5./3.8W2R3./3.R3G8R./3.5G4R4G/3.5G4R4G/3.5G4R4G/3.R3G5R4G/4.8R4G/6.7R3./16.", "Варежка|16|20|16./7.5U4./6.7U3./5.2UWUWUW2U2./5.4UW4U2./4.3U5W3U./2.7UW5U./.6UWUWUW3U./.14U./.14U./.14U./.URURURURURURUR./2.12U2./3.12R./3.WA2WA2WA2WAW./3.A2WA2WA2WA2W./3.2WA2WA2WA2WA./3.WA2WA2WA2WAW./3.A2WA2WA2WA2W./3.2WA2WA2WA2WA.", "Ёлочный шар|16|19|7.2K7./6.K2.K6./6.4Y6./6.O2YO6./6.4R6./4.W7R4./3.2W8R3./2.9RW2R2./.14R./.14Y./.2RG5RG5R./.RGRG3RGRG3RG./.G3RGRG3RGRGR./.14Y./.14R./2.12R2./3.2RW4RW2R3./4.8R4./6.4R6.", "Снеговик|18|22|6.7K5./6.7R5./5.9K4./7.5W6./6.2WKWK2W5./6.3W3OW5./6.7W5./7.5W6./T4.RG2RG2RGR3.T/.2T2.RG2RG2RGR2.T./3.T.6WRGW.T2./4.T6WRGWT3./5.4WKWRGW4./5.9W4./6.7W5./4.5WK5W3./3.13W2./3.13W2./3.6WK6W2./3.13W2./4.11W3./6.7W5.", "Колокольчик|18|21|18./3.5G.R.5G2./2.6GW2R6G./3.5G3R5G2./6.3YR3Y5./5.9Y4./5.YW7Y4./5.YW7Y4./4.YW9Y3./4.YW9Y3./4.YW9Y3./4.YW9Y3./3.OW10OY2./3.YW11Y2./3.YW11Y2./3.13Y2./.16O./.16O./8.3T7./8.3T7./18.", "Подарок|18|18|18./18./3.5Y2O6Y2./3.2Y2OY2O2Y2O2Y2./3.5Y2O6Y2./8r2Y8r/8r2Y8r/8r2Y8r/.7R2Y7R./.RW3RWR2YW3RW2R./.7R2Y7R./.16Y./.16Y./.RW3RWR2YW3RW2R./.7R2Y7R./.7R2Y7R./.7R2Y7R./.RW3RWR2YW3RW2R.", "Пряник|20|21|10.T9./8.2Tt2T7./7.T5tT6./6.T7tT5./6.T2tKtK2tT5./6.T7tT5./6.T2t3W2tT5./7.T5tT6./3.5T5t5T2./2.TW6tR6tWT./.TtW13tWtT/2.TW6tG6tWT./3.4T7t4T2./5.T4tR3tT5./5.T9tT4./5.T9tT4./4.T4tTtT4tT3./4.T3tT.T.T3tT3./4.3WtT3.T3WT3./3.T4tT3.T4tT2./4.4T5.4T3.", "Кукла|18|22|3.V5.Y8./3.3V2Y3M2Y2V3./3.5V3M4V3./3.3V7Y2VY2./3.13Y2./2.4Y7S4Y./2.3Y9S3Y./2.3Y2SU3SU2S3Y./.4Y2SU3SU2S4Y/.4Y9S3Y./.4YSP5SPS3Y./.4Y4SR4S3Y./.5Y7S4Y./.6Y5S5Y./.5Y7W4Y./.3YS8PYS2Y./.2YSY9PYSY./4.10M4./4.11P3./3.12P3./3.13P2./2.15W.", "Самолёт|26|18|26./10.4O12./10.4O12./10.5Y10.K/3R7.5Y10.K/.RWR6.5Y10.K/.4R5.3YBW2B8.K/.12R4B3R3.A.K/.21R3AK/2.2R18W2A2K/3.7R6Y6R3AK/6.4R6Y3RK3.A.K/10.6Y3.K5.K/10.5Y4.K5.K/10.5Y4.K5.K/10.5O3.3K4.K/10.4O4.3K5./26.", "Барабан|22|20|2.R16.R2./.3R14.3R./4.t12.t4./5.2t8.2t5./6.11U5./3.2U13W2U2./2.U17WU./2.R2U13W2U2./2.4R11U3R2./2.2RYW5RWY4RW2R2./2.RYRY5RYRY5RY2./2.Y3RY3RY3RY3RYR2./2.5RYRY5RYRY2R2./2.6RY7RY3R2./2.18R2./2.18U2./2.19R./3.17U2./6.11U5./22.", "Ракета|18|26|18./9.R8./8.3R7./7.5R6./6.7R5./6.7R5./6.7W5./6.7W5./5.3W3U3W4./5.2WUW2BU2W4./5.2WU3BU2W4./5.2WU3BU2W4./5.3W3U3W4./5.9W4./3.2R9WR3./3.3R7W3R2./3.13R2./3.3R7W3R2./2.3R8A4R./2.3R8A4R./2.3R8A4R./.5R.OYWYO.5R/7.2OYO7./8.OYO7./8.OY8./9.O8.", "Юла|22|22|9.4K9./10.2A10./10.2A10./10.2A10./10.2A10./7.9R6./4.RW3RW3RW3RWR3./3.17R2./2.19Y./.21Y/.21R/.21R/2.UW3UW3UW3UW3UWU./3.17U2./4.15R3./6.11R5./7.9G6./8.7R7./8.7R7./9.5R8./10.3R9./11.K10.", "Пингвин|20|24|9.3W8./6.YGYGWGYGY5./6.9G5./5.10W5./6.9G5./6.4WG4W5./5.K2WK3WK2WK4./4.2K9W2K3./4.3K2W3O2W3K3./4.5KWOW5K3./3.K2RW2RW2RW2RW2K2./3.K2RW2RW2RW2RW2K2./3.3K7W2R3K2./3.3K7W2R3K2./2.4K7W2R4K./2.4K7W2R4K./2.4K9W4K./2.4K9W4K./4.2K9W2K3./4.2K9W2K3./5.2K7W2K4./6.K7WK5./7.OK3WKO6./5.5OK5O4.", "Неваляшка|20|24|20./10.R9./7.3RW3R6./6.3RW3RWR5./5.2R6Y3R4./5.2R7S2R4./5.2R7S2R4./4.3RSU3SUS3R3./5.2R7S2R4./5.2RP5SP2R4./5.2R3SR3S2R4./6.2R5S2R5./4.13R3./4.4R5W4R3./3.4R7W4R2./3.3R4WP4W3R2./3.3R3WPYP3W3R2./3.3R2WP3YP2W3R2./3.3R3WPYP3W3R2./3.3R4WG4W3R2./4.2RW2GWGW2GW2R3./4.3R3WG3W3R3./6.2R5W2R5./8.5R7.", "Плюшевый мишка|22|22|22./5.T11.T4./3.5T7.5T2./3.T3tT.5T.T3tT2./2.2T3t9T3t2T./3.T2t11T2tT2./3.4TW5TW6T2./5.3TK5TK3T4./5.6Tt6T4./5.4Tt3Kt4T4./5.3T3tK3t3T4./6.3T5t3T5./4.2T.4Tt4T.2T3./3.5T3Gg3G5T2./3.5TGT3tTG5T2./3.6T5t6T2./3.5T2tRtR2t5T2./3.5T2t3R2t5T2./4.4T3tR3t4T3./6.3T5t3T5./5.13t4./5.5t3T5t4.", "Кораблик|24|20|9.TG11.W./9.T4G5.5W/9.T3G6.2W3./9.T6.3r5./9.T6.3Y5./9.T6.3Y5./9.T6.3r5./5.11r3Y5./6.9W.3Y5./6.WBWBWBWBW.3Y5./6.9W.3Y5./.23R/2.20WR./2.21R./3.4RY4RY4RY4R2./4.17R3./2B2U2B2U2B2U2B2U2B2U2B2U/24U/2U2B2U2B2U2B2U2B2U2B2U2B/24U", "Паровозик|24|18|3.W2.W17./2.3W.W6.10r./3.W5K4.10r./5.3K6.8R2./5.3K6.2RW3B2R2./5.3K.2Y3.2R4B2R2./2.g4GYG3Y2G2R4B2R2./.3g3GY3GY2G8R2./.3g3GY3GY2G8R2./.3g3GY3GY2G8R2./.3g3GY3GY2G8R2./.3g3GY3GY2G8R2./.gRg3GY3GY2G3R4KR2./.22K./4.5K.4K2.2K2R2K2./4.2KR4K2R2K.2K2R2K2./4.5K.4K2.6K2./5.3K2.4K3.4K3.", "Робот|20|24|9.3R8./10.A9./5.10A5./5.A8NA5./3.2RA2NB2NB2NA2R3./3.2RA2NB2NB2NA2R3./3.2RA8NA2R3./5.A2NBNBNBNA5./5.10A5./9.2K9./4.12U4./.3A12U3A./.3A2U8W2U3A./.3A2UWRWRWYWG2U3A./.3A2U8W2U3A./.3A2UW6AW2U3A./.3A2U8W2U3A./2.2K12U.2K./.4K11U4K/2.2K2.3A2.3A3.2K./6.3A2.3A6./6.3A2.3A6./5.10K5./5.10K5.", "Матрёшка|18|26|18./8.RWR7./6.5RWR5./5.RW2RY3RW4./4.2R3TS2T3R3./4.2R6TY2R3./4.RY7SYR3./3.2RYSU3SUSYWR2./4.RY7SYR3./4.WYP5SPYR3./4.2RY2SR2SYWR3./3.4RY3SY3RW2./3.W3R5Y4R2./2.3RW7Y4R./2.3R9YW2R./2.W2R3Y3R3Y2RW./2.2R3Y5R3Y2R./2.2R3Y2RY2R3Y2R./2.2R3Y5R3YWR./2.RW4Y3R4Y2R./2.2R2YG2YG2YG2Y2R./3.2R2YGYGYG2YWR2./3.2R4YG4Y2R2./4.11r3./5.9r4./6.7r5.", "Пряничный домик|24|24|12.W11./11.3W.5W4./10.10W4./9.3WG3W3R5./8.3W3T3W2R5./7.3WT4G3WR5./6.3WT2GP2GT3W5./5.3W2TG3TGTG3W4./4.3W3T2GT2GTPT3W3./3.2WTG4TGRG4TGT2W2./2.2W4TP5TP5TP2W./.2W5TG5TG5TGT2W/3.W3tW3tW3tW3tWt3./3.2tW7tW7t3./3.18t3./3.t2YTY8t2YTYt3./3.t2YTY2tRW2RWt2YTYt3./3.t4T2tW2RWRt4Tt3./3.t2YTY2t2RW2Rt2YTYt3./3.7tRW2RW6t3./3.7tW2RWR6t3./3.7t2RW2R6t3./3.7tRW2RW6t3./24W", "Вертолёт|30|20|3.24K3./14.2K14./14.2K14./G13.2K14./GA12.R15./GAG7.6R2BR11./GAG5.R4r3RBW3B9./RA7RrY2r3RBW4B8./RA7R2rYr3R6B8./2.7R4r3R6BR7./5.R16W8./7.15RY7./8.13R9./10.9R11./10.K3.R3.K11./10.K7.K11./10.K7.K11./10.K7.K5.K5./6.18K6./30.", "Лошадка-качалка|28|24|28./21.W6./20.TW6./19.2T2.W4./18.2T.2WK2W2./18.2T7W./17.2T.2W3RWKW/11.5r.2T.2R2W.RW./11.5r2T2R3W5./2.T5.2W7UR5W5./2.4T.WAW7U6W5./2.4TA3W7Y5W6./2.3T.5WA4WYWA2W7./2.2T3.2WA6WA3W8./2.T4.A6WA5W8./7.2W3.A2W3.WAW7./6.3W9.3W7./6.2WA10.2W7./6.AW11.3W6./5.3KR10.3K6./8.3R7.3R7./9.11R8./11.7R10./28.", "Динозаврик|28|22|28./28./21.4G3./19.3GWK3G./19.7Gg./19.8G./19.G7g./10.2O.2O.2O.6G3./8.O.2O.GO.2O5G5./7.2O14G5./7.6Gg5GYGY6./6.2Gg8Gg2RYR6./5.7Gg5G4Y6./4.3Gg2G7LG2RYR6./3.5G10L2RYR6./2.4Gg13LG7./.g6G11Lg8./8.2G7LG10./8.GgG2.G.3G10./8.3G4.3G10./8.WGW4.WGW10./28.", "Олень|26|28|6.T13.T5./6.T2.T7.T2.T5./6.T2.T7.T2.T5./4.2T.T.T7.T.T.2T3./6.3T9.3T5./8.T9.T7./8.T9.T7./9.T.5t.T8./8.t.7t.t7./8.3tK3tK3t7./9.9t8./10.3tS3t9./10.t5St9./11.SWR2S10./11.S3RS10./10.3GR2G10./11.2tYt11./10.5t3R2t2.2W2./8.4t6R2tWt3W./7.2tW2t6Y5tW2./7.5t6StW3t3./7.3t10S3t3./8.2t10S2t4./8.3t8S2t5./8.2t.2t3.2t.2t5./8.2t.2t3.2t.2t5./8.2t.2t3.2t.2t5./8.2K.2K3.2K.2K5.", "Гитара|18|32|7.4T7./6.A4TA6./7.4T7./6.A4TA6./7.4T7./5.G2.tW8./5.3G2g.2G5./5.2G.tW2.G5./8.tW8./8.AW8./8.tW8./8.tW8./8.AW8./8.tW8./8.tW8./8.AW8./8.tW8./7.2RW2R6./5.4RW4R4./5.4RW4R4./5.3RYWY3R4./5.2RYKWKY2R4./5.2RYKWKY2R4./5.2RYKWKY2R4./3.4RYKWKY4R2./3.5RYWY5R2./3.RO4RW4ROR2./3.O4ROW3RO2R2./3.3R6KO3R2./3.3RO2RWRO4R2./5.O4RO3R4./6.3RO3R5.", "Лисичка|26|24|26./7.O9.O8./7.2O7.2O6.B./.B5.3O5.3O8./7.OT7OTO8./7.11O8./7.11O4.B3./7.3OK3OK3O8./3.B3.11O8./7.11O8./7.2O2W3O2W2O8./8.2O2WK2W2O9./7.Y2RY2RY2RY9./7.Y2RY2RY2RY9./7.4O3W2R2O.O.g4./2.B4.3O4W2R4OgRg3W/7.3O4W2R6O4W/6.4O5W7O4W/7.2O7W6O4W/7.3O5W10O./7.3O5W10O./8.2O5W8O3./9.2O3W2O3.O6./26B", "Пожарная машина|30|18|30./30./4.17A3.3U3./4.A.A.A.A.A.A.A.A.A8R./.22R2W3BR./.22R5BR./.2R2rWr2R4r2R4r4R5BR./.2Rr3W2R4r2R4r4R5BR./.2R2rWr2R4r2R4r10R./.28RY/.28Y./.27R2A/.4R3K4R3K8R3K2R2A/4.5K2.5K6.5K3./4.2KA2K2.2KA2K6.2KA2K3./4.2KA2K2.2KA2K6.2KA2K3./4.5K2.5K6.5K3./5.3K4.3K8.3K4.", "Щелкунчик|18|32|4.8K2W4./5.8R5./5.8R5./5.4RY3R5./5.3R3Y2R5./5.8R5./5.8Y5./4.W8SW4./4.W2SW3SWSW4./4.W2SK3SKSW4./4.WSP2SP2SPW4./4.WS6WSW4./4.3W4K3W4./4.W.6W.W4./2.3YRW5RW3Y2./2.3Y2RW3RWR3Y2./2.5RWRYRW4R2./2.6RWRW5R2./2.7RY6R2./2.14R2./2.2R5KY4K2R2./2.2W.Y6NY.2W2./5.Y3NK2NY5./5.Y3NK2NY5./5.Y3NK2NY5./5.Y3NK2NY5./5.Y3NK2NY5./4.KA2K2.KA2K4./4.4K2.4K4./4.4K2.4K4./2.GY2GY2GY2GY2GY2./2.14G2.", "Шкатулка-карусель|26|28|13.Y12./13.Y12./12.W2R11./11.2W2RW10./9.2R2W2R2WR8./8.W2R2W2R2W2R7./6.R2W2R2W2R2W2R2W5./5.2R2W2R2W2R2W2R2WR4./3.WYRYWYRYWYRYWYRYWYRYW2./3.Y.Y.Y3.Y.Y.Y3.Y.Y.Y2./5.Y7.Y7.Y4./5.Y7.Y.WK4.Y4./5.Y5.W2V4W3.Y4./5.Y.WK.Y5W5.Y4./3.W2P4WY5W5.Y.WK./2.Y5W3.W.Y.W3.W2U4W/2.Y5W5.Y4.Y5W2./3.W.Y.W5.Y4.Y5W2./5.Y7.Y5.W.Y.W2./5.Y3.9B3.Y4./3.21B2./2.22U2./2.UY2UY2UY2UY2UY2UY2UY2U2./2.22U2./.24PY/.23N2Y/.24NY/26.", "Сова|24|26|24./24./4.T19./4.2T13.T4./4.3T5.T5.2T4./4.4T.7T.3T4./4.3T4W3T4W2T4./4.2T2W2Y2WT2W2Y2WT4./4.2TWYWKYWTWYWKYWT4./5.2WY2KY3WY2KY2W4./4.2TW4YWTW4YW2T3./3.3r2W2YW3OW2Y2W3r2./3.3rT4W2Ot4WT3r2./2.4r2T4tO4t2T4r./2.3rGR2GR2GR2GR2GR4r./2.3rGR2GR2GR2GR2GR4r./2.5r8t3R5r./2.4rtT3tT3t3Gt4r./2.5r8t3R5r./2.4rT2tT3tTt3GT4r./3.3rT11tT3r2./3.3r2T3tT3tTt2T3r2./7.2T7t2T6./9W2O3W2O8W/Tr4Tr4Tr4Tr4Tr2T/r4Tr4Tr4Tr4Tr3T", "Ангелок|26|26|26./10.7Y9./10.7Y9./11.5Y10./10.7Y9./6.W2.3Y3S3Y2.W5./3.6A2Y5S2Y6A2./2.7W2YSKSKS2Y7W./2.7W2Y5S2Y7W./.8AWYPSRSPYW8A/.10WY3SY10W/.9W7U9W/9AW2BW4BW8A/.9W3BY3B9W/.8WBW2BY2BWB8W/.8A2BS3YS2B8A/2.7W3B3Y3B7W./2.6W4BYBY4B6W./3.5A4BW5BW5A2./6.W.11B.W5./7.3BW5BW3B6./7.13B6./7.BW5BW5B6./6.15B5./6.15U5./26.", "Замок|28|26|5.Y8.W8.Y4./5.W7.3W7.W4./5.W7.3W7.W4./4.3R5.5N5.3R3./4.3R4.7N4.3R3./3.5R2.9N2.5R2./3.5R2.W3AW3A3.5R2./2.7R.8A2.7R./2.2AW3A2.2AW2YAWA2.W3AWA2./2.6A2.3A2Y3A2.6A2./2.W3AWA2.W3AW3A2.2AW3A2./2.6A2.8A2.6A2./2.2A2YA.W.2AW3AW2A2.A2YWA2./2.2A2Y16A2Y2A2./2.W3AW3AW3AW3AW3AW3A2./2.24A2./2.2AW3AW3AWATAW3AW3AWA2./2.2A2Y7ATtT6A2Y2A2./2.WA2YW3AWA2Tt2TAW3A2Y2A2./2.10A2TtT10A2./2.2AW3AW3A2TtTW3AW3AWA2./2.10ATYtT10A2./2.W3AW3AWA2TtT2AW3AW3A2./2.10A2TtT10A2./11W2B2W2B11W/13W2B13W", "Дракончик|32|28|32./22.Y3.Y5./2.B6.U12.Y3.Y5./.3B6.UV10.2Y3G5./2.B7.U3V7.U7G3./11.U4V3.2V4GKW3G2./11.U5VU2VU9Gg./11.VU4VU2VU11G/6.Y5.U3VU2VU2.5G4g./12.VU2VU2VU.6G2.G2./13.U2VU2VU.5G6./13.VUG2VU.5G7./11.Gg6GRWRWRG7./10.6Gg2GRWRWRG7./9.2Gg8Gg2RG8./8.7GY5G2R7.Y./5.R2.2GgG7OgG2R9./5.2R4G9Y3Gg8./5.4GgG9O3G9./2.R.g5G11YGg9./3.R3G2.2G9O2G10./2.Gg2G4.G9YG11./2GR2G5.2G7O2G11./3RG6.GgG2.Y2.2Gg8.B2./.2R7.3G5.3G7.3B./.gR7.WGW5.WgW8.B2./32./32.", "Часы с кукушкой|24|34|12.W11./11.WTW10./9.W5TW8./7.W4Tg4TW6./6.W4TgRg4TW5./4.W7Tg7TW3./2.W19TW./.23W/3.T6t4T6tT3./3.t2G4tTKYO4t2Gt3./3.TGR4t4T4tRGT3./3.7t2YK2Y6t3./3.T5tY2WK2WY4tT3./3.5tY3WK3WY4t3./3.T4tY3WK3WY3tT3./3.5tK3WR3WK4t3./3.T4tY4W2RWY3tT3./3.5tY7WY4t3./3.T5tY5WY4tT3./3.7t2YK2Y6t3./3.T16tT3./7.A4.Y4.A6./7.A4.Y4.A6./7.A4.Y4.A6./7.A4.Y4.A6./7.A4.Y4.A6./7.A4.Y4.T6./7.A3.3Y2.TOT5./7.T2.2YO2Y.3T5./6.TOT.5Y.TOT5./6.3T2.3Y3.T6./6.TOT15./7.T16./24.", "Луноход|32|24|32./3.AR19.4W4./3.A3R17.4W4./3.A5.4W11.A7./3.A5.WK2W2.BWB6.A7./3.A5.4W3BR4B2.A8./3.A7.ABWB3R4BA9./UNUNUN5.A2B4R4B4.UNUNUN/UNUNUN4.BA3B3S5B3.UNUNUN/6N20A6N/UNUNUNAR16ARAUNUNUN/6.2A16Y2A6./6.20A6./6.2A16G2A6./6.20A6./5.22K5./7.K5.K5.K5.K6./5.5K.5K.5K.5K4./5.2KY2K.2KY2K.2KY2K.2KY2K4./5.5K.5K.5K.5K4./5.5K.5K.5K.5K4./7.K5.K5.K5.K6./3A2K23AK3A/16A2K14A", "Снегурочка|24|32|24./11.3B10./8.4BV3B8./8.3BVWV3B7./8.BW2BV2BWB7./7.11B6./7.BWBWBWBWBWB6./7.3Y5S3Y6./7.2Y7S2Y6./7.2Y7S2Y6./7.2YSU3SUS2Y6./7.2YP5SP2Y6./6.O2Y3SR3SY7./6.YO.Y5SY8./6.OY8WB7./6.YOW2B4W2BW6./4.2UOY3B3W4B.2U3./3.3UYO3B3W4B4U2./3.3UOYBWB3WBW2BW3U2./3.3UYO3B3W5B3U2./3.3UOY3B3W5B3U2./3.3UYO2B4W2BW2B3U2./3.2UBOYB7W4B2U2./3.2UBYOBWAWAWAW4B2U2./4.UWOY8WBW2BU3./5.BYO3B3W6B4./4.2B2R3B3W6B4./4.2BW2BWB3WBW2BW2B3./4.7B3W7B3./3.19W2./3.19W2./8.3R2.3R8.", "Сани с подарками|34|22|2.B31./.3B12.W.W15./2.B12.2UW2U10.Y3./5.3t7.2UW2U10.Y3./4.5T2.Y.Y.2UW2U9.3Y2./4.5T.2GY2G5W9.3Y2./3.5R2T2GY2G2UW2UPY2P10./3.6R.5Y2UW2UPY2PVWV7./3.6R.2GY2G2UW2UPY2PVWV7./3.6R.2GY2G2UW2UPY2PVWV7./3.24R7./4.24R5.B/4.RY3RY3RY3RY3RY3RY3R3.2B/4.25YR3.B/5.25R4./5.24r5./5.24r2.Y2./8.Y15.Y7.Y./8.Y15.Y7.Y./.Y6.Y15.Y6.Y2./2.29Y3./34W", "Новогодний поезд|34|20|31.W2./4.Y21.3W.3W./4.G21.3W5./4.G11.8N10./3.2GR4.PWP4.6U2.5K4./2.GR3G3.PWPYRY.UW2B2U3.3K5./2.2GR2G3.PWPYRY.U3B2U3.3K5./.7G2.PWPYRY.U3B2U3.3K5./.7V.7G.6U8RA2./.7V.7G.6U8RY2./.7Y.7Y.6U7Y3A./.7V.7G.6U7R3A./.7VK7GK6U7R3A./.7V.7G.2U2K2U3R2K3RA2./3.K2.K4.K2.K3.4K3.4K2.A2./2.KA2KAK2.KA2KAK2.KA2K3.KA2K2.Y2./2.6K2.6K2.4K3.4K2.2Y./3.K2.K4.K2.K4.2K5.2K3.3Y/34A/T2.T2.T2.T2.T2.T2.T2.T2.T2.T2.T2.T", "Карусель|30|30|15.R14./15.Y14./14.Y2R13./12.3Y3RY11./11.R3Y3R2Y10./9.3R3Y3R3YR8./7.2Y3R3Y3R3Y3R6./6.3Y3R3Y3R3Y3RY5./4.2R3Y3R3Y3R3Y3R3Y3./3.W2RW2YW2RW2YW2RW2YW2RW2YW2./30./2.R.Y.R.Y.R.Y.R.Y.R.Y.R.Y.R.Y./6.Y7.2Y8.Y5./6.Y7.2A8.Y.WK2./6.Y.WK4.2A6.W2G4W./4.W2P4W3.2Y5.Y5W3./3.Y5W5.2A5.Y5W3./3.Y5W5.2A6.WKY.W3./4.W.Y.W5.2Y2.W2V4W5./6.Y7.2A.Y5W.Y5./6.Y7.2A.Y5W.Y5./6.Y7.2Y2.W3.W.Y5./6.Y7.2A8.Y5./4.23B3./.28UB/.2UY2UY2UY2UY2UY2UY2UY2UY2UYU./.28U./12N6A12N/12N6W12N/12N6A12N", "Ёлка с игрушками|28|34|14.Y13./14.Y13./12.5Y11./13.YOY12./13.3Y12./13.YGY12./12.2GY2G11./12.Y4G11./10.2R6G10./10.2R3GB3G9./10.9g3.W5./11.6GY10./10.3GPGY3G9./9.4GY3G2RG8./8.2G2B5G2R2G7./8.GY2B9G7./6.W14gP6./9.3GV5GYG8./8.8GY4G7./8.2R4GYG2B3G7./7.G2R2GY3G2B4G6./6.4GY3GP4G2R2G5./5.2GPY10G2RYGV4./4.21g3./7.10GY4G6./6.9GY7G5./5.2B5G2R4G2B4G4./4.G2B4GY2R4G2B2G2RY3./3.V5GP6GV5G2RGP2./2.18g2VW3Vg./2.2UY3U4.4T4.2VW3V2./2.6Y4.4T4.6W2./2.2UY3U.10r.2VW3V2./2.2UY3U.10R.2VW3V2.", "Дед Мороз|27|32|27./11.R15./6.10R11./4.3W10R8.Y./4.3W.9R8.Y./4.3W.10R5.4Y/8.10R6.3Y/6.14W4.Y.Y/6.6W3S5W5.B./10.2W3S2W8.B./10.SK3SKS8.B./9.SP2SP2SPS7.B./8.11W6.B./8.11W6.B./8.10W7.B./4.R.2RrA7WARr2.R2.B./3.6RA7WA3Rr2R.B./2.7RA7WA5RrRB./2.Rr5RA7WA7RB./2.3Rr4RAWAWAWA8RB./2.5Rr3R5W2Rr6RB./2.7Rr2R3W5Rr4RB./2.3R7K3Y7Kr2RB./2.WRW7K3Y6KWRWrB./3.2G7R3Wr6R2G.B./2.4Gr5R3W2Rr3R4GB./3.2G3Rr3R3W4Rr2R2G.B./4.6RrR3W6RrR2.B./3.21W.B./3.21W.B./7.5K2.5K6.B./7.5K2.5K6.B.", "Пиратский корабль|32|30|11.K20./11.T3K6.R10./11.T9.4R7./10.AT9.T10./6.5WT4W5.T10./7.4RT5R4.TA9./7.4WT9WT4W6./7.3WKTK4W.3WT5W5./7.3WKTK4W.3WT5W5./7.4WT5W.3WT5W5./7.A3.T6.3WT5W.Y3./6.A4WT4W5.T4.A.G3./5.A.4RT9RT4R.AG3./5.A.4WT5W.3RT6R2G2./4.A3.3WT5W.3WT5W3G2./4.A3.3WT5W.3WT4W3GRG./2.YA4.3Wt5W.3Wt3W6t./T2.A7.T6.3WT3W2T2Y2TA/.tA8.t9.t3.6t./.30T./2.29t./3.26Y2T./3.27t2./4.4TK3TK3TK3TK3TK5T2./4.25t3./5.24T3./2B2UW2B3U2B3U2B3U2B3U2BUWU2B/15UW16U/3U2B3U2B3U2B3U2B3U2B3U2B2U/32U", "Кукольный домик|28|30|14.W4.5W4./13.WRW4.3T5./11.W2Rr2RW2.3T5./10.W3RT3RW.3T5./8.r3RrYTYr3Rr2T5./7.W4R5T4RWT5./5.Wr3Rr2RYTY2Rr3RrW4./4.W9RT9RW3./2.WRr3Rr3Rr3Rr3Rr3RrRW./.27W/2.M22PM2./2.MP6W8P6WPM2./2.MPWRBWRW8PWRBWRWPM2./2.MPW2BWBW8PW2BWBWPM2./2.MP6W8P6WPM2./2.MPW2BWBW8PW2BWBWPM2./2.MP6W8P6WPM2./2.MPGR2GRG8PGR2GRGPM2./2.24W2./2.M10P3T9PM2./2.MP6W2P5TP6WPM2./2.MPW2YGYW2P2TG2TPW4YWPM2./2.MPWY3GW2PTGTGTPWY2RYWPM2./2.MPW2YGYW2PTGTGTPW4YWPM2./2.MP6W2P2TRTYP6WPM2./2.M9P5T8PM2./2.M9P5T8PM2./2.M9P5T8PM2./11W7A10W/28W", "Мешок подарков|32|32|13.3GY2G13./13.3GY2G13./4.RW3.W.W.3GY2G.3T2.3T4./3.R2.R3UW2U3GY2G.8T4./3.W2.W3UW2U6Y2.TK2TKT5./6.W3UW2U3GY2G2.6T5./6.R6W3GY2G2.2TKt2T5./6.W3UW2U3GY2G3.T2tT6./6.W3UW2U3GY2G13./6.R3U13R9./6.W3.13R9./6.W.16Y8./8.16Y8./8.7RYRYR6r7./7.9RY5R4r6./6.10RY7R2rW5./5.5RW14R3W4./4.5R3W13RrW2r3./4.6RW15R3r3./4.22R3r3./4.12RB6RY3R2r3./3.12R3B5RY3R3r2./4.2RW2GW6RB4R5YR2r3./4.2R4G12R3YR3r3./4.2R4G12R3YR3r3./4.2RW2GW12RYRY4r3./5.6R3P11R3r4./6.5R3P6RW3R3r5./7.4R3P5R3W4r6./8.11RrW4r7./10.8R5r9./13.5R2r12."];
+  const NAMES_EN = ["Toy car", "Candy cane", "Ball", "Little star", "Stocking", "Mitten", "Bauble", "Snowman", "Bell", "Gift box", "Gingerbread man", "Doll", "Plane", "Drum", "Rocket", "Spinning top", "Penguin", "Roly-poly doll", "Teddy bear", "Toy boat", "Toy train", "Robot", "Matryoshka", "Gingerbread house", "Helicopter", "Rocking horse", "Little dino", "Reindeer", "Guitar", "Fox", "Fire truck", "Nutcracker", "Music box carousel", "Owl", "Little angel", "Castle", "Little dragon", "Cuckoo clock", "Moon rover", "Snow Maiden", "Sleigh with gifts", "New Year train", "Carousel", "Decorated tree", "Grandfather Frost", "Pirate ship", "Dollhouse", "Sack of gifts"];
 
-  const TOYS = [
-    { id: 'car', name: { ru: 'Машинка', en: 'Toy car' }, shapes: [
-      poly([[2, 13], [5, 13], [7, 8], [15, 8], [17, 13], [20, 13], [20, 17], [2, 17]], 'r'),
-      poly([[8, 9], [11, 9], [11, 13], [7, 13]], 's'), poly([[12, 9], [14.5, 9], [16, 13], [12, 13]], 's'),
-      rect(2, 14, 2, 1.5, 'y'), rect(18.5, 14, 1.5, 1.5, 'o'),
-      circle(6.5, 17.5, 2.6, 'k'), circle(15.5, 17.5, 2.6, 'k'), circle(6.5, 17.5, 1, 'w'), circle(15.5, 17.5, 1, 'w')
-    ] },
-    { id: 'doll', name: { ru: 'Кукла', en: 'Doll' }, shapes: [
-      ellipse(11, 7, 6, 6, 'y'), rect(5, 7, 12, 8, 'y'),
-      circle(11, 8, 4, 'e'), circle(9.5, 7.5, 0.7, 'b'), circle(12.5, 7.5, 0.7, 'b'), rect(10, 10, 2, 0.8, 'r'),
-      poly([[6.5, 2.5], [9.5, 4], [6.5, 5.5]], 'v'), poly([[9.5, 4], [12.5, 2.5], [12.5, 5.5]], 'v'),
-      poly([[8, 12], [14, 12], [18, 21], [4, 21]], 'p'), rect(8, 12, 6, 2, 'm'),
-      rect(5, 14, 2, 4, 'e'), rect(15, 14, 2, 4, 'e'), rect(7, 20, 8, 1, 'w')
-    ] },
-    { id: 'bear', name: { ru: 'Мишка', en: 'Teddy bear' }, shapes: [
-      circle(5.5, 4.5, 2.5, 'n'), circle(16.5, 4.5, 2.5, 'n'), circle(5.5, 4.5, 1.2, 'e'), circle(16.5, 4.5, 1.2, 'e'),
-      circle(11, 8, 6, 'n'), ellipse(11, 16.5, 6.5, 5.5, 'n'), ellipse(11, 17, 4, 3.5, 'e'),
-      circle(4.5, 14, 2, 'n'), circle(17.5, 14, 2, 'n'), circle(7, 20.5, 2, 'n'), circle(15, 20.5, 2, 'n'),
-      ellipse(11, 10, 2.8, 2, 'e'), circle(11, 9.3, 0.9, 'k'), circle(8.5, 6.8, 0.8, 'k'), circle(13.5, 6.8, 0.8, 'k'),
-      poly([[7.5, 12], [11, 13.5], [7.5, 15]], 'r'), poly([[14.5, 12], [11, 13.5], [14.5, 15]], 'r')
-    ] },
-    { id: 'ball', name: { ru: 'Мяч', en: 'Beach ball' }, shapes: [
-      sector(11, 11, 9.5, 0, 60, 'r'), sector(11, 11, 9.5, 60, 120, 'y'), sector(11, 11, 9.5, 120, 180, 'b'),
-      sector(11, 11, 9.5, 180, 240, 'g'), sector(11, 11, 9.5, 240, 300, 'p'), sector(11, 11, 9.5, 300, 360, 'o'),
-      circle(11, 11, 2, 'w'), circle(7, 6.5, 1.3, 'w')
-    ] },
-    { id: 'pyramid', name: { ru: 'Пирамидка', en: 'Stacking rings' }, shapes: [
-      rect(10, 1, 2, 18, 'n'), circle(11, 2, 1.6, 'y'),
-      ellipse(11, 5, 3, 1.6, 'v'), ellipse(11, 8, 4.5, 1.7, 'b'), ellipse(11, 11, 6, 1.8, 'g'),
-      ellipse(11, 14, 7.5, 1.9, 'y'), ellipse(11, 17, 9, 2, 'r'), rect(2, 19.5, 18, 2, 'n')
-    ] },
-    { id: 'boat', name: { ru: 'Кораблик', en: 'Toy boat' }, shapes: [
-      rect(10.5, 2, 1, 12, 'n'), poly([[11.5, 3], [18, 12], [11.5, 12]], 'w'), poly([[10.5, 5], [10.5, 12], [5, 12]], 'y'),
-      poly([[10.5, 1], [14, 2], [10.5, 3]], 'r'),
-      poly([[2, 13], [20, 13], [17, 17], [5, 17]], 'r'), rect(4, 13, 14, 1, 'w'),
-      circle(7.5, 15, 0.8, 'y'), circle(11, 15, 0.8, 'y'), circle(14.5, 15, 0.8, 'y'),
-      rect(0, 18, 22, 1.5, 's'), rect(0, 19.5, 22, 2, 'b')
-    ] },
-    { id: 'robot', name: { ru: 'Робот', en: 'Robot' }, shapes: [
-      rect(10.5, 0.5, 1, 2.5, 'k'), circle(11, 1, 1.2, 'r'),
-      rect(6, 3, 10, 7, 'n'), rect(6, 3, 10, 7, 's'), circle(9, 6, 1.5, 'w'), circle(13, 6, 1.5, 'w'),
-      circle(9, 6, 0.7, 'k'), circle(13, 6, 0.7, 'k'), rect(8.5, 8, 5, 1, 'k'),
-      rect(5, 11, 12, 7, 'b'), rect(7, 12.5, 8, 3.5, 's'), circle(9, 14, 0.8, 'r'), circle(11, 14, 0.8, 'y'), circle(13, 14, 0.8, 'l'),
-      rect(2, 11.5, 3, 5, 'o'), rect(17, 11.5, 3, 5, 'o'), rect(6.5, 18, 3, 3.5, 'k'), rect(12.5, 18, 3, 3.5, 'k')
-    ] },
-    { id: 'train', name: { ru: 'Паровозик', en: 'Toy train' }, shapes: [
-      rect(3, 5, 3, 4, 'k'), ellipse(4.5, 3.5, 2.5, 1.5, 'w'),
-      rect(2, 9, 10, 6, 'g'), rect(12, 5, 7, 10, 'r'), rect(13.5, 6.5, 4, 3.5, 's'), rect(11, 4, 9, 1.5, 'k'),
-      rect(1, 15, 20, 1.5, 'y'), circle(5, 18, 2.5, 'k'), circle(10.5, 18, 2.5, 'k'), circle(16.5, 18, 2.5, 'k'),
-      circle(5, 18, 0.9, 'y'), circle(10.5, 18, 0.9, 'y'), circle(16.5, 18, 0.9, 'y'), rect(0, 12, 2, 2, 'y')
-    ] },
-    { id: 'horse', name: { ru: 'Лошадка-качалка', en: 'Rocking horse' }, shapes: [
-      ellipse(11, 11, 6.5, 3.5, 'w'), poly([[14, 9], [16, 3], [19.5, 4], [20, 7], [17, 8], [16.5, 11]], 'w'),
-      poly([[13.5, 8], [15.5, 2.5], [16.5, 3], [15, 9]], 'o'), circle(18, 5, 0.6, 'k'),
-      poly([[4.5, 9], [2, 14], [3.5, 14.5], [5.5, 11]], 'o'),
-      rect(6, 13, 1.6, 5, 'w'), rect(9, 13, 1.6, 5, 'w'), rect(12.5, 13, 1.6, 5, 'w'), rect(15, 13, 1.6, 5, 'w'),
-      ellipse(11, 9, 3, 1.2, 'r'),
-      line(1, 18, 21, 18, 1.6, 'n'), line(1, 18, 3, 20.5, 1.6, 'n'), line(21, 18, 19, 20.5, 1.6, 'n')
-    ] },
-    { id: 'top', name: { ru: 'Юла', en: 'Spinning top' }, shapes: [
-      rect(10, 1, 2, 4, 'n'), circle(11, 1.5, 1.3, 'r'),
-      ellipse(11, 11, 9, 6, 'r'), ellipse(11, 11, 9, 4.2, 'y'), ellipse(11, 11, 9, 2.4, 'b'), ellipse(11, 11, 9, 0.9, 'w'),
-      poly([[6, 15.5], [16, 15.5], [11, 21]], 'v'), circle(11, 20.5, 0.9, 'k')
-    ] },
-    { id: 'plane', name: { ru: 'Самолётик', en: 'Toy plane' }, shapes: [
-      ellipse(11, 11, 9.5, 2.6, 'y'), poly([[8, 10], [13, 10], [10, 2], [8, 2]], 'b'), poly([[8, 12], [13, 12], [10, 20], [8, 20]], 'b'),
-      poly([[1.5, 8.5], [4, 8.5], [5, 11], [1.5, 11]], 'r'), circle(18, 10.5, 1.2, 's'), circle(15, 10.5, 1, 's'),
-      rect(20.3, 7.5, 1, 7, 'k'), circle(11, 11, 0.8, 'r')
-    ] },
-    { id: 'rocket', name: { ru: 'Ракета', en: 'Rocket' }, shapes: [
-      poly([[11, 0.5], [15, 6], [15, 16], [7, 16], [7, 6]], 'w'), poly([[11, 0.5], [14, 4.5], [8, 4.5]], 'r'),
-      circle(11, 9, 2.2, 'b'), circle(11, 9, 1.2, 's'),
-      poly([[7, 11], [3, 17], [7, 16]], 'r'), poly([[15, 11], [19, 17], [15, 16]], 'r'), rect(10, 11, 2, 5, 'r'),
-      poly([[8, 16], [14, 16], [11, 21.5]], 'o'), poly([[9.5, 16], [12.5, 16], [11, 19.5]], 'y')
-    ] }
-  ];
-
-  function rasterize(toy) {
-    const rows = [];
-    const k = SIZE / GRID;
-    for (let y = 0; y < GRID; y++) {
-      let row = '';
-      for (let x = 0; x < GRID; x++) {
-        let ch = '.';
-        for (const s of toy.shapes) if (s.hit((x + 0.5) * k, (y + 0.5) * k)) ch = s.c;
-        row += ch;
-      }
-      rows.push(row);
-    }
-    // обрезаем пустые края, чтобы картинка была по центру поля
-    let top = 0, bottom = GRID - 1, left = GRID, right = -1;
-    while (top < GRID && !/[^.]/.test(rows[top])) top++;
-    while (bottom > top && !/[^.]/.test(rows[bottom])) bottom--;
-    rows.forEach(r => { const a = r.search(/[^.]/); if (a >= 0) { left = Math.min(left, a); right = Math.max(right, r.length - 1 - [...r].reverse().join('').search(/[^.]/)); } });
-    const cut = rows.slice(top, bottom + 1).map(r => r.slice(left, right + 1));
-    return { id: toy.id, name: toy.name, rows: cut, w: cut[0].length, h: cut.length };
+  function decode(line, i) {
+    const [name, w, h, rle] = line.split('|');
+    const rows = rle.split('/').map(row => {
+      let out = '';
+      row.replace(/(\d*)(\D)/g, (_, n, ch) => { out += ch.repeat(n ? +n : 1); return ''; });
+      return out;
+    });
+    return { id: 'toy' + (i + 1), name: { ru: name, en: NAMES_EN[i] }, rows, w: +w, h: +h };
   }
 
-  const PICTURES = TOYS.map(rasterize);
+  const PICTURES = DATA.map(decode);
 
-  const api = { PALETTE, PICTURES, SIZE, GRID };
+  // Главы: 12 уровней в каждой, правила — из макета.
+  const CHAPTERS = [
+    { name: { ru: 'Лёгкие', en: 'Easy' }, color: '#22A45D', slots: 5, queues: 3, maxTile: 40 },
+    { name: { ru: 'Средние', en: 'Medium' }, color: '#2F6BEB', slots: 5, queues: 3, maxTile: 48 },
+    { name: { ru: 'Сложные', en: 'Hard' }, color: '#8B4DF0', slots: 5, queues: 4, maxTile: 56 },
+    { name: { ru: 'Мастер', en: 'Master' }, color: '#C8102E', slots: 4, queues: 4, maxTile: 64 }
+  ];
+
+  const api = { PALETTE, SHADE, INK, PICTURES, CHAPTERS };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else Object.assign(root, api);
 })(this);
