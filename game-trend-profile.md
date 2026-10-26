@@ -2,12 +2,12 @@
 
 - **Updated:** 2026-10-26
 - **Team:** solo
-- **Engine & tooling:** не выбран (кандидаты: HTML5/JS для веба, Unity/Godot для мобайла)
+- **Engine & tooling:** HTML5/JS + Claude Code (рекомендовано)
 - **Monthly budget:** ~0
 - **Budget rule when revenue starts:** не задано
-- **Platforms:** не решено
+- **Platforms:** сначала веб (Яндекс Игры, Playgama, CrazyGames), мобайл позже
 - **Store accounts:** нет данных
-- **Home market / language:** предположение — русскоязычный рынок (уточнить)
+- **Home market / language:** Россия, русский (подтверждено 2026-10-26)
 - **Target markets:** не задано
 - **Paid UA:** none
 - **Strengths:** не указано
