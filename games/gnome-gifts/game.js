@@ -63,6 +63,65 @@
     deny() { this.beep(180, 0.12, 'square', 0.05); }
   };
 
+  // ---------- фоновая музыка ----------
+  // Своя мелодия «музыкальной шкатулки»: тихие арпеджио C–Am–F–G и колокольчик сверху.
+  const Music = {
+    on: true, playing: false, timer: null, next: 0, step: 0, gain: null,
+    NOTE: n => 440 * Math.pow(2, ({ C: -9, D: -7, E: -5, F: -4, G: -2, A: 0, B: 2 }[n[0]] + (+n.slice(1) - 4) * 12) / 12),
+    CHORDS: [['C3', ['C4', 'E4', 'G4', 'E4', 'C5', 'G4', 'E4', 'G4']], ['A2', ['A3', 'C4', 'E4', 'C4', 'A4', 'E4', 'C4', 'E4']],
+      ['F2', ['F3', 'A3', 'C4', 'A3', 'F4', 'C4', 'A3', 'C4']], ['G2', ['G3', 'B3', 'D4', 'B3', 'G4', 'D4', 'B3', 'D4']]],
+    // по четыре четверти на такт, '-' — пауза; 8 тактов
+    MELODY: ['E5', 'G5', 'E5', 'D5', 'C5', 'E5', 'A4', '-', 'A4', 'C5', 'F5', 'E5', 'D5', 'B4', 'G4', '-',
+      'E5', 'G5', 'C6', 'G5', 'A5', 'G5', 'E5', '-', 'F5', 'E5', 'D5', 'C5', 'D5', '-', 'G4', '-'],
+    EIGHTH: 0.3,
+    note(freq, t, dur, type, vol) {
+      const ctx = Sound.ctx;
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g).connect(this.gain);
+      o.start(t); o.stop(t + dur + 0.05);
+    },
+    schedule() {
+      const ctx = Sound.ctx;
+      while (this.next < ctx.currentTime + 0.4) {
+        const s = this.step % 64, bar = Math.floor(s / 8) % 4, i = s % 8;
+        const [bass, arp] = this.CHORDS[bar];
+        if (i === 0 || i === 4) this.note(this.NOTE(bass), this.next, 0.9, 'triangle', 0.5);
+        this.note(this.NOTE(arp[i]), this.next, 0.35, 'triangle', 0.22);
+        if (i % 2 === 0) {
+          const m = this.MELODY[Math.floor(s / 2)];
+          if (m !== '-') {
+            this.note(this.NOTE(m), this.next, 0.9, 'sine', 0.45);
+            this.note(this.NOTE(m) * 2, this.next, 0.4, 'sine', 0.08);
+          }
+        }
+        this.next += this.EIGHTH; this.step++;
+      }
+    },
+    start() {
+      if (!this.on || this.playing) return;
+      try {
+        Sound.ctx = Sound.ctx || new (window.AudioContext || window.webkitAudioContext)();
+        if (Sound.ctx.state === 'suspended') Sound.ctx.resume();
+        if (!this.gain) { this.gain = Sound.ctx.createGain(); this.gain.connect(Sound.ctx.destination); }
+        this.gain.gain.value = 0.06;
+        this.playing = true;
+        this.next = Sound.ctx.currentTime + 0.1;
+        this.timer = setInterval(() => this.schedule(), 150);
+        this.schedule();
+      } catch (e) {}
+    },
+    stop() {
+      this.playing = false;
+      if (this.timer) clearInterval(this.timer);
+      this.timer = null;
+      if (this.gain) this.gain.gain.value = 0;
+    }
+  };
+
   // ---------- состояние ----------
   let save = { level: 0 };
   let levelIndex = 0, pic = null, level = null;
@@ -111,13 +170,24 @@
     ctx.beginPath(); ctx.moveTo(x - s * 0.5, y + s * 0.05); ctx.quadraticCurveTo(x, y + s * 0.2, x + s * 0.5, y + s * 0.05); ctx.stroke();
   }
 
+  // Кубик: верхняя грань цветом блока, под ней тёмная боковая грань.
+  const shadeCache = {};
+  function shade(hex) {
+    if (!shadeCache[hex]) {
+      const n = parseInt(hex.slice(1), 16);
+      const f = v => Math.round(v * 0.72);
+      shadeCache[hex] = `rgb(${f(n >> 16)},${f((n >> 8) & 255)},${f(n & 255)})`;
+    }
+    return shadeCache[hex];
+  }
   function drawBlock(ctx, px, py, c, color) {
+    const d = Math.max(1, c * 0.2), r = Math.max(1, c * 0.18);
+    ctx.fillStyle = shade(color);
+    roundRect(ctx, px + 0.4, py + 0.4, c - 0.8, c - 0.8, r); ctx.fill();
     ctx.fillStyle = color;
-    roundRect(ctx, px + 0.6, py + 0.6, c - 1.2, c - 1.2, Math.max(1, c * 0.2)); ctx.fill();
-    ctx.fillStyle = '#ffffff40';
-    ctx.fillRect(px + c * 0.2, py + c * 0.16, c * 0.32, c * 0.14);
-    ctx.fillStyle = '#00000018';
-    ctx.fillRect(px + c * 0.1, py + c * 0.78, c * 0.8, c * 0.12);
+    roundRect(ctx, px + 0.4, py + 0.4, c - 0.8, c - 0.8 - d, r); ctx.fill();
+    ctx.fillStyle = '#ffffff55';
+    ctx.fillRect(px + c * 0.18, py + c * 0.14, c * 0.3, c * 0.12);
   }
 
   function setupCanvas(canvas, w, h) {
@@ -166,6 +236,13 @@
       const s = sack.getBoundingClientRect();
       geo.mouth = { x: s.left - g.left + s.width / 2, y: s.top - g.top + s.height * 0.35 };
     } else geo.mouth = { x: geo.bx + geo.w / 2, y: geo.by + geo.h };
+    slots.forEach(bag => {
+      if (!bag) return;
+      const el = els.slots.querySelector(`[data-id="${bag.id}"]`);
+      if (!el) return;
+      const e = el.getBoundingClientRect();
+      bag.origin = { x: e.left - g.left + e.width / 2, y: e.top - g.top + e.height * 0.2 };
+    });
   }
 
   const cellXY = (x, y) => ({ x: geo.bx + geo.ox + (x + 0.5) * geo.c, y: geo.by + geo.oy + (y + 0.5) * geo.c });
@@ -267,9 +344,9 @@
   }
 
   // Путь по пустым клеткам от мешка до соседней с блоком клетки.
-  function findPath(tx, ty) {
+  function findPath(tx, ty, sx) {
     const out = Engine.outside(grid);
-    const sx = Math.floor(W / 2), sy = H;
+    const sy = H;
     const key = (x, y) => x + ',' + y;
     const prev = new Map([[key(sx, sy), null]]);
     const queue = [[sx, sy]];
@@ -295,14 +372,16 @@
       if (!bag || bag.claimed >= bag.n || bag.out >= PER_BAG || now - bag.lastSend < SEND_GAP) return;
       const list = (availableNow()[bag.color] || []).filter(([x, y]) => !reserved.has(x + ',' + y));
       if (!list.length) return;
-      const cx = W / 2, cy = H;
-      list.sort((a, b) => (a[0] - cx) ** 2 + (a[1] - cy) ** 2 - ((b[0] - cx) ** 2 + (b[1] - cy) ** 2));
+      const origin = bag.origin || geo.mouth;
+      // клетка под полем напротив квадрата — отсюда гномы заходят на поле
+      const sx = Math.max(-1, Math.min(W, Math.round((origin.x - geo.bx - geo.ox) / geo.c - 0.5)));
+      list.sort((a, b) => (a[0] - sx) ** 2 + (a[1] - H) ** 2 - ((b[0] - sx) ** 2 + (b[1] - H) ** 2));
       for (const [tx, ty] of list.slice(0, 6)) {
-        const path = findPath(tx, ty);
+        const path = findPath(tx, ty, sx);
         if (!path) continue;
         reserved.add(tx + ',' + ty);
         bag.claimed++; bag.out++; bag.lastSend = now;
-        const pts = [{ ...geo.mouth }, ...path.map(([x, y]) => cellXY(x, y))];
+        const pts = [{ ...origin }, ...path.map(([x, y]) => cellXY(x, y))];
         gnomes.push({ bag, color: bag.color, pts, i: 0, x: pts[0].x, y: pts[0].y, target: [tx, ty], carry: null, back: false });
         return;
       }
@@ -326,7 +405,7 @@
         const [tx, ty] = g.target;
         grid[ty][tx] = null; reserved.delete(tx + ',' + ty); avCache = null;
         g.carry = g.color; g.back = true; g.i = 0;
-        g.pts = g.pts.slice(0, -1).reverse();
+        g.pts = [...g.pts.slice(1, -1).reverse(), { ...geo.mouth }];
         Sound.drop();
         return true;
       }
@@ -488,15 +567,21 @@
     const saved = await Platform.load();
     if (saved && typeof saved.level === 'number') save = Object.assign(save, saved);
 
-    Platform.onPause = () => { Sound.paused = true; };
-    Platform.onResume = () => { Sound.paused = false; };
-    document.addEventListener('visibilitychange', () => { Sound.paused = document.hidden; });
+    Platform.onPause = () => { Sound.paused = true; Music.stop(); };
+    Platform.onResume = () => { Sound.paused = false; Music.start(); };
+    document.addEventListener('visibilitychange', () => (document.hidden ? Platform.onPause() : Platform.onResume()));
 
     els.play.addEventListener('click', () => startLevel(save.level));
     $('btn-home').addEventListener('click', openMenu);
     $('btn-restart').addEventListener('click', () => startLevel(levelIndex));
     els.addSlot.addEventListener('click', addSlot);
-    els.sound.addEventListener('click', () => { Sound.on = !Sound.on; els.sound.classList.toggle('off', !Sound.on); });
+    els.sound.addEventListener('click', () => {
+      Sound.on = Music.on = !Sound.on;
+      els.sound.classList.toggle('off', !Sound.on);
+      if (Music.on) Music.start(); else Music.stop();
+    });
+    // музыка стартует после первого нажатия: браузеры не дают играть звук без действия игрока
+    document.addEventListener('pointerdown', () => Music.start(), { once: true });
     window.addEventListener('resize', () => { if (grid) { renderUI(); layout(); } });
     document.addEventListener('contextmenu', e => e.preventDefault());
 
