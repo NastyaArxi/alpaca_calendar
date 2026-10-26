@@ -3,9 +3,9 @@
     ru: {
       title: 'Гномы и подарки', subtitle: 'Помоги гномам Деда Мороза собрать игрушки в мешок',
       play: 'Играть', level: 'Уровень', addSlot: '+1 ячейка', restart: 'Заново',
-      hint0: 'Нажми на подарок: гномы побегут за блоками его цвета.',
+      howto: 'Как играть', hint0: 'Нажми на цветной квадрат — гномы побегут за блоками этого цвета.',
       hint1: 'Гномы берут только блоки с краю. Разбирай игрушку снаружи внутрь!',
-      hint2: 'Если всем подаркам в ячейках нечего брать, уровень проигран. Выбирай порядок!',
+      hint2: 'Если всем квадратам в ячейках нечего брать — проигрыш. Выбирай порядок!',
       noSlot: 'Все ячейки заняты. Подожди, пока гномы освободят место.',
       winTitle: 'Игрушка в мешке!', winText: '{n} поедет к ребёнку на Новый год', next: 'Дальше',
       loseTitle: 'Гномы застряли', loseText: 'Подаркам в ячейках нечего брать. Добавь ячейку или начни заново.',
@@ -14,9 +14,9 @@
     en: {
       title: 'Gnomes & Gifts', subtitle: "Help Santa's gnomes pack the toys into the sack",
       play: 'Play', level: 'Level', addSlot: '+1 slot', restart: 'Restart',
-      hint0: 'Tap a gift: the gnomes will run for blocks of its color.',
+      howto: 'How to play', hint0: 'Tap a color square: the gnomes will run for blocks of that color.',
       hint1: 'Gnomes only take blocks at the edge. Take the toy apart from the outside in!',
-      hint2: 'If no gift in the slots has anything to take, you lose. Choose the order!',
+      hint2: 'If no square in the slots has anything to take, you lose. Choose the order!',
       noSlot: 'All slots are busy. Wait for the gnomes to free one.',
       winTitle: 'Toy packed!', winText: 'The {n} is going to a child for New Year', next: 'Next',
       loseTitle: 'The gnomes are stuck', loseText: 'No gift in the slots has anything to take. Add a slot or restart.',
@@ -28,7 +28,7 @@
   const $ = id => document.getElementById(id);
   const els = {
     menu: $('screen-menu'), game: $('screen-game'), stage: $('stage'), board: $('board'),
-    slots: $('slots'), queues: $('queues'), level: $('level-label'), hint: $('hint'),
+    slots: $('slots'), queues: $('queues'), level: $('level-label'),
     addSlot: $('btn-slot'), play: $('btn-play'), sound: $('btn-sound'),
     modal: $('modal'), modalTitle: $('modal-title'), modalText: $('modal-text'),
     modalArt: $('modal-art'), modalButtons: $('modal-buttons'), fx: $('fx')
@@ -143,10 +143,10 @@
     if (!grid) return;
     const width = Math.min(window.innerWidth, 560) - 24;
     const n = Math.max(slots.length, queues.length);
-    const gift = Math.floor(Math.max(40, Math.min(60, width / n - 8, (window.innerHeight - 160) / 9)));
+    const gift = Math.floor(Math.max(36, Math.min(50, width / n - 10, (window.innerHeight - 160) / 11)));
     document.documentElement.style.setProperty('--gift', gift + 'px');
     const r = els.stage.getBoundingClientRect();
-    const c = Math.max(6, Math.floor(Math.min(r.width / (W + 2.6), r.height / (H + 2.8))));
+    const c = Math.max(6, Math.floor(Math.min(r.width / (W + 2.2), r.height / (H + 2.3))));
     const pad = Math.round(c * 0.3);
     const w = (W + 2) * c + pad * 2, h = (H + 2) * c + pad * 2;
     geo = { c, pad, ox: pad + c, oy: pad + c, w, h, ctx: setupCanvas(els.board, w, h) };
@@ -208,7 +208,7 @@
     queues.forEach((q, qi) => {
       const col = document.createElement('div');
       col.className = 'queue';
-      q.slice(0, 3).forEach((bag, i) => {
+      q.slice(0, 2).forEach((bag, i) => {
         const el = giftEl(bag, bag.n);
         if (i === 0) {
           el.classList.add('front');
@@ -218,7 +218,7 @@
       });
       const more = document.createElement('div');
       more.className = 'more';
-      more.textContent = q.length > 3 ? `+${q.length - 3}` : '';
+      more.textContent = q.length > 2 ? `+${q.length - 2}` : '';
       col.appendChild(more);
       els.queues.appendChild(col);
     });
@@ -251,19 +251,13 @@
     const free = slots.indexOf(null);
     if (free < 0) {
       Sound.deny();
-      setHint(T.noSlot);
+      els.slots.classList.remove('shake'); void els.slots.offsetWidth; els.slots.classList.add('shake');
       return;
     }
     const b = q.shift();
     slots[free] = { id: ++uid, color: b.color, n: b.n, delivered: 0, claimed: 0, out: 0, lastSend: 0 };
     Sound.tap();
-    if (levelIndex === 0 || els.hint.textContent === T.noSlot) setHint('');
     renderUI();
-  }
-
-  function setHint(text) {
-    els.hint.textContent = text;
-    els.hint.style.visibility = text ? 'visible' : 'hidden';
   }
 
   // ---------- гномы ----------
@@ -382,8 +376,6 @@
     gnomes = []; reserved = new Set(); avCache = null;
     over = false; extraSlot = false;
     els.level.textContent = `${T.level} ${index + 1}`;
-    const hint = [T.hint0, T.hint1, T.hint2][index] || '';
-    setHint(hint);
     closeModal();
     show('game');
     layout();      // размер подарков
@@ -473,6 +465,7 @@
     closeModal();
     show('menu');
     els.play.innerHTML = `${T.play}<span class="sub">${T.level} ${save.level + 1}</span>`;
+    $('howto').innerHTML = `<b>${T.howto}</b><ol>${[T.hint0, T.hint1, T.hint2].map(t => `<li>${t}</li>`).join('')}</ol>`;
     const art = $('menu-art');
     const ctx = drawToy(art, PICTURES[0], 170);
     const colors = ['#ff3b3b', '#20b85a', '#2f6bff', '#ffd21f'];
