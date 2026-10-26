@@ -60,7 +60,7 @@
 
   function difficulty(L) {
     return {
-      slots: 6,
+      slots: 5,
       queues: 3,
       jitter: Math.min(0.8 + L * 0.5, 6),
       sizes: L < 2 ? [40, 60] : L < 6 ? [20, 30, 40, 60] : [12, 16, 20, 25, 30, 40]

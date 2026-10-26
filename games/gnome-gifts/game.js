@@ -142,7 +142,7 @@
   function layout() {
     if (!grid) return;
     const width = Math.min(window.innerWidth, 560) - 24;
-    const n = Math.max(slots.length + 1, queues.length);
+    const n = Math.max(slots.length, queues.length);
     const gift = Math.floor(Math.max(40, Math.min(60, width / n - 8, (window.innerHeight - 160) / 9)));
     document.documentElement.style.setProperty('--gift', gift + 'px');
     const r = els.stage.getBoundingClientRect();
@@ -161,7 +161,7 @@
     if (!geo) return;
     const g = els.game.getBoundingClientRect(), b = els.board.getBoundingClientRect();
     geo.bx = b.left - g.left; geo.by = b.top - g.top;
-    const sack = els.slots.querySelector('.sack');
+    const sack = $('sack');
     if (sack) {
       const s = sack.getBoundingClientRect();
       geo.mouth = { x: s.left - g.left + s.width / 2, y: s.top - g.top + s.height * 0.35 };
@@ -195,20 +195,11 @@
     <ellipse cx="20" cy="13" rx="11" ry="4.5" fill="#5a1018"/>
     <path d="M10 17 Q20 21 30 17" stroke="#ffc93c" stroke-width="2.2" fill="none"/></svg>`;
 
-  function giftSVG(color) {
-    const ribbon = color === 'w' ? '#e8323f' : '#ffffff';
-    const fill = PALETTE[color];
-    return `<svg viewBox="0 0 40 40" aria-hidden="true">
-      <rect x="4" y="14" width="32" height="23" rx="4" fill="${fill}"/>
-      <rect x="2" y="9" width="36" height="8" rx="3" fill="${fill}"/><rect x="2" y="9" width="36" height="8" rx="3" fill="#0000001f"/>
-      <rect x="17" y="9" width="6" height="28" fill="${ribbon}" opacity=".9"/>
-      <path d="M20 9 C13 0 7 6 20 9 Z M20 9 C27 0 33 6 20 9 Z" fill="${ribbon}" stroke="#0003" stroke-width=".8"/></svg>`;
-  }
-
   function giftEl(bag, remaining) {
     const d = document.createElement('div');
-    d.className = 'gift';
-    d.innerHTML = giftSVG(bag.color) + `<b>${remaining}</b>`;
+    d.className = 'gift' + (bag.color === 'w' ? ' light' : '');
+    d.style.background = PALETTE[bag.color];
+    d.innerHTML = `<b>${remaining}</b>`;
     return d;
   }
 
@@ -232,14 +223,7 @@
       els.queues.appendChild(col);
     });
     els.slots.innerHTML = '';
-    const mid = Math.floor(slots.length / 2);
     slots.forEach((bag, i) => {
-      if (i === mid) {
-        const sack = document.createElement('div');
-        sack.className = 'sack';
-        sack.innerHTML = SACK_SVG;
-        els.slots.appendChild(sack);
-      }
       const s = document.createElement('div');
       s.className = 'slot' + (extraSlot && i === slots.length - 1 ? ' extra' : '');
       if (bag) {
@@ -507,6 +491,7 @@
     lang = STR[Platform.lang] ? Platform.lang : 'en';
     T = STR[lang];
     applyI18n();
+    $('sack').innerHTML = SACK_SVG;
     const saved = await Platform.load();
     if (saved && typeof saved.level === 'number') save = Object.assign(save, saved);
 
