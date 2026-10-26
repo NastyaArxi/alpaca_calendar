@@ -60,10 +60,10 @@
 
   function difficulty(L) {
     return {
-      slots: 5,
+      slots: 6,
       queues: 3,
-      jitter: Math.min(0.5 + L * 0.35, 4),
-      sizes: L < 2 ? [20, 30] : L < 6 ? [10, 15, 20, 30] : [6, 8, 10, 12, 15, 20]
+      jitter: Math.min(0.8 + L * 0.5, 6),
+      sizes: L < 2 ? [40, 60] : L < 6 ? [20, 30, 40, 60] : [12, 16, 20, 25, 30, 40]
     };
   }
 
@@ -79,7 +79,7 @@
       let i = 0;
       while (i < layers.length) {
         let n = d.sizes[Math.floor(rnd() * d.sizes.length)];
-        if (layers.length - i - n < 4) n = layers.length - i;
+        if (layers.length - i - n < 8) n = layers.length - i;
         const part = layers.slice(i, i + n);
         bags.push({ color, n, key: part.reduce((a, b) => a + b, 0) / part.length });
         i += n;

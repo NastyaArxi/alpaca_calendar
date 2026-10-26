@@ -31,12 +31,12 @@
     slots: $('slots'), queues: $('queues'), level: $('level-label'), hint: $('hint'),
     addSlot: $('btn-slot'), play: $('btn-play'), sound: $('btn-sound'),
     modal: $('modal'), modalTitle: $('modal-title'), modalText: $('modal-text'),
-    modalArt: $('modal-art'), modalButtons: $('modal-buttons')
+    modalArt: $('modal-art'), modalButtons: $('modal-buttons'), fx: $('fx')
   };
 
-  const SPEED = 9;        // клеток в секунду
-  const PER_BAG = 4;      // гномов одного подарка одновременно в пути
-  const SEND_GAP = 140;   // мс между выходами гномов одного подарка
+  const SPEED = 16;       // клеток в секунду
+  const PER_BAG = 8;      // гномов одного подарка одновременно в пути
+  const SEND_GAP = 60;    // мс между выходами гномов одного подарка
   const SKIN = '#ffd2a8';
 
   // ---------- звук ----------
@@ -137,21 +137,38 @@
   }
 
   // ---------- раскладка ----------
+  // Поле (рамка + блоки) рисуется на #board. Гномы — на слое #fx поверх всего экрана игры,
+  // чтобы они могли добежать от игрушки до мешка в ряду ячеек.
   function layout() {
     if (!grid) return;
-    const r = els.stage.getBoundingClientRect();
-    const c = Math.max(8, Math.floor(Math.min(r.width / (W + 2.6), r.height / (H + 5.2))));
-    const pad = Math.round(c * 0.3);
-    const w = (W + 2) * c + pad * 2, h = (H + 5) * c + pad * 2;
-    geo = { c, pad, ox: pad + c, oy: pad + c, w, h, ctx: setupCanvas(els.board, w, h) };
-    geo.mouth = { x: geo.ox + (W / 2) * c, y: geo.oy + (H + 1.9) * c };
     const width = Math.min(window.innerWidth, 560) - 24;
-    const n = Math.max(slots.length, queues.length);
+    const n = Math.max(slots.length + 1, queues.length);
     const gift = Math.floor(Math.max(40, Math.min(60, width / n - 8, (window.innerHeight - 160) / 9)));
     document.documentElement.style.setProperty('--gift', gift + 'px');
+    const r = els.stage.getBoundingClientRect();
+    const c = Math.max(6, Math.floor(Math.min(r.width / (W + 2.6), r.height / (H + 2.8))));
+    const pad = Math.round(c * 0.3);
+    const w = (W + 2) * c + pad * 2, h = (H + 2) * c + pad * 2;
+    geo = { c, pad, ox: pad + c, oy: pad + c, w, h, ctx: setupCanvas(els.board, w, h) };
+    const g = els.game.getBoundingClientRect();
+    geo.fxCtx = setupCanvas(els.fx, g.width, g.height);
+    geo.fw = g.width; geo.fh = g.height;
+    locate();
   }
 
-  const cellXY = (x, y) => ({ x: geo.ox + (x + 0.5) * geo.c, y: geo.oy + (y + 0.5) * geo.c });
+  // Где поле и мешок находятся на слое гномов.
+  function locate() {
+    if (!geo) return;
+    const g = els.game.getBoundingClientRect(), b = els.board.getBoundingClientRect();
+    geo.bx = b.left - g.left; geo.by = b.top - g.top;
+    const sack = els.slots.querySelector('.sack');
+    if (sack) {
+      const s = sack.getBoundingClientRect();
+      geo.mouth = { x: s.left - g.left + s.width / 2, y: s.top - g.top + s.height * 0.35 };
+    } else geo.mouth = { x: geo.bx + geo.w / 2, y: geo.by + geo.h };
+  }
+
+  const cellXY = (x, y) => ({ x: geo.bx + geo.ox + (x + 0.5) * geo.c, y: geo.by + geo.oy + (y + 0.5) * geo.c });
 
   function render() {
     if (!geo) return;
@@ -166,11 +183,18 @@
       const ch = grid[y][x];
       if (ch) drawBlock(ctx, ox + x * c, oy + y * c, c, PALETTE[ch]);
     }
-    drawSack(ctx, geo.mouth.x, geo.mouth.y + c * 0.4, c * 2.2);
-    gnomes.forEach(g => drawGnome(ctx, g.x, g.y, c * 1.55, PALETTE[g.color], g.carry ? PALETTE[g.carry] : null));
+    const fx = geo.fxCtx;
+    fx.clearRect(0, 0, geo.fw, geo.fh);
+    gnomes.forEach(g => drawGnome(fx, g.x, g.y, Math.max(14, c * 1.5), PALETTE[g.color], g.carry ? PALETTE[g.carry] : null));
   }
 
   // ---------- подарки в очередях и ячейках ----------
+  const SACK_SVG = `<svg viewBox="0 0 40 40" aria-hidden="true">
+    <path d="M9 13 Q2 36 20 37 Q38 36 31 13 Z" fill="#d42a3a"/>
+    <ellipse cx="14" cy="25" rx="2.5" ry="6" fill="#ffffff33" transform="rotate(-15 14 25)"/>
+    <ellipse cx="20" cy="13" rx="11" ry="4.5" fill="#5a1018"/>
+    <path d="M10 17 Q20 21 30 17" stroke="#ffc93c" stroke-width="2.2" fill="none"/></svg>`;
+
   function giftSVG(color) {
     const ribbon = color === 'w' ? '#e8323f' : '#ffffff';
     const fill = PALETTE[color];
@@ -208,7 +232,14 @@
       els.queues.appendChild(col);
     });
     els.slots.innerHTML = '';
+    const mid = Math.floor(slots.length / 2);
     slots.forEach((bag, i) => {
+      if (i === mid) {
+        const sack = document.createElement('div');
+        sack.className = 'sack';
+        sack.innerHTML = SACK_SVG;
+        els.slots.appendChild(sack);
+      }
       const s = document.createElement('div');
       s.className = 'slot' + (extraSlot && i === slots.length - 1 ? ' extra' : '');
       if (bag) {
@@ -221,6 +252,7 @@
     });
     els.slots.classList.toggle('danger', slots.every(Boolean));
     els.addSlot.disabled = extraSlot;
+    locate();
   }
 
   function updateCounter(bag) {
@@ -235,15 +267,19 @@
     const free = slots.indexOf(null);
     if (free < 0) {
       Sound.deny();
-      els.hint.textContent = T.noSlot; els.hint.hidden = false;
+      setHint(T.noSlot);
       return;
     }
     const b = q.shift();
     slots[free] = { id: ++uid, color: b.color, n: b.n, delivered: 0, claimed: 0, out: 0, lastSend: 0 };
     Sound.tap();
-    if (levelIndex === 0) els.hint.hidden = true;
-    if (els.hint.textContent === T.noSlot) els.hint.hidden = true;
+    if (levelIndex === 0 || els.hint.textContent === T.noSlot) setHint('');
     renderUI();
+  }
+
+  function setHint(text) {
+    els.hint.textContent = text;
+    els.hint.style.visibility = text ? 'visible' : 'hidden';
   }
 
   // ---------- гномы ----------
@@ -288,7 +324,7 @@
         if (!path) continue;
         reserved.add(tx + ',' + ty);
         bag.claimed++; bag.out++; bag.lastSend = now;
-        const pts = [geo.mouth, ...path.map(([x, y]) => cellXY(x, y))];
+        const pts = [{ ...geo.mouth }, ...path.map(([x, y]) => cellXY(x, y))];
         gnomes.push({ bag, color: bag.color, pts, i: 0, x: pts[0].x, y: pts[0].y, target: [tx, ty], carry: null, back: false });
         return;
       }
@@ -363,11 +399,12 @@
     over = false; extraSlot = false;
     els.level.textContent = `${T.level} ${index + 1}`;
     const hint = [T.hint0, T.hint1, T.hint2][index] || '';
-    els.hint.textContent = hint; els.hint.hidden = !hint;
+    setHint(hint);
     closeModal();
     show('game');
-    layout();
-    renderUI();
+    layout();      // размер подарков
+    renderUI();    // ряды подарков и мешок
+    layout();      // поле под оставшееся место
     running = true;
     Platform.gameplayStart();
   }
@@ -403,7 +440,7 @@
         { label: T.revive, primary: true, action: async () => {
           if (!(await Platform.showRewarded())) return;
           slots.push(null); extraSlot = true;
-          closeModal(); layout(); renderUI();
+          closeModal(); renderUI(); layout();
           over = false;
           Platform.gameplayStart();
         } },
@@ -419,7 +456,7 @@
     running = true;
     if (!ok) return;
     slots.push(null); extraSlot = true;
-    layout(); renderUI();
+    renderUI(); layout();
   }
 
   // ---------- экраны ----------
@@ -446,6 +483,8 @@
 
   function openMenu() {
     running = false;
+    gnomes = [];
+    if (geo) geo.fxCtx.clearRect(0, 0, geo.fw, geo.fh);
     Platform.gameplayStop();
     closeModal();
     show('menu');
@@ -480,7 +519,7 @@
     $('btn-restart').addEventListener('click', () => startLevel(levelIndex));
     els.addSlot.addEventListener('click', addSlot);
     els.sound.addEventListener('click', () => { Sound.on = !Sound.on; els.sound.classList.toggle('off', !Sound.on); });
-    window.addEventListener('resize', () => { if (grid) { layout(); renderUI(); } });
+    window.addEventListener('resize', () => { if (grid) { renderUI(); layout(); } });
     document.addEventListener('contextmenu', e => e.preventDefault());
 
     // для автотестов: index.html#debug

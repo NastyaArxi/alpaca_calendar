@@ -1,7 +1,8 @@
 // Игрушки-картинки. Каждая описана фигурами в системе координат SIZE×SIZE
-// и переводится в пиксели: клетка получает цвет последней фигуры, которая накрывает её центр.
+// и переводится в пиксели сетки GRID×GRID: клетка получает цвет последней фигуры, которая накрывает её центр.
 (function (root) {
-  const SIZE = 22;
+  const SIZE = 22;   // координаты, в которых описаны фигуры
+  const GRID = 32;   // сколько клеток получается в картинке по стороне
 
   // Яркая палитра: символ → цвет.
   const PALETTE = {
@@ -113,18 +114,19 @@
 
   function rasterize(toy) {
     const rows = [];
-    for (let y = 0; y < SIZE; y++) {
+    const k = SIZE / GRID;
+    for (let y = 0; y < GRID; y++) {
       let row = '';
-      for (let x = 0; x < SIZE; x++) {
+      for (let x = 0; x < GRID; x++) {
         let ch = '.';
-        for (const s of toy.shapes) if (s.hit(x + 0.5, y + 0.5)) ch = s.c;
+        for (const s of toy.shapes) if (s.hit((x + 0.5) * k, (y + 0.5) * k)) ch = s.c;
         row += ch;
       }
       rows.push(row);
     }
     // обрезаем пустые края, чтобы картинка была по центру поля
-    let top = 0, bottom = SIZE - 1, left = SIZE, right = -1;
-    while (top < SIZE && !/[^.]/.test(rows[top])) top++;
+    let top = 0, bottom = GRID - 1, left = GRID, right = -1;
+    while (top < GRID && !/[^.]/.test(rows[top])) top++;
     while (bottom > top && !/[^.]/.test(rows[bottom])) bottom--;
     rows.forEach(r => { const a = r.search(/[^.]/); if (a >= 0) { left = Math.min(left, a); right = Math.max(right, r.length - 1 - [...r].reverse().join('').search(/[^.]/)); } });
     const cut = rows.slice(top, bottom + 1).map(r => r.slice(left, right + 1));
@@ -133,7 +135,7 @@
 
   const PICTURES = TOYS.map(rasterize);
 
-  const api = { PALETTE, PICTURES, SIZE };
+  const api = { PALETTE, PICTURES, SIZE, GRID };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else Object.assign(root, api);
 })(this);
