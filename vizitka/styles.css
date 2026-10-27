@@ -177,6 +177,7 @@ h1, h2, h3, p, figure { margin: 0; }
 .h3 { font-size: 20px; font-weight: 700; }
 .body { font-size: 17px; line-height: 1.6; color: var(--muted); }
 .lead { max-width: 500px; font-size: 18px; line-height: 1.6; color: var(--muted); }
+.section-lead { max-width: 640px; margin-top: 8px; }
 .bar { width: 48px; height: 3px; border-radius: 2px; background: var(--accent); transform-origin: center; }
 .section-head.is-in .bar { animation: barGrow 1s var(--ease) .3s both; }
 @keyframes barGrow { from { transform: scaleX(0); } }
@@ -556,6 +557,13 @@ h1, h2, h3, p, figure { margin: 0; }
   .certs__track { --per: 1; }
   .site__shot { border-right: 0; border-bottom: 1px solid var(--line); }
   .marquee__track { font-size: 16px; }
+}
+
+@media (max-width: 400px) {
+  .container { padding: 0 16px; }
+  .panel { padding: 40px 18px; border-radius: 20px; }
+  .stat { padding: 20px 4px; }
+  .tros, .card:not(.work) { padding: 20px; }
 }
 
 /* ===== Reduced motion ===== */
