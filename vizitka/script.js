@@ -117,6 +117,15 @@
     }, 1500);
   }
 
+  /* ---------- Contribution graph in hero ---------- */
+  const contrib = $('.contrib');
+  if (contrib) {
+    const cells = Array.from({ length: 84 }, () => contrib.appendChild(document.createElement('i')));
+    const level = () => { const r = Math.random(); return r < 0.35 ? 0 : r < 0.6 ? 1 : r < 0.8 ? 2 : r < 0.93 ? 3 : 4; };
+    cells.forEach((c) => { c.dataset.l = level(); });
+    if (!reduce) setInterval(() => { for (let k = 0; k < 6; k++) cells[(Math.random() * cells.length) | 0].dataset.l = level(); }, 700);
+  }
+
   /* ---------- Pointer effects (desktop only) ---------- */
   if (fine && !reduce) {
     const root = document.documentElement;
