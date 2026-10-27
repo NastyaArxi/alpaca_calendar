@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Настя Архипова — email-разработчик. Вёрстка писем, триггерные цепочки, интерактивные письма.">
+<meta name="theme-color" content="#0A0A14">
+<title>Настя Архипова — email-разработчик</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<div class="progress" aria-hidden="true"><span></span></div>
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="spotlight" aria-hidden="true"></div>
+
+<header class="header">
+  <div class="header__inner">
+    <a href="#top" class="logo"><span class="mono accent">&lt;/&gt;</span>Настя Архипова</a>
+    <button class="burger" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="nav"><span></span><span></span></button>
+    <nav class="nav" id="nav">
+      <a href="#top" class="is-active">Главная</a>
+      <a href="#about">Обо мне</a>
+      <a href="#skills">Навыки</a>
+      <a href="#ai">ИИ</a>
+      <a href="#work">Услуги</a>
+      <a href="#case">Кейс</a>
+      <a href="#github">Сайты</a>
+      <a href="#hobby">Хобби</a>
+      <a href="#contacts">Контакты</a>
+      <span class="nav__line" aria-hidden="true"></span>
+    </nav>
+    <a href="https://t.me/ArNastya" class="btn btn--primary btn--sm magnetic header__cta">Обсудить проект
+      <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+  </div>
+</header>
+
+<main class="container">
+
+<!-- HERO -->
+<section id="top" class="hero">
+  <div class="hero__text">
+    <span class="tag intro" style="--d:0">Я email-разработчик</span>
+    <h1 class="hero__title">
+      <span class="line"><span class="intro-word" style="--d:1">Привет,</span> <span class="intro-word" style="--d:2">я</span> <span class="intro-word accent shimmer" style="--d:3">Настя</span></span>
+      <span class="hero__sub"><span class="intro-word" style="--d:4">Верстаю</span> <span class="intro-word" style="--d:5">письма,</span> <span class="intro-word" style="--d:6">которые</span> <span class="intro-word" style="--d:7">не</span> <span class="intro-word glitch" style="--d:8" data-text="ломаются">ломаются</span></span>
+    </h1>
+    <p class="lead intro" style="--d:9">Рассылки, триггерные цепочки и интерактивные письма для e-commerce, ритейла и финтеха. Одинаково выглядят в Gmail, Mail.ru, Яндекс Почте и Outlook.</p>
+    <div class="row intro" style="--d:10">
+      <a href="#work" class="btn btn--primary btn--lg magnetic">Смотреть работы
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+      <a href="https://t.me/ArNastya" class="btn btn--ghost btn--lg magnetic">Написать в Telegram</a>
+    </div>
+    <div class="tools intro" style="--d:11">
+      <span class="eyebrow muted">Инструменты</span>
+      <ul class="chips">
+        <li class="chip c-orange" style="--i:0">HTML</li>
+        <li class="chip c-blue" style="--i:1">CSS</li>
+        <li class="chip c-yellow" style="--i:2">JS</li>
+        <li class="chip c-violet" style="--i:3">MJML</li>
+        <li class="chip c-green" style="--i:4">Fig</li>
+        <li class="chip c-red" style="--i:5">Git</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="hero__visual" data-parallax>
+    <div class="orb" aria-hidden="true"></div>
+    <div class="orb-ring" aria-hidden="true"></div>
+    <div class="dots" aria-hidden="true"></div>
+    <img class="hero__photo" src="./assets/dfae5b48461e9161c73e6bec229dafbf.jpg" alt="Настя Архипова на сцене с микрофоном">
+    <div class="codecard float">
+      <div class="codecard__bar mono"><span>&lt;/&gt; email.html</span><span class="pulse-dot" aria-hidden="true"></span></div>
+      <pre class="mono" aria-label='const nastya = { stack: ["HTML", "MJML"], tested: "40+ клиентов", focus: "письма, которые не ломаются" };'><code id="typed"></code><span class="caret" aria-hidden="true"></span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee__track">
+    <span>Gmail</span><b>✦</b><span>Outlook</span><b>✦</b><span>Mail.ru</span><b>✦</b><span>Яндекс Почта</span><b>✦</b><span>Apple Mail</span><b>✦</b><span>Тёмная тема</span><b>✦</b><span>MJML</span><b>✦</b><span>Litmus</span><b>✦</b><span>Mindbox</span><b>✦</b>
+    <span>Gmail</span><b>✦</b><span>Outlook</span><b>✦</b><span>Mail.ru</span><b>✦</b><span>Яндекс Почта</span><b>✦</b><span>Apple Mail</span><b>✦</b><span>Тёмная тема</span><b>✦</b><span>MJML</span><b>✦</b><span>Litmus</span><b>✦</b><span>Mindbox</span><b>✦</b>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about" class="panel about">
+  <div class="stack reveal">
+    <span class="tag">Обо мне</span>
+    <h2 class="h2">Из бара — в вёрстку писем</h2>
+    <p class="body">Почти 4 года вела все маркетинговые рассылки мебельной сети Hoff и параллельно работала в email-агентстве. До IT шесть лет руководила баром и командой до 10 человек, а ещё выступаю со стендапом — поэтому держу сроки, спокойно договариваюсь и не боюсь сложных задач.</p>
+    <a href="https://www.behance.net/aarkhi_web_design" class="btn btn--outline magnetic">Портфолио на Behance</a>
+  </div>
+  <div class="stats reveal-group">
+    <div class="stat">
+      <span class="stat__icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/></svg></span>
+      <div><b class="stat__num"><span data-count="5">0</span> лет</b><span class="muted">в вёрстке, 4 — в email</span></div>
+    </div>
+    <div class="stat">
+      <span class="stat__icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span>
+      <div><b class="stat__num"><span data-count="40">0</span>+</b><span class="muted">почтовых клиентов в тестах</span></div>
+    </div>
+    <div class="stat">
+      <span class="stat__icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></span>
+      <div><b class="stat__num">+<span data-count="15">0</span>%</b><span class="muted">CTR после оптимизации под мобильные</span></div>
+    </div>
+    <div class="stat">
+      <span class="stat__icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="m9 12 2 2 4-4"/></svg></span>
+      <div><b class="stat__num">−<span data-count="30">0</span>%</b><span class="muted">ошибок отображения писем</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills" class="section">
+  <div class="section-head reveal">
+    <span class="eyebrow">Навыки</span>
+    <h2 class="h2">Чем я работаю</h2>
+    <span class="bar" aria-hidden="true"></span>
+  </div>
+  <ul class="grid grid--300 reveal-group">
+    <li class="card skill tilt"><span class="badge c-orange">HTML</span><div><b>HTML и CSS для писем</b><span class="muted">Табличная адаптивная вёрстка</span></div></li>
+    <li class="card skill tilt"><span class="badge c-violet">MJML</span><div><b>MJML</b><span class="muted">Библиотеки блоков и шаблонов</span></div></li>
+    <li class="card skill tilt"><span class="badge c-green">Test</span><div><b>Litmus и Email on Acid</b><span class="muted">Тесты до отправки</span></div></li>
+    <li class="card skill tilt"><span class="badge c-blue">ESP</span><div><b>Mindbox, Unisender, SendPulse, Sendsay</b><span class="muted">А ещё Rubbles и Exponea</span></div></li>
+    <li class="card skill tilt"><span class="badge c-yellow">CJM</span><div><b>Цепочки и A/B-тесты</b><span class="muted">CJM, сегментация, CRM и CDP</span></div></li>
+    <li class="card skill tilt"><span class="badge c-red">Fig</span><div><b>Figma, Photoshop, Git</b><span class="muted">Макеты, GIF, контроль версий</span></div></li>
+  </ul>
+</section>
+
+<!-- AI -->
+<section id="ai" class="panel ai">
+  <div class="ai__head">
+    <div class="stack reveal">
+      <span class="tag">ИИ в работе</span>
+      <h2 class="h2">Изучаю ИИ и работаю в паре с Claude</h2>
+    </div>
+    <p class="body reveal">Claude помогает мне быстрее верстать, раскладывать задачи на шаги, разбирать данные и писать тексты. Решения, финальная вёрстка и проверка в почтовых клиентах — за мной.</p>
+  </div>
+  <ul class="grid grid--240 reveal-group">
+    <li class="card card--dark tilt"><span class="mono kicker">01 · Вёрстка</span><b>Быстрее от макета к коду</b><span class="muted small">Черновики HTML-писем и лендингов, адаптив, поиск причин, почему письмо «поехало» в Outlook или тёмной теме.</span></li>
+    <li class="card card--dark tilt"><span class="mono kicker">02 · Оптимизация задач</span><b>ТЗ раскладываю на шаги</b><span class="muted small">Декомпозиция задач, чек-листы перед отправкой, шаблоны и библиотеки блоков, чтобы не делать одно и то же дважды.</span></li>
+    <li class="card card--dark tilt"><span class="mono kicker">03 · Аналитика</span><b>Цифры — в выводы</b><span class="muted small">Разбор метрик рассылок и A/B-тестов, SQL-запросы, сводки по результатам и гипотезы, что улучшить дальше.</span></li>
+    <li class="card card--dark tilt"><span class="mono kicker">04 · Тексты</span><b>Слова, которые кликают</b><span class="muted small">Темы писем и прехедеры, варианты для A/B, тексты кнопок, описания кейсов и структура страниц.</span></li>
+  </ul>
+  <div class="stack">
+    <h3 class="h3 reveal">Как мы с Claude проходим задачу</h3>
+    <ol class="steps reveal-group">
+      <li><span class="steps__n">1</span><b>Разбираем задачу</b><span class="muted small">ТЗ, референсы, ограничения ESP и почтовых клиентов.</span></li>
+      <li><span class="steps__n">2</span><b>Собираем структуру</b><span class="muted small">Блоки, тексты и первый черновик кода.</span></li>
+      <li><span class="steps__n">3</span><b>Верстаю и проверяю</b><span class="muted small">Довожу вручную, тестирую в Litmus и Email on Acid.</span></li>
+      <li><span class="steps__n">4</span><b>Считаем и улучшаем</b><span class="muted small">Смотрим метрики после отправки и решаем, что менять.</span></li>
+    </ol>
+  </div>
+  <div class="pills reveal">
+    <span>Инструменты:</span>
+    <span class="pill pill--accent">Claude</span>
+    <span class="pill">ChatGPT</span>
+    <span class="pill">DeepSeek</span>
+    <span class="pills__note">Этот сайт тоже собран вместе с Claude: от разбора референсов до вёрстки.</span>
+  </div>
+</section>
+
+<!-- WORK -->
+<section id="work" class="section">
+  <div class="section-head reveal">
+    <span class="eyebrow">Услуги и работы</span>
+    <h2 class="h2">Что могу сделать для вас</h2>
+    <span class="bar" aria-hidden="true"></span>
+  </div>
+  <div class="grid grid--320 reveal-group">
+    <article class="card work tilt">
+      <div class="work__img"><img src="./assets/a6b5acee9ecbbb8caab0ecb3b49ff8f5.png" alt="Промо-рассылка LUNE" loading="lazy"><span class="num mono">01</span></div>
+      <div class="work__body"><h3>Вёрстка письма по макету</h3><p class="muted">Адаптивная вёрстка из Figma под вашу ESP.</p><div class="work__foot"><b>от [ЦЕНА] ₽</b><a href="https://t.me/ArNastya" class="link">Заказать <span class="arrow">→</span></a></div></div>
+    </article>
+    <article class="card work tilt">
+      <div class="work__img"><img src="./assets/458e7ee5318d7a322aa1fe9dd9d32a7b.png" alt="Исправление письма в тёмной теме" loading="lazy"><span class="num mono">02</span></div>
+      <div class="work__body"><h3>Починка «поехавших» писем</h3><p class="muted">Outlook, Gmail, тёмная тема, Mail.ru, телефоны.</p><div class="work__foot"><b>от [ЦЕНА] ₽</b><a href="https://t.me/ArNastya" class="link">Заказать <span class="arrow">→</span></a></div></div>
+    </article>
+    <article class="card work tilt">
+      <div class="work__img"><img src="./assets/6a968dbf91ebd287310dfe931fb01126.png" alt="Интерактивное письмо с каруселью" loading="lazy"><span class="num mono">03</span></div>
+      <div class="work__body"><h3>Интерактивные письма</h3><p class="muted">Карусели, аккордеоны, табы, опросы.</p><div class="work__foot"><b>от [ЦЕНА] ₽</b><a href="https://t.me/ArNastya" class="link">Заказать <span class="arrow">→</span></a></div></div>
+    </article>
+    <article class="card work tilt">
+      <div class="work__img"><img src="./assets/4e1546c3b8ff99a21a6168b536716226.png" alt="Письмо о брошенной корзине" loading="lazy"><span class="num mono">04</span></div>
+      <div class="work__body"><h3>Триггерные цепочки</h3><p class="muted">Welcome, корзина, реактивация, день рождения.</p><div class="work__foot"><b>от [ЦЕНА] ₽</b><a href="https://t.me/ArNastya" class="link">Заказать <span class="arrow">→</span></a></div></div>
+    </article>
+    <article class="card work tilt">
+      <div class="work__img"><img src="./assets/e38765b5443ec1666ed43377bbee2dfd.gif" alt="GIF-таймер для письма" loading="lazy"><span class="num mono">05</span></div>
+      <div class="work__body"><h3>GIF-анимация</h3><p class="muted">Таймеры, слайды, баннеры распродаж.</p><div class="work__foot"><b>от [ЦЕНА] ₽</b><a href="https://t.me/ArNastya" class="link">Заказать <span class="arrow">→</span></a></div></div>
+    </article>
+    <article class="card work work--cta">
+      <h3>Нужно что-то другое?</h3>
+      <p>Лендинги, промо-страницы, шаблоны для ESP — пришлите задачу, предложу решение.</p>
+      <a href="https://t.me/ArNastya" class="btn btn--primary magnetic">Описать задачу</a>
+    </article>
+  </div>
+</section>
+
+<!-- CASE -->
+<section id="case" class="section">
+  <div class="section-head reveal">
+    <span class="eyebrow">Кейс · сайт с нуля</span>
+    <h2 class="h2">ТросБарьер: сайт, который приносит заявки</h2>
+    <span class="bar" aria-hidden="true"></span>
+  </div>
+  <div class="case">
+    <figure class="browser reveal">
+      <div class="browser__bar"><i class="r"></i><i class="y"></i><i class="g"></i><span class="url mono">trosbarrier.ru</span></div>
+      <div class="tros">
+        <div class="tros__nav"><span>Продукция</span><span>Наличие</span><span>Как заказать</span><span>Решения</span><span>FAQ</span><span>Блог</span></div>
+        <p class="tros__title">Оцинкованный трос, сетка и крепёж для физических барьеров</p>
+        <p class="tros__lead">Комплекты материалов под ваш объект: расчёт, документы, отгрузка за 2–5 дней.</p>
+        <div class="row"><span class="tros__btn">Получить расчёт</span><span class="tros__btn tros__btn--ghost">Скачать прайс</span></div>
+        <span class="tros__foot mono">Отвечаем в течение часа · 9:00–21:00</span>
+      </div>
+      <figcaption>Схема первого экрана · [ЗАМЕНИТЬ НА СКРИНШОТ]</figcaption>
+    </figure>
+    <div class="stack reveal-group">
+      <div class="card"><span class="eyebrow red">Задача</span><p>Поставщику троса, сетки и крепежа для защитных барьеров нужен был сайт, который сам приводит заявки от юрлиц и подрядчиков. Готового сайта не было.</p></div>
+      <div class="card"><span class="eyebrow green">Результат</span><p>Сайт запущен и стабильно приносит заявки от юрлиц и подрядчиков. <span class="muted">Цифры под NDA — расскажу подробнее на созвоне.</span></p></div>
+      <a href="https://trosbarrier.ru/" class="btn btn--primary magnetic">Открыть сайт
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+    </div>
+  </div>
+  <div class="stack">
+    <h3 class="h3 reveal">Как собирала: 5 шагов с нуля</h3>
+    <ol class="grid grid--210 reveal-group">
+      <li class="card tilt"><span class="mono kicker">01 · Смыслы</span><b>Структура под закупщика</b><span class="muted small">16 блоков: от оффера и сценариев применения до наличия, FAQ и формы.</span></li>
+      <li class="card tilt"><span class="mono kicker">02 · Каталог</span><b>7 групп товаров</b><span class="muted small">Трос Ø 0,65–56 мм по ГОСТ и DIN, сетка, крепёж, каркасы, таблица наличия.</span></li>
+      <li class="card tilt"><span class="mono kicker">03 · Доверие</span><b>Факты вместо обещаний</b><span class="muted small">Сертификаты на партию, фото отгрузок, менеджер с именем, адрес, НДС.</span></li>
+      <li class="card tilt"><span class="mono kicker">04 · Заявки</span><b>Форма прямо в Telegram</b><span class="muted small">«Получить расчёт» на каждом экране, прайс в PDF, ответ в течение часа.</span></li>
+      <li class="card tilt"><span class="mono kicker">05 · Техника</span><b>Своя тема WordPress</b><span class="muted small">Блог для SEO, разметка для Яндекса, тёмная «индустриальная» тема.</span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- GITHUB SLIDER -->
+<section id="github" class="section">
+  <div class="head-row reveal">
+    <div class="stack-sm">
+      <span class="eyebrow">GitHub</span>
+      <h2 class="h2">Сайты, которые я сверстала</h2>
+    </div>
+    <div class="ctrl">
+      <span class="ctrl__count mono" aria-live="polite" id="siteCount">01 / 06</span>
+      <button type="button" class="ctrl__btn" id="sitePrev" aria-label="Предыдущий сайт"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <button type="button" class="ctrl__btn ctrl__btn--accent" id="siteNext" aria-label="Следующий сайт"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+  </div>
+
+  <article class="site reveal" id="site">
+    <div class="site__shot">
+      <div class="browser__bar"><i></i><i></i><i></i><span class="url mono" data-f="host"></span></div>
+      <div class="site__imgwrap"><img data-f="img" alt="" src="./assets/035ba706d694969b32a6e95c18ff41a6.png"></div>
+    </div>
+    <div class="site__body">
+      <div class="site__meta mono"><span data-f="year"></span><span data-f="tech"></span></div>
+      <h3 class="site__title" data-f="title"></h3>
+      <p class="body" data-f="text"></p>
+      <div class="site__links">
+        <a data-f="url" href="#" class="btn btn--primary magnetic">Открыть сайт
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+        <a data-f="repo" href="#" class="link">Код на GitHub</a>
+      </div>
+    </div>
+    <span class="site__timer" aria-hidden="true"></span>
+  </article>
+
+  <div class="head-row">
+    <div class="dots-nav" role="group" aria-label="Выбрать сайт" id="siteDots"></div>
+    <a href="https://github.com/NastyaArxi" class="btn btn--outline magnetic">Все репозитории</a>
+  </div>
+</section>
+
+<!-- CONTACTS -->
+<section id="contacts" class="contacts">
+  <div class="stack reveal">
+    <span class="eyebrow">Давайте работать</span>
+    <h2 class="h2 h2--sm">Есть рассылка на примете?</h2>
+    <p class="muted">Пришлите макет или ссылку на письмо — посмотрю и назову сроки и стоимость.</p>
+    <a href="https://t.me/ArNastya" class="btn btn--primary magnetic">Написать в Telegram</a>
+  </div>
+  <div class="stack reveal">
+    <span class="eyebrow">Контакты</span>
+    <div class="row">
+      <a href="https://t.me/ArNastya" class="social">Telegram</a>
+      <a href="https://www.behance.net/aarkhi_web_design" class="social">Behance</a>
+      <a href="https://github.com/NastyaArxi" class="social">GitHub</a>
+      <a href="https://set.ki/account/N5AULPH" class="social">Сетка</a>
+    </div>
+    <a href="mailto:arhipian1991@mail.ru" class="contact"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>arhipian1991@mail.ru</a>
+    <a href="tel:+79122130557" class="contact"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>+7 912 213-05-57</a>
+  </div>
+</section>
+
+<!-- HOBBY -->
+<section id="hobby" class="hobby">
+  <div class="hobby__photo reveal">
+    <img src="./assets/c9561f5e3b1d4a585bc86a0c75cdab0b.jpg" alt="Настя выступает со стендапом на сцене" loading="lazy">
+    <span class="rec mono"><i aria-hidden="true"></i>stand-up · humor · video</span>
+  </div>
+  <div class="stack reveal-group">
+    <span class="tag">Хобби и увлечения</span>
+    <h2 class="h2">После работы — сцена и монтаж</h2>
+    <p class="body">Выступаю со стендапом и снимаю видео. Сейчас учусь режиссуре монтажа (уже прошла «Теорию монтажа» в Skillbox) и разбираюсь, как ритм, склейка и пауза управляют вниманием зрителя. Это помогает и в работе — письмо тоже нужно «смонтировать» так, чтобы его дочитали до кнопки.</p>
+    <ul class="row">
+      <li class="pill pill--line">Стендап</li>
+      <li class="pill pill--line">КВН</li>
+      <li class="pill pill--line">Видео</li>
+      <li class="pill pill--line">Режиссура монтажа — учусь</li>
+    </ul>
+    <div class="award">
+      <img src="./assets/6d3b02d792add1b901b0ac96ced06e87.jpg" alt="Диплом: чемпион КВН, Премьер-лига 2017" loading="lazy">
+      <div><b>Чемпион Премьер-лиги КВН, сезон 2017</b><span class="muted small">В составе команды «Театр уральского зрителя», Челябинск</span></div>
+    </div>
+    <a href="https://www.youtube.com/@nastya-ar-ar" class="btn btn--primary magnetic"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="m10 9 5 3-5 3z"/></svg>Смотреть на YouTube</a>
+  </div>
+</section>
+
+<!-- CERTS -->
+<section id="certs" class="section">
+  <div class="head-row reveal">
+    <div class="stack-sm">
+      <span class="eyebrow">Сертификаты</span>
+      <h2 class="h2">Продолжаю учиться</h2>
+      <p class="muted">10 курсов с 2021 по 2025 год: вёрстка, email-маркетинг, CRM, программирование и монтаж</p>
+    </div>
+    <div class="ctrl">
+      <span class="ctrl__count mono" aria-live="polite" id="certCount">01 / 10</span>
+      <button type="button" class="ctrl__btn" id="certPrev" aria-label="Предыдущий сертификат"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <button type="button" class="ctrl__btn ctrl__btn--accent" id="certNext" aria-label="Следующий сертификат"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+  </div>
+  <div class="certs reveal" id="certs-viewport">
+    <ul class="certs__track" id="certTrack"></ul>
+  </div>
+  <div class="dots-nav dots-nav--center" role="group" aria-label="Выбрать сертификат" id="certDots"></div>
+</section>
+
+<footer class="footer">© 2026 Настя Архипова · Санкт-Петербург · удалённо</footer>
+</main>
+
+<script src="./script.js"></script>
+</body>
+</html>
