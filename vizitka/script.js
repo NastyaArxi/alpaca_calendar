@@ -24,39 +24,6 @@
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
   onScroll();
 
-  /* ---------- Theme toggle ---------- */
-  const root = document.documentElement;
-  const toggle = $('.theme-toggle');
-  const metaTheme = $('meta[name="theme-color"]');
-  const syncTheme = () => {
-    const light = root.dataset.theme === 'light';
-    toggle.setAttribute('aria-label', light ? 'Включить тёмную тему' : 'Включить светлую тему');
-    metaTheme.setAttribute('content', light ? '#ffffff' : '#0d1117');
-  };
-  const setTheme = (t, save) => {
-    root.dataset.theme = t;
-    if (save) { try { localStorage.setItem('theme', t); } catch (e) {} }
-    syncTheme();
-  };
-  syncTheme();
-  toggle.addEventListener('click', (e) => {
-    const next = root.dataset.theme === 'light' ? 'dark' : 'light';
-    if (reduce || !document.startViewTransition) { setTheme(next, true); return; }
-    // circular reveal growing from the toggle button
-    const r = Math.hypot(Math.max(e.clientX, innerWidth - e.clientX), Math.max(e.clientY, innerHeight - e.clientY));
-    document.startViewTransition(() => setTheme(next, true)).ready.then(() => {
-      root.animate(
-        { clipPath: [`circle(0 at ${e.clientX}px ${e.clientY}px)`, `circle(${r}px at ${e.clientX}px ${e.clientY}px)`] },
-        { duration: 650, easing: 'cubic-bezier(.22, 1, .36, 1)', pseudoElement: '::view-transition-new(root)' }
-      );
-    });
-  });
-  matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
-    let saved = null;
-    try { saved = localStorage.getItem('theme'); } catch (err) {}
-    if (!saved) setTheme(e.matches ? 'light' : 'dark', false);
-  });
-
   /* ---------- Mobile nav ---------- */
   const burger = $('.burger');
   const nav = $('#nav');
