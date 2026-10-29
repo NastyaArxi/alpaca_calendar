@@ -90,31 +90,46 @@
     requestAnimationFrame(step);
   }
 
-  /* ---------- Typewriter in hero code card ---------- */
-  const typed = $('#typed');
-  const code = [
-    ['k', 'const'], ['', ' nastya = {\n  stack: ['], ['s', '"HTML"'], ['', ', '], ['s', '"MJML"'], ['', '],\n  tested: '],
-    ['g', '"40+ клиентов"'], ['', ',\n  focus: '], ['s', '"письма, которые\n    не ломаются"'], ['', '\n};']
-  ];
-  const renderCode = (n) => {
-    let left = n;
-    let html = '';
-    for (const [cls, txt] of code) {
-      if (left <= 0) break;
-      const part = txt.slice(0, left).replace(/&/g, '&amp;').replace(/</g, '&lt;');
-      left -= txt.length;
-      html += cls ? `<span class="${cls}">${part}</span>` : part;
+  /* ---------- Hero: tag wall + terminal ---------- */
+  const tagsBox = $('.hero__tags');
+  if (tagsBox) {
+    const wall = Array(60).fill('<td> <tr> <table> <a> <img> <mj-text> <!--[if mso]> </td>').join(' ');
+    $$('.hero__tags-layer', tagsBox).forEach((l) => { l.textContent = wall + ' ' + wall; });
+    if (fine && !reduce) {
+      const hero = $('.hero');
+      hero.addEventListener('pointermove', (e) => {
+        const r = tagsBox.getBoundingClientRect();
+        tagsBox.style.setProperty('--hx', e.clientX - r.left + 40 + 'px');
+        tagsBox.style.setProperty('--hy', e.clientY - r.top + 40 + 'px');
+        tagsBox.classList.add('is-lit');
+      });
+      hero.addEventListener('pointerleave', () => tagsBox.classList.remove('is-lit'));
     }
-    typed.innerHTML = html;
-  };
-  const total = code.reduce((a, [, t]) => a + t.length, 0);
-  if (reduce) renderCode(total);
-  else {
-    let n = 0;
-    setTimeout(function tick() {
-      renderCode(++n);
-      if (n < total) setTimeout(tick, 18 + Math.random() * 40);
-    }, 1500);
+  }
+
+  const term = $('.term');
+  if (term && !reduce) {
+    const lines = $$('.term__line', term);
+    const texts = lines.map((l) => $('.term__text', l));
+    texts.forEach((t, k) => { if (t) t.textContent = ''; });
+    term.classList.add('is-typing');
+    let k = 0;
+    const next = () => {
+      if (k >= lines.length) return;
+      const line = lines[k];
+      const cmd = line.dataset.cmd;
+      line.classList.add('is-shown');
+      k++;
+      if (!cmd) { setTimeout(next, 450); return; }
+      const t = texts[k - 1];
+      let n = 0;
+      (function type() {
+        t.textContent = cmd.slice(0, ++n);
+        if (n < cmd.length) setTimeout(type, 35 + Math.random() * 55);
+        else setTimeout(next, 500);
+      })();
+    };
+    setTimeout(next, 1400);
   }
 
   /* ---------- Demo video ---------- */

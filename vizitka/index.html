@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=202610290755">
+<link rel="stylesheet" href="./styles.css?v=202610290805">
 </head>
 <body>
 <div class="progress" aria-hidden="true"><span></span></div>
@@ -44,38 +44,35 @@
 
 <!-- HERO -->
 <section id="top" class="hero">
-  <div class="hero__text">
-    <span class="tag intro" style="--d:0">Я email-разработчик</span>
-    <h1 class="hero__title">
-      <span class="line"><span class="intro-word" style="--d:1">Привет,</span> <span class="intro-word" style="--d:2">я</span> <span class="intro-word accent shimmer" style="--d:3">Настя</span></span>
-      <span class="hero__sub"><span class="intro-word" style="--d:4">Верстаю</span> <span class="intro-word" style="--d:5">письма,</span> <span class="intro-word" style="--d:6">которые</span> <span class="intro-word" style="--d:7">не</span> <span class="intro-word glitch" style="--d:8" data-text="ломаются">ломаются</span></span>
-    </h1>
-    <p class="lead intro" style="--d:9">Рассылки, триггерные цепочки и интерактивные письма для e-commerce, ритейла и финтеха. Они одинаково выглядят в Gmail, Mail.ru, Яндекс Почте и Outlook. Да, даже в Outlook.</p>
-    <div class="row intro" style="--d:10">
-      <a href="#work" class="btn btn--primary btn--lg magnetic">Смотреть работы
-        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
-      <a href="https://t.me/ArNastya" class="btn btn--ghost btn--lg magnetic">Написать в Telegram</a>
-    </div>
-    <div class="tools intro" style="--d:11">
-      <span class="eyebrow muted">Инструменты</span>
-      <ul class="chips">
-        <li class="chip c-orange" style="--i:0">HTML</li>
-        <li class="chip c-blue" style="--i:1">CSS</li>
-        <li class="chip c-yellow" style="--i:2">JS</li>
-        <li class="chip c-violet" style="--i:3">MJML</li>
-        <li class="chip c-green" style="--i:4">Fig</li>
-        <li class="chip c-red" style="--i:5">Git</li>
-      </ul>
-    </div>
+  <div class="hero__tags" aria-hidden="true">
+    <div class="hero__tags-layer"></div>
+    <div class="hero__tags-layer hero__tags-layer--lit"></div>
   </div>
 
-  <div class="hero__visual" data-parallax>
-    <div class="orb" aria-hidden="true"></div>
-    <div class="orb-ring" aria-hidden="true"></div>
-    <img class="hero__photo" src="./assets/dfae5b48461e9161c73e6bec229dafbf.jpg" alt="Настя Архипова на сцене с микрофоном">
-    <div class="codecard float">
-      <div class="codecard__bar mono"><span>&lt;/&gt; email.html</span><span class="pulse-dot" aria-hidden="true"></span></div>
-      <pre class="mono" aria-label='const nastya = { stack: ["HTML", "MJML"], tested: "40+ клиентов", focus: "письма, которые не ломаются" };'><code id="typed"></code><span class="caret" aria-hidden="true"></span></pre>
+  <span class="hero__meta mono intro" style="--d:0">// email-разработчик · Санкт-Петербург · удалённо</span>
+  <h1 class="hero__title">
+    <span class="tagmark intro" style="--d:1">&lt;h1&gt;</span><span class="intro-word" style="--d:2">Письма,</span> <span class="intro-word" style="--d:3">которые</span><br>
+    <span class="intro-word accent glitch" style="--d:4" data-text="не ломаются">не ломаются</span><span class="caret caret--title" aria-hidden="true"></span><span class="tagmark intro" style="--d:6">&lt;/h1&gt;</span>
+  </h1>
+
+  <div class="hero__bottom">
+    <div class="hero__text">
+      <p class="lead intro" style="--d:7">Верстаю рассылки, триггерные цепочки и интерактивные письма для e-commerce, ритейла и финтеха.</p>
+      <div class="row intro" style="--d:8">
+        <a href="https://t.me/ArNastya" class="btn btn--primary btn--xl magnetic">Обсудить рассылку
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+        <a href="#work" class="btn btn--ghost btn--xl magnetic">Смотреть работы</a>
+      </div>
+    </div>
+
+    <div class="term intro" style="--d:9" role="img" aria-label="Терминал: test sale.html --clients all → Gmail, Mail.ru, Яндекс, Outlook, Apple Mail… ✓ 40+ клиентов · тёмная тема · мобильные. ship --to esp">
+      <div class="term__bar"><span class="term__dots" aria-hidden="true"><i></i><i></i><i></i></span>terminal — test-email</div>
+      <div class="term__body" aria-hidden="true">
+        <div class="term__line" data-cmd="test sale.html --clients all"><span class="term__ps">$</span> <span class="term__text">test sale.html --clients all</span></div>
+        <div class="term__line term__line--out">→ Gmail, Mail.ru, Яндекс, Outlook, Apple Mail…</div>
+        <div class="term__line term__line--ok">✓ 40+ клиентов · тёмная тема · мобильные</div>
+        <div class="term__line" data-cmd="ship --to esp"><span class="term__ps">$</span> <span class="term__text">ship --to esp</span><span class="caret caret--term"></span></div>
+      </div>
     </div>
   </div>
 </section>
@@ -387,6 +384,6 @@
 <footer class="footer">© 2026 Настя Архипова · Санкт-Петербург · удалённо</footer>
 </main>
 
-<script src="./script.js?v=202610290755"></script>
+<script src="./script.js?v=202610290805"></script>
 </body>
 </html>
