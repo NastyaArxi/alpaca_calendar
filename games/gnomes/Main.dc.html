@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Гномы и подарки — начать</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#F5C04A}a:hover{color:#FFE08A}
+.snowA,.snowB{position:absolute;left:0;right:0;top:-400px;bottom:0;pointer-events:none}
+.snowA{background-image:radial-gradient(circle at 20px 30px,rgba(255,255,255,.95) 1.8px,transparent 2.6px),radial-gradient(circle at 90px 80px,rgba(255,255,255,.7) 1.4px,transparent 2.2px),radial-gradient(circle at 60px 115px,rgba(255,255,255,.55) 1.1px,transparent 1.9px);background-size:130px 130px;animation:snowA 14s linear infinite}
+.snowB{background-image:radial-gradient(circle at 40px 50px,rgba(255,255,255,.9) 2.8px,transparent 3.6px),radial-gradient(circle at 150px 140px,rgba(255,255,255,.6) 2.2px,transparent 3px);background-size:195px 195px;animation:snowB 9s linear infinite;opacity:.8}
+@keyframes snowA{from{background-position:0 0}to{background-position:26px 390px}}
+@keyframes snowB{from{background-position:0 0}to{background-position:-39px 390px}}
+@keyframes twinkle{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes aurora{0%,100%{transform:translateX(-30px) skewX(-8deg);opacity:.55}50%{transform:translateX(30px) skewX(8deg);opacity:.9}}
+@keyframes titleIn{0%{transform:translateY(-24px) scale(.9);opacity:0}100%{transform:none;opacity:1}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes wave{0%,100%{transform:rotate(10deg)}50%{transform:rotate(-30deg)}}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
+@keyframes popIn{0%{transform:scale(.6);opacity:0}100%{transform:none;opacity:1}}
+@keyframes pulse{0%,100%{box-shadow:0 6px 0 #7A0819,0 0 0 0 rgba(245,192,74,.7)}50%{box-shadow:0 6px 0 #7A0819,0 0 0 10px rgba(245,192,74,0)}}
+@keyframes candy{from{background-position:0 0}to{background-position:28px 0}}
+@keyframes spark{0%,100%{transform:scale(.4);opacity:0}50%{transform:scale(1);opacity:1}}
+.mini{width:100px;height:62px;box-sizing:border-box;border-radius:18px;background:rgba(6,40,31,.85);border:2px solid rgba(245,192,74,.75);box-shadow:0 4px 0 #031912;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-decoration:none;color:#FFF7E8;font-size:12px;font-weight:800}
+.mini:hover{border-color:#F5C04A;color:#FFFFFF}
+.round{width:44px;height:44px;box-sizing:border-box;border-radius:50%;background:rgba(6,40,31,.85);border:2px solid rgba(245,192,74,.75);box-shadow:0 3px 0 #031912;display:flex;align-items:center;justify-content:center}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; font-family: Montserrat, system-ui, sans-serif; color: #FFFFFF; background: linear-gradient(180deg, #020A14 0%, #061A24 30%, #072B23 62%, #0E4535 100%)">
+
+<div aria-hidden="true" style="position: absolute; left: -80px; right: -80px; top: 60px; height: 220px; background: linear-gradient(100deg, rgba(43,212,111,0) 10%, rgba(43,212,111,.35) 35%, rgba(77,184,255,.3) 55%, rgba(139,77,240,.25) 72%, rgba(139,77,240,0) 90%); filter: blur(28px); border-radius: 50%; animation: aurora 9s ease-in-out infinite"></div>
+<sc-for list="{{stars}}" as="s" hint-placeholder-count="20">
+<div aria-hidden="true" style="position: absolute; left: {{s.x}}px; top: {{s.y}}px; width: {{s.r}}px; height: {{s.r}}px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 0 6px rgba(255,255,255,.8); animation: twinkle {{s.dur}}s ease-in-out {{s.d}}s infinite"></div>
+</sc-for>
+<div class="snowB" aria-hidden="true"></div>
+
+<div aria-hidden="true" style="position: absolute; left: 10px; right: 10px; top: 8px; display: flex; justify-content: space-between">
+<sc-for list="{{bulbs}}" as="b" hint-placeholder-count="14">
+<div style="width: 11px; height: 15px; border-radius: 50% 50% 50% 50% / 42% 42% 58% 58%; background: {{b.c}}; box-shadow: 0 0 12px 3px {{b.c}}; animation: twinkle 1.4s ease-in-out {{b.d}}s infinite"></div>
+</sc-for>
+</div>
+
+<!-- top bar: stars earned, sound, settings -->
+<div style="position: absolute; left: 20px; right: 20px; top: 38px; display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px 0 10px; box-sizing: border-box; border-radius: 20px; background: rgba(6,40,31,.85); border: 2px solid rgba(245,192,74,.75); box-shadow: 0 3px 0 #031912">
+<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z" fill="#F5C04A"></path></svg>
+<span style="font-size: 15px; font-weight: 900; color: #FFF7E8">{{starsGot}}<span style="color: #A9CBBB; font-weight: 700"> / {{starsMax}}</span></span>
+</div>
+<div style="display: flex; gap: 10px">
+<a class="round" href="#" aria-label="Звук: включён">
+<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#F5C04A"></path><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="#F5C04A" stroke-width="2" fill="none" stroke-linecap="round"></path></svg>
+</a>
+<a class="round" href="#" aria-label="Настройки">
+<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="#F5C04A" stroke-width="2.2"></circle><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1" stroke="#F5C04A" stroke-width="2.2" stroke-linecap="round"></path></svg>
+</a>
+</div>
+</div>
+
+<!-- title, smaller than on the loading screen -->
+<div style="position: absolute; left: 0; right: 0; top: 98px; text-align: center; animation: titleIn .9s cubic-bezier(.2,1.4,.4,1) both">
+<h1 style="margin: 0; font-weight: 900; font-size: 50px; line-height: .95; letter-spacing: -1.5px; color: #FFF7E8; text-shadow: 0 3px 0 #C8102E, 0 6px 0 #9E0E22, 0 0 30px rgba(245,192,74,.45)">ГНОМЫ</h1>
+<div style="margin-top: 6px; display: inline-flex; align-items: center; gap: 8px">
+<svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z" fill="#F5C04A"></path></svg>
+<span style="font-weight: 900; font-size: 22px; letter-spacing: -.5px; color: #F5C04A; text-shadow: 0 3px 0 #7A4A08">и подарки</span>
+<svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.2l7.1-.6z" fill="#F5C04A"></path></svg>
+</div>
+</div>
+
+<!-- scene: snowy hill, small firs, the toy of the next level on a stand -->
+<svg aria-hidden="true" width="390" height="380" viewBox="0 0 390 380" style="position: absolute; left: 0; top: 196px; overflow: visible">
+<path d="M-20 250 Q70 200 160 226 Q260 196 410 236 V380 H-20 Z" fill="#0A3A2E"></path>
+<g fill="#06281F"><polygon points="34,150 56,206 12,206"></polygon><polygon points="34,176 64,246 4,246"></polygon><polygon points="356,140 380,202 332,202"></polygon><polygon points="356,168 388,242 324,242"></polygon></g>
+<g fill="#DCEFEA" opacity=".8"><polygon points="34,150 41,168 34,164 27,168"></polygon><polygon points="356,140 364,160 356,156 348,160"></polygon></g>
+
+<!-- glow behind the toy -->
+<circle cx="195" cy="150" r="96" fill="rgba(245,192,74,.12)"></circle>
+<circle cx="195" cy="150" r="64" fill="rgba(245,192,74,.12)"></circle>
+<sc-for list="{{sparks}}" as="p" hint-placeholder-count="6">
+<path d="M{{p.x}} {{p.y}} l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 z" fill="#FFE08A" style="transform-box: fill-box; transform-origin: 50% 50%; animation: spark {{p.dur}}s ease-in-out {{p.d}}s infinite"></path>
+</sc-for>
+
+<!-- stand -->
+<ellipse cx="195" cy="236" rx="92" ry="14" fill="#5A2E14"></ellipse>
+<rect x="103" y="222" width="184" height="14" fill="#7A4220"></rect>
+<ellipse cx="195" cy="222" rx="92" ry="14" fill="#A35A2A"></ellipse>
+<ellipse cx="195" cy="221" rx="78" ry="10" fill="#C8102E"></ellipse>
+<path d="M117 221 Q195 236 273 221" stroke="#F5C04A" stroke-width="3" fill="none"></path>
+
+<!-- toy car built from blocks: the player takes it apart from the outside in -->
+<g style="transform-box: fill-box; transform-origin: 50% 100%; animation: float 3s ease-in-out infinite">
+<sc-for list="{{blocks}}" as="k" hint-placeholder-count="40">
+<g><rect x="{{k.x}}" y="{{k.y}}" width="17" height="17" rx="4" fill="{{k.c}}" stroke="rgba(0,0,0,.22)" stroke-width="1"></rect><rect x="{{k.hx}}" y="{{k.hy}}" width="7" height="3" rx="1.5" fill="rgba(255,255,255,.55)"></rect></g>
+</sc-for>
+</g>
+
+<path d="M-20 290 Q90 258 195 272 Q300 258 410 290 V380 H-20 Z" fill="#E6F3F0"></path>
+<path d="M-20 304 Q100 276 195 288 Q300 276 410 304" fill="none" stroke="#FFFFFF" stroke-width="3" opacity=".8"></path>
+</svg>
+
+<!-- level label under the toy -->
+<div style="position: absolute; left: 0; right: 0; top: 448px; display: flex; justify-content: center; animation: popIn .5s .3s ease-out both">
+<div style="display: flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 14px; background: #FFF7E8; color: #6E0A18; font-size: 14px; font-weight: 900; box-shadow: 0 3px 0 #A86F12">
+<span style="padding: 2px 8px; border-radius: 8px; background: #C8102E; color: #FFFFFF; font-size: 12px">Уровень {{level}}</span>
+{{toy}}
+</div>
+</div>
+
+<!-- gnome waving on the left -->
+<div aria-hidden="true" style="position: absolute; left: 28px; top: 404px; animation: bob 1s ease-in-out infinite">
+<svg width="46" height="74" viewBox="0 0 40 64" style="overflow: visible">
+<ellipse cx="20" cy="55" rx="10" ry="8" fill="#C8102E"></ellipse>
+<rect x="10" y="54" width="20" height="2.6" fill="#3A1A10"></rect><rect x="18" y="53.4" width="4" height="3.8" rx="1" fill="#F5C04A"></rect>
+<ellipse cx="15" cy="63" rx="4" ry="1.6" fill="#3A2416"></ellipse><ellipse cx="25" cy="63" rx="4" ry="1.6" fill="#3A2416"></ellipse>
+<g style="transform-box: fill-box; transform-origin: 100% 100%; animation: wave .7s ease-in-out infinite"><rect x="4" y="38" width="4" height="13" rx="2" fill="#C8102E"></rect><circle cx="6" cy="37" r="2.8" fill="#22A45D"></circle></g>
+<path d="M20 19 L9 38 H31 Z" fill="#F5C04A"></path><rect x="8" y="35.5" width="24" height="4.5" rx="2.2" fill="#FFFFFF"></rect><circle cx="20" cy="19" r="3.2" fill="#FFFFFF"></circle>
+<path d="M11 44 Q20 61 29 44 Z" fill="#FFFFFF"></path><rect x="12.5" y="39.5" width="15" height="6.5" rx="3" fill="#FFD3A8"></rect>
+<circle cx="16.3" cy="42" r="1" fill="#2A2D3E"></circle><circle cx="23.7" cy="42" r="1" fill="#2A2D3E"></circle><circle cx="20" cy="44.2" r="1.9" fill="#F28B82"></circle>
+</svg>
+</div>
+
+<!-- gnome with a gift box on the right -->
+<div aria-hidden="true" style="position: absolute; left: 318px; top: 398px; animation: bob 1.3s ease-in-out .4s infinite">
+<svg width="44" height="72" viewBox="0 0 40 64" style="overflow: visible">
+<rect x="9" y="0" width="22" height="18" rx="3" fill="#8B4DF0"></rect><rect x="18" y="0" width="4" height="18" fill="#FFF7E8"></rect><rect x="9" y="7" width="22" height="4" fill="#FFF7E8"></rect>
+<ellipse cx="20" cy="55" rx="10" ry="8" fill="#C8102E"></ellipse>
+<ellipse cx="15" cy="63" rx="4" ry="1.6" fill="#3A2416"></ellipse><ellipse cx="25" cy="63" rx="4" ry="1.6" fill="#3A2416"></ellipse>
+<path d="M20 19 L9 38 H31 Z" fill="#2F6BEB"></path><rect x="8" y="35.5" width="24" height="4.5" rx="2.2" fill="#FFFFFF"></rect><circle cx="20" cy="19" r="3.2" fill="#FFFFFF"></circle>
+<path d="M11 44 Q20 61 29 44 Z" fill="#FFFFFF"></path><rect x="12.5" y="39.5" width="15" height="6.5" rx="3" fill="#FFD3A8"></rect>
+<path d="M14.8 42.4 Q16.3 41 17.8 42.4 M22.2 42.4 Q23.7 41 25.2 42.4" stroke="#2A2D3E" stroke-width="1" fill="none" stroke-linecap="round"></path><circle cx="20" cy="44.2" r="1.9" fill="#F28B82"></circle>
+</svg>
+</div>
+
+<div class="snowA" aria-hidden="true"></div>
+
+<!-- progress through the 48 toys -->
+<section style="position: absolute; left: 32px; right: 32px; top: 584px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<span style="font-size: 14px; font-weight: 800; color: #CFE6D8">Собрано игрушек</span>
+<span style="font-size: 16px; font-weight: 900; color: #F5C04A">{{done}} из {{total}}</span>
+</div>
+<div role="progressbar" aria-label="Собрано игрушек" aria-valuemin="0" aria-valuemax="{{total}}" aria-valuenow="{{done}}" style="width: 100%; height: 20px; box-sizing: border-box; padding: 3px; border-radius: 10px; background: #FFF7E8; border: 3px solid #F5C04A; box-shadow: 0 3px 0 #A86F12">
+<div style="height: 100%; width: {{donePct}}%; min-width: 8px; border-radius: 6px; background-color: #C8102E; background-image: repeating-linear-gradient(-45deg, #E5293F 0 7px, #FFFFFF 7px 14px); background-size: 28px 100%; animation: candy .6s linear infinite"></div>
+</div>
+</section>
+
+<!-- main call to action -->
+<section style="position: absolute; left: 32px; right: 32px; top: 644px; display: flex; flex-direction: column; align-items: center; gap: 14px">
+<a href="Game.dc.html" style="width: 280px; height: 78px; box-sizing: border-box; border-radius: 26px; background: linear-gradient(180deg, #E5293F, #B80D25); border: 3px solid #F5C04A; animation: pulse 1.6s ease-out infinite; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #FFFFFF">
+<span style="display: flex; align-items: center; gap: 10px; font-size: 28px; font-weight: 900; line-height: 1">
+<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z" fill="#FFFFFF"></path></svg>
+Играть
+</span>
+<span style="font-size: 12px; font-weight: 700; color: #FFD9A0">уровень {{level}} · {{toyLower}}</span>
+</a>
+
+<nav aria-label="Меню" style="display: flex; gap: 12px">
+<a class="mini" href="#">
+<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2" fill="#F5C04A"></rect><rect x="13.5" y="3" width="7.5" height="7.5" rx="2" fill="#F5C04A"></rect><rect x="3" y="13.5" width="7.5" height="7.5" rx="2" fill="#F5C04A"></rect><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2" fill="rgba(245,192,74,.45)"></rect></svg>
+Уровни
+</a>
+<a class="mini" href="#">
+<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="#F5C04A" stroke-width="2.2"></circle><path d="M9.3 9.3a2.8 2.8 0 1 1 3.9 2.6c-.8.4-1.2 1-1.2 1.8v.6" stroke="#F5C04A" stroke-width="2.2" fill="none" stroke-linecap="round"></path><circle cx="12" cy="17.3" r="1.3" fill="#F5C04A"></circle></svg>
+Как играть
+</a>
+<a class="mini" href="#" style="position: relative">
+<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="9" width="18" height="12" rx="2" fill="#22A45D"></rect><rect x="2" y="6.5" width="20" height="4" rx="1.5" fill="#2BD46F"></rect><rect x="10.5" y="6.5" width="3" height="14.5" fill="#F5C04A"></rect><path d="M12 6.5 Q8 1.5 6.5 4 Q5.5 6 12 6.5 Q18.5 6 17.5 4 Q16 1.5 12 6.5z" fill="#F5C04A"></path></svg>
+Подарок дня
+<span style="position: absolute; top: -7px; right: -7px; width: 20px; height: 20px; border-radius: 50%; background: #C8102E; border: 2px solid #FFF7E8; font-size: 11px; font-weight: 900; display: flex; align-items: center; justify-content: center; color: #FFFFFF">1</span>
+</a>
+</nav>
+</section>
+
+<p style="position: absolute; left: 0; right: 0; bottom: 14px; margin: 0; text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 1px; color: rgba(207,230,216,.5)">ВЕРСИЯ 1.0 · 48 УРОВНЕЙ</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var lc = ['#FF4D4F', '#FFD23F', '#2BD46F', '#4DB8FF', '#FF7AD9'];
+    var bulbs = [];
+    for (var b = 0; b < 14; b++) bulbs.push({ c: lc[b % 5], d: ((b * 0.29) % 1.4).toFixed(2) });
+    var stars = [];
+    for (var i = 0; i < 18; i++) stars.push({ x: (i * 73 + 17) % 380, y: 92 + (i * 47) % 150, r: 1.5 + (i % 3), dur: (1.6 + (i % 4) * 0.5).toFixed(1), d: ((i * 0.31) % 2).toFixed(2) });
+
+    // Toy car of level 1, one letter per block: R body, D dark body, W window, Y headlight, O tail light, K wheel
+    var shape = [
+      '...RRRR...',
+      '..RWWRWR..',
+      'ORRRRRRRRY',
+      'DDDDDDDDDD',
+      '.KK....KK.'
+    ];
+    var col = { R: '#E5293F', D: '#B80D25', W: '#9FE0FF', Y: '#FFD23F', O: '#FF8A1F', K: '#2A2D3E' };
+    var size = 18, x0 = 195 - (10 * size) / 2, y0 = 212 - 5 * size;
+    var blocks = [];
+    shape.forEach(function (row, r) {
+      row.split('').forEach(function (ch, c) {
+        if (ch === '.') return;
+        var x = x0 + c * size, y = y0 + r * size;
+        blocks.push({ x: x, y: y, c: col[ch], hx: x + 3, hy: y + 3 });
+      });
+    });
+
+    var sparks = [[112, 96], [282, 84], [96, 176], [292, 168], [150, 62], [244, 54]].map(function (p, j) {
+      return { x: p[0], y: p[1], dur: (1.8 + (j % 3) * 0.4).toFixed(1), d: (j * 0.37).toFixed(2) };
+    });
+
+    var done = 0, total = 48;
+    return {
+      bulbs: bulbs, stars: stars, blocks: blocks, sparks: sparks,
+      level: done + 1, toy: 'Машинка', toyLower: 'машинка',
+      done: done, total: total, donePct: Math.round((done / total) * 100),
+      starsGot: 0, starsMax: total * 3
+    };
+  }
+}
+</script>
+</body>
+</html>
