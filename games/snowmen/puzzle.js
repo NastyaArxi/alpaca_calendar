@@ -135,7 +135,7 @@
   }
 
   function sizeForLevel(L) {
-    return L < 3 ? 5 : L < 10 ? 6 : L < 20 ? 7 : L < 35 ? 8 : 9;
+    return 5 + Math.min(4, Math.floor(L / 30)); // по 30 уровней на каждый размер: 5×5 … 9×9
   }
 
   function levelPuzzle(L) { return generate(sizeForLevel(L), L * 7919 + 17); }

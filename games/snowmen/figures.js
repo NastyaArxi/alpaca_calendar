@@ -1,18 +1,24 @@
 // Фигурки на поле: снеговик в разных нарядах и Дед Мороз (главный приз календаря 31 декабря).
 (function (root) {
-  const INK = '#22324a';
+  const INK = '#1F2A44';
   const OUT = `stroke="${INK}" stroke-width="1.1"`;
 
-  function snowman(hat, scarf) {
-    return '<svg viewBox="0 0 40 40" aria-hidden="true">' +
-      `<circle cx="20" cy="28" r="9" fill="#fff" stroke="${INK}" stroke-width="1.6"/>` +
-      `<circle cx="20" cy="15.5" r="6.5" fill="#fff" stroke="${INK}" stroke-width="1.6"/>` +
-      `<circle cx="17.8" cy="14.5" r="1" fill="${INK}"/><circle cx="22.2" cy="14.5" r="1" fill="${INK}"/>` +
-      '<path d="M20 16.3 l5.5 1.3 -5.5 1.1z" fill="#ff8a1c"/>' +
-      `<path d="M13.6 21.8 q6.4 3 12.8 0" stroke="${scarf}" stroke-width="2.6" fill="none" stroke-linecap="round"/>` +
-      `<circle cx="20" cy="26.5" r="1.1" fill="${INK}"/><circle cx="20" cy="30.5" r="1.1" fill="${INK}"/>` +
-      hat + '</svg>';
+  // Тело снеговика из макета (viewBox 40×48). Шапки нарядов нарисованы под старую голову,
+  // поэтому они чуть увеличены и сдвинуты, чтобы сесть на новую.
+  function snowman(hat, scarf, own) {
+    return '<svg viewBox="0 0 40 48" aria-hidden="true">' +
+      '<ellipse cx="20" cy="46" rx="10" ry="2" fill="rgba(31,42,68,.18)"/>' +
+      `<circle cx="20" cy="35" r="10.5" fill="#FFFFFF" stroke="${INK}" stroke-width="2.4"/>` +
+      `<circle cx="20" cy="19" r="7.5" fill="#FFFFFF" stroke="${INK}" stroke-width="2.4"/>` +
+      `<rect x="11.5" y="24.5" width="17" height="4.4" rx="2.2" fill="${scarf}"/><rect x="22.5" y="26" width="4" height="8" rx="1.6" fill="${scarf}"/>` +
+      `<circle cx="17.3" cy="18" r="1.3" fill="${INK}"/><circle cx="22.7" cy="18" r="1.3" fill="${INK}"/>` +
+      '<path d="M20 20.3 L27 21.4 L20 22.6 Z" fill="#FF8A2A"/>' +
+      '<circle cx="15.6" cy="21.4" r="1.4" fill="#F7A1A9"/><circle cx="24.4" cy="21.4" r="1.4" fill="#F7A1A9"/>' +
+      `<circle cx="20" cy="33" r="1.3" fill="${INK}"/><circle cx="20" cy="38" r="1.3" fill="${INK}"/>` +
+      (own ? hat : `<g transform="translate(-3 1.4) scale(1.15)">${hat}</g>`) + '</svg>';
   }
+
+  const DESIGN_HAT = '<rect x="12.5" y="3" width="15" height="9" rx="2" fill="#E03C4E"/><rect x="9.5" y="10.5" width="21" height="3.2" rx="1.6" fill="#B82A3B"/>';
 
   const HATS = {
     topRed: '<rect x="13.5" y="7" width="13" height="2.6" rx="1.2" fill="#d93a52"/><rect x="15.5" y="2" width="9" height="6" rx="1.5" fill="#d93a52"/>',
@@ -34,7 +40,7 @@
       '<circle cx="20" cy="4.6" r="1.1" fill="#fff"/><circle cx="16.6" cy="7.2" r="0.8" fill="#fff"/><circle cx="23.4" cy="7.2" r="0.8" fill="#fff"/>'
   };
 
-  const DED_MOROZ = '<svg viewBox="0 0 40 40" aria-hidden="true">' +
+  const DED_MOROZ = '<svg viewBox="0 -4 40 48" aria-hidden="true">' +
     `<line x1="31.5" y1="9" x2="31.5" y2="38" stroke="#c9a227" stroke-width="1.6" stroke-linecap="round"/>` +
     `<circle cx="31.5" cy="8.4" r="2.2" fill="#7fd8ff" stroke="#fff" stroke-width="0.8"/>` +
     `<path d="M11 38 L14 20 Q20 17 26 20 L29 38 Z" fill="#c81f37" ${OUT}/>` +
@@ -50,7 +56,7 @@
 
   // Порядок = порядок в гардеробе. day — день декабря, в который наряд выдаёт календарь.
   const FIGURES = [
-    { id: 'classic', day: 0, name: { ru: 'Классика', en: 'Classic' }, svg: snowman(HATS.topRed, '#2e7a58') },
+    { id: 'classic', day: 0, name: { ru: 'Классика', en: 'Classic' }, svg: snowman(DESIGN_HAT, '#2E7D5B', true) },
     { id: 'ushanka', day: 2, name: { ru: 'Ушанка', en: 'Ushanka' }, svg: snowman(HATS.ushanka, '#d93a52') },
     { id: 'elf', day: 5, name: { ru: 'Колпак эльфа', en: 'Elf hat' }, svg: snowman(HATS.elf, '#d93a52') },
     { id: 'beanie', day: 8, name: { ru: 'Шапка с помпоном', en: 'Bobble hat' }, svg: snowman(HATS.beanie, '#2f6fe0') },
