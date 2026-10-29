@@ -15,7 +15,14 @@
       next: 'Дальше', replay: 'Сыграть ещё раз', toLevels: 'К уровням', startOver: 'Начать заново',
       nextSub: 'Уровень {n} · {name}', eyebrow: 'Уровень {n} из {t} пройден', winTitle: '{name} в мешке!',
       winText: 'Гномы унесли все {b} {bw}. Дед Мороз доволен!', allDone: 'Все игрушки собраны!',
-      loseTitle: 'Гномам нечего брать', loseText: 'Все ячейки заняты, а снаружи игрушки нет блоков нужных цветов.'
+      loseTitle: 'Гномам нечего брать', loseText: 'Все ячейки заняты, а снаружи игрушки нет блоков нужных цветов.',
+      loadEyebrow: 'НОВОГОДНЯЯ ГОЛОВОЛОМКА', loadTitle: 'ГНОМЫ', start: 'Начать', giftsReady: 'подарки готовы!',
+      loadSteps: ['Гномы просыпаются…', 'Упаковываем подарки…', 'Наряжаем ёлку…', 'Завязываем мешок…'],
+      loadTips: ['Совет: гномы берут только блоки с краю — разбирай игрушку снаружи внутрь.',
+        'Совет: не занимай все ячейки одним цветом — оставь место для манёвра.',
+        'Совет: нет ходов? Возьми «+1 ячейку» и продолжай.',
+        'Всего {n} игрушек — от машинки до мешка Деда Мороза!'],
+      version: 'ВЕРСИЯ 1.0 · {n} УРОВНЕЙ'
     },
     en: {
       title: 'Gnomes & Gifts', logo1: 'Gnomes', logo2: '& Gifts',
@@ -30,7 +37,14 @@
       next: 'Next', replay: 'Play again', toLevels: 'Levels', startOver: 'Start over',
       nextSub: 'Level {n} · {name}', eyebrow: 'Level {n} of {t} complete', winTitle: '{name} packed!',
       winText: 'The gnomes carried all {b} blocks. Grandfather Frost is happy!', allDone: 'All toys packed!',
-      loseTitle: 'Nothing to take', loseText: 'All slots are busy, and no blocks of those colors are on the outside of the toy.'
+      loseTitle: 'Nothing to take', loseText: 'All slots are busy, and no blocks of those colors are on the outside of the toy.',
+      loadEyebrow: 'NEW YEAR PUZZLE', loadTitle: 'GNOMES', start: 'Start', giftsReady: 'the gifts are ready!',
+      loadSteps: ['Gnomes are waking up…', 'Wrapping the gifts…', 'Decorating the tree…', 'Tying the sack…'],
+      loadTips: ['Tip: gnomes only take blocks at the edge — take the toy apart from the outside in.',
+        "Tip: don't fill every slot with one color — leave room to maneuver.",
+        'Tip: stuck? Take “+1 slot” and keep going.',
+        '{n} toys in all — from a toy car to Grandfather Frost\'s sack!'],
+      version: 'VERSION 1.0 · {n} LEVELS'
     }
   };
   let T = STR.ru, lang = 'ru';
@@ -604,6 +618,85 @@
     renderUI(); layout();
   }
 
+  // ---------- 0 · загрузка ----------
+  // Сцена нарисована под 390×844 и масштабируется целиком; полоса честно ждёт SDK, сохранение и шрифты.
+  const LOAD_LIGHTS = ['#FF4D4F', '#FFD23F', '#2BD46F', '#4DB8FF', '#FF7AD9'];
+  const WALKER = (box, hat) => '<g class="wad">' +
+    `<rect x="9" y="0" width="22" height="18" rx="3" fill="${box}"/><rect x="18" y="0" width="4" height="18" fill="#FFF7E8"/><rect x="9" y="7" width="22" height="4" fill="#FFF7E8"/>` +
+    '<ellipse cx="20" cy="55" rx="10" ry="8" fill="#C8102E"/><ellipse cx="15" cy="63" rx="4" ry="1.6" fill="#3A2416"/><ellipse cx="25" cy="63" rx="4" ry="1.6" fill="#3A2416"/>' +
+    `<path d="M20 19 L9 38 H31 Z" fill="${hat}"/><rect x="8" y="35.5" width="24" height="4.5" rx="2.2" fill="#FFFFFF"/><circle cx="20" cy="19" r="3.2" fill="#FFFFFF"/>` +
+    '<path d="M11 44 Q20 61 29 44 Z" fill="#FFFFFF"/><rect x="12.5" y="39.5" width="15" height="6.5" rx="3" fill="#FFD3A8"/>' +
+    '<circle cx="16.3" cy="42" r="1" fill="#2A2D3E"/><circle cx="23.7" cy="42" r="1" fill="#2A2D3E"/><circle cx="20" cy="44.2" r="1.9" fill="#F28B82"/></g>';
+
+  function buildLoader() {
+    let stars = '';
+    for (let i = 0; i < 22; i++) {
+      const r = 1.5 + (i % 3);
+      stars += `<i style="left:${(i * 73 + 17) % 380}px;top:${30 + (i * 47) % 220}px;width:${r}px;height:${r}px;` +
+        `animation-duration:${(1.6 + (i % 4) * 0.5).toFixed(1)}s;animation-delay:${((i * 0.31) % 2).toFixed(2)}s"></i>`;
+    }
+    $('ld-stars').innerHTML = stars;
+    let bulbs = '';
+    for (let b = 0; b < 14; b++) {
+      const c = LOAD_LIGHTS[b % 5];
+      bulbs += `<i style="background:${c};box-shadow:0 0 12px 3px ${c};animation-delay:${((b * 0.29) % 1.4).toFixed(2)}s"></i>`;
+    }
+    $('ld-bulbs').innerHTML = bulbs;
+    const pts = [[168, 122], [184, 126], [200, 127], [216, 122], [150, 186], [170, 192], [190, 196], [210, 195], [230, 190], [246, 182], [134, 256], [156, 262], [180, 266], [204, 267], [228, 263], [252, 254]];
+    $('ld-lights').innerHTML = pts.map(([x, y], j) =>
+      `<circle cx="${x}" cy="${y}" r="4" fill="${LOAD_LIGHTS[j % 5]}" style="animation:twinkle 1.3s ease-in-out ${((j * 0.23) % 1.3).toFixed(2)}s infinite"/>`).join('');
+    $('ld-walkers').innerHTML = [
+      [160, 520, 34, 54, '#FF8A1F', '#22A45D', 0], [170, 540, 30, 48, '#8B4DF0', '#C8102E', 1.4], [150, 530, 32, 51, '#3EC1F3', '#F5C04A', 2.8]
+    ].map(([x, y, w, h, box, hat, d]) => `<div style="left:${x}px;top:${y}px;animation-delay:${d}s">` +
+      `<svg width="${w}" height="${h}" viewBox="0 0 40 64" style="overflow:visible">${WALKER(box, hat)}</svg></div>`).join('');
+    $('ld-runner').innerHTML = '<svg width="22" height="34" viewBox="0 0 40 64">' +
+      '<g class="wad"><rect x="9" y="0" width="22" height="18" rx="3" fill="#22A45D"/><rect x="18" y="0" width="4" height="18" fill="#F5C04A"/>' +
+      '<ellipse cx="20" cy="55" rx="10" ry="8" fill="#C8102E"/><ellipse cx="15" cy="63" rx="4" ry="1.6" fill="#3A2416"/><ellipse cx="25" cy="63" rx="4" ry="1.6" fill="#3A2416"/>' +
+      '<path d="M20 19 L9 38 H31 Z" fill="#C8102E"/><rect x="8" y="35.5" width="24" height="4.5" rx="2.2" fill="#FFFFFF"/><circle cx="20" cy="19" r="3.2" fill="#FFFFFF"/>' +
+      '<path d="M11 44 Q20 61 29 44 Z" fill="#FFFFFF"/><rect x="12.5" y="39.5" width="15" height="6.5" rx="3" fill="#FFD3A8"/></g></svg>';
+    fitLoader();
+    window.addEventListener('resize', fitLoader);
+  }
+
+  function fitLoader() {
+    const box = $('screen-load'), scene = $('load-scene');
+    const s = Math.min(box.clientWidth / 390, box.clientHeight / 844);
+    const top = Math.max(0, (box.clientHeight - 844 * s) / 2);
+    scene.style.transform = `translate(-50%, ${top}px) scale(${s})`;
+  }
+
+  // Полоса идёт к цели target; пока загрузка не закончена, цель не выше 90 %.
+  const loader = { pct: 0, target: 0, done: false, raf: 0 };
+  function setLoad(p) {
+    loader.pct = p;
+    const k = Math.min(3, Math.floor(p / 25)), v = Math.round(p);
+    $('ld-status').textContent = T.loadSteps[k];
+    $('ld-tip').textContent = fill(T.loadTips[k], { n: TOTAL });
+    $('ld-pct').textContent = v + '%';
+    $('ld-fill').style.width = p + '%';
+    $('ld-runner').style.left = `calc(${p}% - 6px)`;
+    $('ld-bar').setAttribute('aria-valuenow', v);
+  }
+  function runLoader(onDone) {
+    const t0 = performance.now();
+    const step = now => {
+      // не быстрее ~1,6 с, чтобы сцена успела показаться
+      const cap = loader.done ? 100 : 90;
+      const byTime = Math.min(cap, (now - t0) / 16);
+      const p = Math.min(cap, Math.max(loader.pct, byTime));
+      setLoad(p);
+      if (p >= 100) return onDone();
+      loader.raf = requestAnimationFrame(step);
+    };
+    loader.raf = requestAnimationFrame(step);
+  }
+  function finishLoader() {
+    $('ld-progress').hidden = true;
+    $('btn-start').hidden = false;
+    $('screen-load').removeAttribute('aria-busy');
+    $('btn-start').focus({ preventScroll: true });
+  }
+
   // ---------- экраны ----------
   function show(name) {
     els.menu.hidden = name !== 'menu';
@@ -697,20 +790,30 @@
   }
 
   async function main() {
+    buildLoader();
+    setLoad(0);
+    runLoader(finishLoader);
     await Platform.init();
     lang = STR[Platform.lang] ? Platform.lang : 'en';
     T = STR[lang];
     applyI18n();
+    $('ld-version').textContent = fill(T.version, { n: TOTAL });
     els.sack.innerHTML = SACK_SVG;
     $('sad-gnome').innerHTML = SAD_GNOME;
     buildGarland();
     const saved = await Platform.load();
     if (saved && typeof saved.level === 'number') save = { level: saved.level, stars: saved.stars || {} };
+    try { await document.fonts.ready; } catch (e) {}
 
     Platform.onPause = () => { Sound.paused = true; Music.stop(); };
     Platform.onResume = () => { Sound.paused = false; Music.start(); };
     document.addEventListener('visibilitychange', () => (document.hidden ? Platform.onPause() : Platform.onResume()));
 
+    $('btn-start').addEventListener('click', () => {
+      $('screen-load').hidden = true;
+      window.removeEventListener('resize', fitLoader);
+      openMenu();
+    });
     $('btn-play').addEventListener('click', () => openMap());
     $('btn-map-back').addEventListener('click', openMenu);
     $('btn-map').addEventListener('click', () => openMap());
@@ -740,7 +843,7 @@
     // для автотестов: index.html#debug
     if (location.hash === '#debug') window.__gifts = { state: () => ({ queues, slots, grid, gnomes: gnomes.length, over }), Engine, start: startLevel, lose };
 
-    openMenu();
+    loader.done = true;
     requestAnimationFrame(frame);
     Platform.ready();
   }
