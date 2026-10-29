@@ -1,59 +1,62 @@
 # Карточка игры «Гномы и подарки» для Яндекс Игр
 
-Точные размеры изображений смотрите в подсказках у полей черновика в консоли. Ниже — готовые файлы в типовых размерах; если консоль попросит другой размер, их можно перерисовать из `promo.html` (`#icon`, `#cover`).
+Точные размеры изображений смотрите в подсказках у полей черновика в консоли. Ниже готовые файлы в типовых размерах; иконку и обложку можно перерисовать из `promo.html` (`#icon`, `#cover`).
 
 | Файл | Для чего |
 |---|---|
+| `../dist/gnome-gifts-yandex.zip` | Архив игры (собирается `build.sh`) |
 | `icon-512.png` | Иконка игры |
 | `cover-800x470.png`, `cover-1600x940.png` | Обложка |
-| `screen-1-loading-1080x1920.png` | Скриншот: экран загрузки (вертикальный) |
+| `screen-1-loading-1080x1920.png` | Скриншот: загрузка (вертикальный) |
 | `screen-2-menu-1080x1920.png` | Скриншот: главное меню (вертикальный) |
 | `screen-3-game-1080x1920.png` | Скриншот: процесс игры (вертикальный) |
 | `screen-4-win-1080x1920.png` | Скриншот: уровень пройден (вертикальный) |
 | `screen-*-1920x1080.png` | Те же экраны для ПК (горизонтальные) |
-
-Архив для загрузки: `../dist/gnome-gifts-yandex.zip` (собирается `build.sh`).
 
 ## Русский
 
 **Название:** Гномы и подарки
 
 **Короткое описание:**
-Помоги гномам Деда Мороза разобрать игрушки по цветам и унести их в мешок до Нового года!
+Помоги гномам Деда Мороза разобрать игрушки по блокам и собрать их в мешок!
 
 **Описание:**
-Новогодняя головоломка про ловких гномов. Каждая игрушка собрана из цветных блоков: машинка, кукла, ёлочный шар, паровозик и ещё 44 подарка.
-Выбирай цветные квадраты внизу — гномы побегут за блоками этого цвета и отнесут их в мешок. Но брать можно только блоки с краю, а ячеек мало, так что думай, в каком порядке разбирать игрушку.
+Новогодняя головоломка про гномов-помощников. Каждая игрушка собрана из цветных блоков. Выбирай цветные квадраты, и гномы побегут за блоками этого цвета и унесут их в мешок Деда Мороза.
 
-— 48 уровней в четырёх главах: от лёгких до «Мастера»
-— на каждый уровень есть время — успей до того, как оно кончится
-— застрял? Возьми ещё одну ячейку или добавь 30 секунд
+— 48 уровней: от машинки и мяча до пряничного домика и мешка подарков
+— 4 главы сложности: Лёгкие, Средние, Сложные и Мастер
+— гномы берут только блоки с краю, поэтому важно, в каком порядке разбирать игрушку
+— на каждый уровень есть время: успей собрать игрушку
+— застрял? Возьми дополнительную ячейку или добавь времени
 — звёзды за прохождение без помощи
-— уютная новогодняя музыка и снег
-— прогресс сохраняется
+— уютная новогодняя музыка, прогресс сохраняется
 
 **Как играть:**
-Нажми на цветной квадрат внизу — он встанет в свободную ячейку, и гномы побегут за блоками этого цвета. Гномы берут только блоки, которые снаружи игрушки. Когда квадрат соберёт свои блоки, ячейка освободится. Если всем квадратам в ячейках нечего брать или время вышло — уровень не пройден.
+Нажми на цветной квадрат внизу, и он займёт ячейку. Гномы побегут за блоками этого цвета, которые лежат с краю игрушки, и унесут их в мешок. Когда квадрат соберёт свои блоки, ячейка освободится.
+Если все ячейки заняты, а снаружи игрушки нет блоков нужных цветов, гномам нечего брать — уровень проигран. Следи за таймером: игрушку нужно собрать, пока не вышло время.
 
-**Теги / категории:** головоломки, логические, казуальные, новогодние, для всей семьи
+**Теги / категории:** головоломки, казуальные, новогодние, для всей семьи
+
+**Возраст:** 0+
 
 ## English
 
 **Title:** Gnomes & Gifts
 
 **Short description:**
-Help Grandfather Frost's gnomes sort the toys by color and pack them into the sack before New Year!
+Help Grandfather Frost's gnomes take the toys apart block by block and pack them into the sack!
 
 **Description:**
-A New Year puzzle about busy gnomes. Every toy is built from colored blocks: a toy car, a doll, a Christmas ball, a train and 44 more gifts.
-Pick color squares at the bottom and the gnomes will run for blocks of that color and carry them to the sack. They can only take blocks at the edge, and slots are few, so plan the order.
+A New Year puzzle about little helper gnomes. Every toy is built from colored blocks. Pick color squares and the gnomes run for blocks of that color and carry them into the sack.
 
-— 48 levels in four chapters, from Easy to Master
-— every level is timed: finish before the clock runs out
-— stuck? Get an extra slot or 30 more seconds
-— stars for finishing without help
-— cozy holiday music and snow
-— progress is saved
+— 48 levels, from a toy car and a ball to a gingerbread house and a sack of gifts
+— 4 chapters: Easy, Medium, Hard and Master
+— gnomes only take blocks at the edge, so the order matters
+— every level has a time limit
+— stuck? Take an extra slot or add more time
+— earn stars for clearing levels without help
+— cozy holiday music, progress is saved
 
 **How to play:**
-Tap a color square at the bottom to put it in a free slot; the gnomes will run for blocks of that color. Gnomes only take blocks on the outside of the toy. When a square has collected its blocks, the slot frees up. If no square in the slots has anything to take, or time runs out, the level is lost.
+Tap a color square at the bottom to put it into a slot. The gnomes run for blocks of that color on the outside of the toy and carry them to the sack. When the square has collected its blocks, the slot frees up.
+If every slot is busy and no blocks of those colors are on the outside, the gnomes have nothing to take and the level is lost. Watch the timer: pack the toy before time runs out.
