@@ -59,12 +59,13 @@
   }
 
   // Правила уровня из главы: ячейки, колонки и наибольший размер плитки.
+  // Первые два уровня — обучение: у них на одну ячейку больше.
   // Внутри главы порядок подарков постепенно перемешивается сильнее.
   function difficulty(L, chapter) {
     const k = L % 12;
     const top = chapter.maxTile;
     return {
-      slots: chapter.slots,
+      slots: chapter.slots + (L < 2 ? 1 : 0),
       queues: chapter.queues,
       jitter: Math.min(0.8 + Math.floor(L / 12) * 1.2 + k * 0.25, 7),
       sizes: [Math.round(top * 0.4), Math.round(top * 0.6), Math.round(top * 0.8), top].filter(n => n >= 8)

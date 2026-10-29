@@ -30,10 +30,10 @@
 
   // Главы: 12 уровней в каждой, правила — из макета.
   const CHAPTERS = [
-    { name: { ru: 'Лёгкие', en: 'Easy' }, color: '#22A45D', slots: 5, queues: 3, maxTile: 40 },
-    { name: { ru: 'Средние', en: 'Medium' }, color: '#2F6BEB', slots: 5, queues: 3, maxTile: 48 },
-    { name: { ru: 'Сложные', en: 'Hard' }, color: '#8B4DF0', slots: 5, queues: 4, maxTile: 56 },
-    { name: { ru: 'Мастер', en: 'Master' }, color: '#C8102E', slots: 4, queues: 4, maxTile: 64 }
+    { name: { ru: 'Лёгкие', en: 'Easy' }, color: '#22A45D', slots: 4, queues: 3, maxTile: 40 },
+    { name: { ru: 'Средние', en: 'Medium' }, color: '#2F6BEB', slots: 4, queues: 3, maxTile: 48 },
+    { name: { ru: 'Сложные', en: 'Hard' }, color: '#8B4DF0', slots: 3, queues: 4, maxTile: 56 },
+    { name: { ru: 'Мастер', en: 'Master' }, color: '#C8102E', slots: 3, queues: 4, maxTile: 64 }
   ];
 
   const api = { PALETTE, SHADE, INK, PICTURES, CHAPTERS };

@@ -11,7 +11,8 @@
       hint2: 'Если всем квадратам в ячейках нечего брать — проигрыш. Выбирай порядок!',
       levels: 'Уровни', done: 'Пройдено {n} из {t}', daysLeft: 'до Нового года {n} {w}', newYear: 'С Новым годом!',
       chapter: 'Глава', chSub: 'Уровни {a}–{b} · {s} {sw} · {q} колонки', playCard: 'Играть ▸',
-      level: 'Уровень', addSlot: '+1 ячейка', restart: 'Заново', forAd: 'за просмотр рекламы',
+      level: 'Уровень', addSlot: '+1 ячейка', addTime: '+{n} сек', restart: 'Заново', forAd: 'за просмотр рекламы',
+      timeTitle: 'Время вышло!', timeText: 'Гномы не успели собрать игрушку. Добавь времени — и они продолжат с того же места.',
       next: 'Дальше', replay: 'Сыграть ещё раз', toLevels: 'К уровням', startOver: 'Начать заново',
       nextSub: 'Уровень {n} · {name}', eyebrow: 'Уровень {n} из {t} пройден', winTitle: '{name} в мешке!',
       winText: 'Гномы унесли все {b} {bw}. Дед Мороз доволен!', allDone: 'Все игрушки собраны!',
@@ -33,7 +34,8 @@
       hint2: 'If no square in the slots has anything to take, you lose. Choose the order!',
       levels: 'Levels', done: '{n} of {t} done', daysLeft: '{n} {w} to New Year', newYear: 'Happy New Year!',
       chapter: 'Chapter', chSub: 'Levels {a}–{b} · {s} slots · {q} columns', playCard: 'Play ▸',
-      level: 'Level', addSlot: '+1 slot', restart: 'Restart', forAd: 'watch an ad',
+      level: 'Level', addSlot: '+1 slot', addTime: '+{n} sec', restart: 'Restart', forAd: 'watch an ad',
+      timeTitle: "Time's up!", timeText: 'The gnomes ran out of time. Add more and they will carry on from where they stopped.',
       next: 'Next', replay: 'Play again', toLevels: 'Levels', startOver: 'Start over',
       nextSub: 'Level {n} · {name}', eyebrow: 'Level {n} of {t} complete', winTitle: '{name} packed!',
       winText: 'The gnomes carried all {b} blocks. Grandfather Frost is happy!', allDone: 'All toys packed!',
@@ -67,13 +69,24 @@
   const els = {
     app: $('app'), menu: $('screen-menu'), map: $('screen-map'), game: $('screen-game'),
     stage: $('stage'), board: $('board'), slots: $('slots'), queues: $('queues'),
-    level: $('level-label'), levelSub: $('level-sub'), addSlot: $('btn-slot'), sound: $('btn-sound'),
+    level: $('level-label'), levelSub: $('level-sub'), addSlot: $('btn-slot'), addTime: $('btn-time'), timer: $('timer'), sound: $('btn-sound'),
     sack: $('sack'), fx: $('fx'), win: $('win'), lose: $('lose'), mapList: $('map-list')
   };
 
   const SPEED = 16;       // клеток в секунду
   const PER_BAG = 11;     // гномов одного квадрата одновременно в пути
   const SEND_GAP = 60;    // мс между выходами гномов одного квадрата
+  const MAX_EXTRA = 2;    // сколько ячеек можно докупить за рекламу на уровне
+  const TIME_BONUS = 30;  // секунд за просмотр рекламы
+
+  // Время на уровень: от числа блоков, с запасом к тому, как быстро проходит жадный бот
+  // (бот тратит примерно perBlock секунд на блок, игроку даём больше).
+  function timeLimit(p, L) {
+    if (L < 2) return 90; // обучение — без спешки
+    const perBlock = [0.13, 0.16, 0.22, 0.34][Math.min(3, Math.floor(L / 12))];
+    const blocks = p.rows.join('').replace(/\./g, '').length;
+    return Math.ceil((blocks * perBlock * 1.3 + 15) / 5) * 5;
+  }
 
   // ---------- звук ----------
   const Sound = {
@@ -182,7 +195,8 @@
   let save = { level: 0, stars: {} };
   let levelIndex = 0, pic = null, level = null;
   let grid = null, W = 0, H = 0, queues = [], slots = [], gnomes = [], reserved = new Set();
-  let running = false, over = false, extraSlot = false, revived = false, geo = null, uid = 0;
+  let running = false, over = false, extraSlots = 0, revived = false, timeAdded = false, geo = null, uid = 0;
+  let timeLeft = 0, shownSec = -1, loseKind = 'stuck';
   let avCache = null, lastGulp = 0;
 
   // ---------- персонажи (рисунок из UI-кита) ----------
@@ -379,7 +393,7 @@
     els.slots.innerHTML = '';
     slots.forEach((bag, i) => {
       const s = document.createElement('div');
-      s.className = 'slot' + (extraSlot && i === slots.length - 1 ? ' extra' : '');
+      s.className = 'slot' + (i >= level.slots ? ' extra' : '');
       if (bag) {
         const el = tileEl(bag.color, bag.n - bag.delivered, 'active');
         el.dataset.id = bag.id;
@@ -389,7 +403,7 @@
       els.slots.appendChild(s);
     });
     els.slots.classList.toggle('full', slots.every(Boolean));
-    els.addSlot.disabled = extraSlot;
+    els.addSlot.disabled = extraSlots >= MAX_EXTRA;
     locate();
   }
 
@@ -517,7 +531,10 @@
     if (running && !over && geo) {
       dispatch(now);
       moveGnomes(dt, now);
+      timeLeft -= dt;
+      renderTimer();
       if (!gnomes.length && grid.every(r => r.every(c => !c))) win();
+      else if (timeLeft <= 0) lose('time');
       else if (isStuck()) lose();
     }
     if (!els.game.hidden) render(now);
@@ -537,7 +554,9 @@
     queues = level.queues.map(q => q.map(b => ({ ...b })));
     slots = Array(level.slots).fill(null);
     gnomes = []; reserved = new Set(); avCache = null;
-    over = false; extraSlot = false; revived = false;
+    over = false; extraSlots = 0; revived = false; timeAdded = false;
+    timeLeft = timeLimit(pic, levelIndex); shownSec = -1; renderTimer();
+    els.addTime.querySelector('span').textContent = fill(T.addTime, { n: TIME_BONUS });
     els.level.textContent = `${T.level} ${levelIndex + 1}`;
     const b = blocksIn(pic);
     els.levelSub.textContent = `${ch.name[lang] || ch.name.ru} · ${toyName(pic)} · ${b} ${blocksWord(b)}`;
@@ -569,7 +588,7 @@
     running = false;
     Platform.gameplayStop();
     Sound.win();
-    const stars = Math.max(1, 3 - (extraSlot ? 1 : 0) - (revived ? 1 : 0));
+    const stars = Math.max(1, 3 - (extraSlots ? 1 : 0) - (revived ? 1 : 0) - (timeAdded ? 1 : 0));
     save.stars[levelIndex] = Math.max(save.stars[levelIndex] || 0, stars);
     save.level = Math.max(save.level, levelIndex + 1);
     Platform.save(save);
@@ -588,20 +607,36 @@
     }, 450);
   }
 
-  function lose() {
+  function renderTimer() {
+    const s = Math.max(0, Math.ceil(timeLeft));
+    if (s === shownSec) return;
+    shownSec = s;
+    els.timer.querySelector('span').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    els.timer.classList.toggle('low', s <= 10);
+  }
+
+  // kind: 'stuck' — ячейкам нечего брать, 'time' — время вышло
+  function lose(kind = 'stuck') {
     over = true;
     running = false;
+    loseKind = kind;
     Platform.gameplayStop();
     Sound.lose();
+    const time = kind === 'time';
+    $('lose-title').textContent = time ? T.timeTitle : T.loseTitle;
+    $('lose-text').textContent = time ? T.timeText : T.loseText;
+    $('revive-label').textContent = time ? fill(T.addTime, { n: TIME_BONUS }) : T.addSlot;
     const box = $('lose-slots');
     box.innerHTML = '';
-    slots.filter(Boolean).forEach(bag => { const t = tileEl(bag.color, bag.n - bag.delivered, ''); t.tabIndex = -1; box.appendChild(t); });
+    box.hidden = time;
+    if (!time) slots.filter(Boolean).forEach(bag => { const t = tileEl(bag.color, bag.n - bag.delivered, ''); t.tabIndex = -1; box.appendChild(t); });
     els.lose.hidden = false;
   }
 
   async function revive() {
     if (!(await Platform.showRewarded())) return;
-    slots.push(null); extraSlot = true; revived = true;
+    if (loseKind === 'time') { timeLeft += TIME_BONUS; timeAdded = true; renderTimer(); }
+    else { slots.push(null); extraSlots++; revived = true; }
     els.lose.hidden = true;
     renderUI(); layout();
     over = false; running = true;
@@ -609,13 +644,23 @@
   }
 
   async function addSlot() {
-    if (extraSlot || over || !running) return;
+    if (extraSlots >= MAX_EXTRA || over || !running) return;
     running = false;
     const ok = await Platform.showRewarded();
     running = true;
     if (!ok) return;
-    slots.push(null); extraSlot = true;
+    slots.push(null); extraSlots++;
     renderUI(); layout();
+  }
+
+  async function addTime() {
+    if (over || !running) return;
+    running = false;
+    const ok = await Platform.showRewarded();
+    running = true;
+    if (!ok) return;
+    timeLeft += TIME_BONUS; timeAdded = true;
+    renderTimer();
   }
 
   // ---------- 0 · загрузка ----------
@@ -819,6 +864,7 @@
     $('btn-map').addEventListener('click', () => openMap());
     $('btn-restart').addEventListener('click', () => startLevel(levelIndex));
     els.addSlot.addEventListener('click', addSlot);
+    els.addTime.addEventListener('click', addTime);
     $('btn-next').addEventListener('click', async () => {
       const done = levelIndex;
       els.win.hidden = true;
@@ -841,7 +887,7 @@
     document.addEventListener('contextmenu', e => e.preventDefault());
 
     // для автотестов: index.html#debug
-    if (location.hash === '#debug') window.__gifts = { state: () => ({ queues, slots, grid, gnomes: gnomes.length, over }), Engine, start: startLevel, lose };
+    if (location.hash === '#debug') window.__gifts = { state: () => ({ queues, slots, grid, gnomes: gnomes.length, over, timeLeft }), Engine, start: startLevel, lose, timeLimit };
 
     loader.done = true;
     requestAnimationFrame(frame);

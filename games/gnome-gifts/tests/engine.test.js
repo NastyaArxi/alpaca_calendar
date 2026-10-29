@@ -8,7 +8,7 @@ for (let L = 0; L < 48; L++) {
   const pic = PICTURES[L];
   const ch = CHAPTERS[Math.floor(L / 12)];
   const level = E.buildLevel(pic, L, ch);
-  assert.strictEqual(level.slots, ch.slots, `level ${L}: slots`);
+  assert.strictEqual(level.slots, ch.slots + (L < 2 ? 1 : 0), `level ${L}: slots`);
   assert.strictEqual(level.queues.length, ch.queues, `level ${L}: queues`);
   assert(level.queues.flat().every(b => b.n <= ch.maxTile), `level ${L}: tile too big`);
   const blocks = pic.rows.join('').replace(/\./g, '').length;
