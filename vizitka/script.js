@@ -117,6 +117,20 @@
     }, 1500);
   }
 
+  /* ---------- Demo video ---------- */
+  const botVideo = $('#botVideo');
+  const player = botVideo && botVideo.closest('.player');
+  if (botVideo) {
+    $('#botPlay').addEventListener('click', () => {
+      botVideo.controls = true;
+      botVideo.play();
+    });
+    botVideo.addEventListener('play', () => player.classList.add('is-playing'));
+    botVideo.addEventListener('ended', () => { player.classList.remove('is-playing'); botVideo.controls = false; botVideo.load(); });
+    // pause when scrolled away
+    new IntersectionObserver(([en]) => { if (!en.isIntersecting && !botVideo.paused) botVideo.pause(); }, { threshold: 0.2 }).observe(botVideo);
+  }
+
   /* ---------- Pointer effects (desktop only) ---------- */
   if (fine && !reduce) {
     const root = document.documentElement;

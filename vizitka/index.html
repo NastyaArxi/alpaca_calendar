@@ -25,6 +25,7 @@
       <a href="#about">Обо мне</a>
       <a href="#skills">Навыки</a>
       <a href="#ai">ИИ</a>
+      <a href="#bot">Бот</a>
       <a href="#work">Услуги</a>
       <a href="#case">Кейс</a>
       <a href="#github">Сайты</a>
@@ -163,6 +164,47 @@
     <span class="pill">DeepSeek</span>
     <span class="pills__note">Этот сайт тоже собран вместе с Claude: от разбора референсов до вёрстки.</span>
   </div>
+</section>
+
+<!-- AI PROJECT: HELIOS BOT -->
+<section id="bot" class="section bot">
+  <div class="bot__grid">
+    <div class="stack reveal">
+      <span class="eyebrow">Проект · ИИ-автоматизация</span>
+      <h2 class="h2">Бот, который читает заказ-наряды</h2>
+      <p class="body">Telegram-бот распознаёт бумажные заказ-наряды зуботехнической лаборатории по фото и записывает их в Google Таблицу.</p>
+      <ul class="row bot__stack">
+        <li class="pill pill--line">n8n</li>
+        <li class="pill pill--line">GigaChat</li>
+        <li class="pill pill--line">Проверка кодом</li>
+        <li class="pill pill--line">Google Таблицы</li>
+      </ul>
+      <div class="bot__facts">
+        <div class="bot__fact"><b>20</b><span class="muted small">нарядов в замере точности</span></div>
+        <div class="bot__fact"><b>152-ФЗ</b><span class="muted small">учтён при работе с персональными данными</span></div>
+      </div>
+    </div>
+
+    <figure class="player reveal">
+      <div class="browser__bar"><i class="r"></i><i class="y"></i><i class="g"></i><span class="url mono">helios_demo.mp4</span></div>
+      <div class="player__screen">
+        <video id="botVideo" src="./assets/helios_demo.mp4" poster="./assets/helios_poster.jpg" preload="none" playsinline></video>
+        <button type="button" class="player__play" id="botPlay" aria-label="Смотреть демо бота">
+          <span class="player__ring" aria-hidden="true"></span>
+          <svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.6-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+          <span class="player__label">Демо · 1:49</span>
+        </button>
+      </div>
+    </figure>
+  </div>
+
+  <ol class="flow reveal-group" aria-label="Как работает бот">
+    <li class="flow__step"><span class="flow__icon" aria-hidden="true">📷</span><b>Фото наряда</b><span class="muted small">Техник отправляет снимок в Telegram</span></li>
+    <li class="flow__step"><span class="flow__icon" aria-hidden="true">✨</span><b>ИИ распознаёт</b><span class="muted small">GigaChat читает рукописный бланк</span></li>
+    <li class="flow__step"><span class="flow__icon" aria-hidden="true">⚙️</span><b>Код проверяет</b><span class="muted small">Ловит ошибки ИИ: зубы, сроки, суммы</span></li>
+    <li class="flow__step"><span class="flow__icon" aria-hidden="true">👤</span><b>Человек решает</b><span class="muted small">Спорные места бот показывает отдельно</span></li>
+    <li class="flow__step"><span class="flow__icon" aria-hidden="true">📊</span><b>Google Таблица</b><span class="muted small">Наряд записан, фото — на Диске</span></li>
+  </ol>
 </section>
 
 <!-- WORK -->
