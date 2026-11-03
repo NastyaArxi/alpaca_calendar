@@ -146,6 +146,28 @@
     new IntersectionObserver(([en]) => { if (!en.isIntersecting && !botVideo.paused) botVideo.pause(); }, { threshold: 0.2 }).observe(botVideo);
   }
 
+  /* ---------- Game showcase ---------- */
+  const phone = $('#gnomesPhone');
+  if (phone) {
+    const shots = $$('.phone__shots img', phone);
+    let shot = 0;
+    if (!reduce) setInterval(() => {
+      if (phone.classList.contains('is-live')) return;
+      shots[shot].classList.remove('is-active');
+      shot = (shot + 1) % shots.length;
+      shots[shot].classList.add('is-active');
+    }, 3200);
+    $('#gnomesPlay').addEventListener('click', () => {
+      const frame = document.createElement('iframe');
+      frame.src = './games/gnomes/index.html';
+      frame.title = 'Игра «Гномы и подарки»';
+      frame.allow = 'autoplay; fullscreen';
+      $('.phone__screen', phone).appendChild(frame);
+      phone.classList.add('is-live');
+      frame.focus();
+    });
+  }
+
   /* ---------- Pointer effects (desktop only) ---------- */
   if (fine && !reduce) {
     const root = document.documentElement;

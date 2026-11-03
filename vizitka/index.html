@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=202610290805">
+<link rel="stylesheet" href="./styles.css?v=202611030824">
 </head>
 <body>
 <div class="progress" aria-hidden="true"><span></span></div>
@@ -26,6 +26,7 @@
       <a href="#skills">Навыки</a>
       <a href="#ai">ИИ</a>
       <a href="#bot">Бот</a>
+      <a href="#games">Игры</a>
       <a href="#work">Услуги</a>
       <a href="#case">Кейс</a>
       <a href="#github">Сайты</a>
@@ -204,6 +205,94 @@
   </ol>
 </section>
 
+<!-- GAMES -->
+<section id="games" class="section games">
+  <div class="section-head reveal">
+    <span class="eyebrow">Игры</span>
+    <h2 class="h2">Делаю браузерные игры</h2>
+    <span class="bar" aria-hidden="true"></span>
+  </div>
+
+  <article class="game">
+    <div class="game__stage reveal">
+      <div class="phone" id="gnomesPhone">
+        <div class="phone__screen">
+          <div class="phone__shots" aria-hidden="true">
+            <img src="./assets/gnomes_2.jpg" alt="" class="is-active" loading="lazy">
+            <img src="./assets/gnomes_3.jpg" alt="" loading="lazy">
+            <img src="./assets/gnomes_4.jpg" alt="" loading="lazy">
+          </div>
+          <button type="button" class="phone__play" id="gnomesPlay" aria-label="Запустить игру «Гномы и подарки» прямо здесь">
+            <span class="phone__play-icon" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.6-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg></span>
+            <span class="phone__play-label">Играть здесь</span>
+          </button>
+        </div>
+      </div>
+      <span class="game__snow" aria-hidden="true"></span>
+    </div>
+
+    <div class="game__info stack reveal-group">
+      <span class="tag">Новогодняя головоломка</span>
+      <h3 class="game__title">Гномы и подарки</h3>
+      <p class="body">Помоги гномам Деда Мороза разобрать пиксельные игрушки и собрать их в мешок до Нового года. Нажимаешь на цветной квадрат — гномы бегут за блоками этого цвета, но брать могут только с краю. Весь смысл — в порядке ходов.</p>
+      <div class="game__facts">
+        <div class="bot__fact"><b>48</b><span class="muted small">уровней-игрушек</span></div>
+        <div class="bot__fact"><b>4</b><span class="muted small">главы: от лёгких до «Мастера»</span></div>
+        <div class="bot__fact"><b>RU / EN</b><span class="muted small">два языка интерфейса</span></div>
+      </div>
+      <ul class="row bot__stack">
+        <li class="pill pill--line">HTML5</li>
+        <li class="pill pill--line">JavaScript</li>
+        <li class="pill pill--line">VK Bridge</li>
+        <li class="pill pill--line">Яндекс Игры SDK</li>
+      </ul>
+      <div class="row">
+        <a href="./games/gnomes/index.html" class="btn btn--primary magnetic" target="_blank" rel="noopener noreferrer">Открыть игру
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+      </div>
+    </div>
+  </article>
+
+  <div class="tbgames">
+    <div class="head-row reveal">
+      <div class="stack-sm">
+        <span class="eyebrow">Для ТросБарьера</span>
+        <h3 class="h3 tbgames__title">Игры, которые продают трос</h3>
+        <p class="muted tbgames__lead">Три промо-игры на сайте клиента: посетитель играет, разбирается в продукте и уходит с готовой заявкой на расчёт.</p>
+      </div>
+    </div>
+    <ul class="grid grid--300 reveal-group">
+    <li class="card tbgame tilt">
+      <a href="https://trosbarrier.ru/game/" class="tbgame__link" target="_blank" rel="noopener noreferrer" aria-label="Играть: Собери комплект"></a>
+      <div class="tbgame__img"><img src="./assets/tb_platformer.jpg" alt="Новогодний 8-битный платформер с промзоной, ящиками «?» и экскаваторами" loading="lazy"><span class="tbgame__genre mono">8-бит платформер</span></div>
+      <div class="tbgame__body">
+        <h4>Собери комплект</h4>
+        <p class="muted small">Бежишь по промзоне, собираешь трос, сетку, талрепы и зажимы, а в финале над подстанцией собирается защитный купол.</p>
+        <span class="link tbgame__cta">Играть <span class="arrow">→</span></span>
+      </div>
+    </li>
+    <li class="card tbgame tilt">
+      <a href="https://trosbarrier.ru/game/detective/" class="tbgame__link" target="_blank" rel="noopener noreferrer" aria-label="Играть: Дело о незащищённом объекте"></a>
+      <div class="tbgame__img"><img src="./assets/tb_detective.jpg" alt="Стартовый экран игры-расследования с менеджером Владиславом" loading="lazy"><span class="tbgame__genre mono">Игра-расследование</span></div>
+      <div class="tbgame__body">
+        <h4>Дело о незащищённом объекте</h4>
+        <p class="muted small">Осматриваешь объект, находишь три уязвимости и подбираешь защиту. В конце — состав комплекта и заявка на расчёт.</p>
+        <span class="link tbgame__cta">Играть <span class="arrow">→</span></span>
+      </div>
+    </li>
+    <li class="card tbgame tilt">
+      <a href="https://trosbarrier.ru/game/arcade/" class="tbgame__link" target="_blank" rel="noopener noreferrer" aria-label="Играть: Натяни трос"></a>
+      <div class="tbgame__img"><img src="./assets/tb_arcade.jpg" alt="Правила мини-аркады: натянуть трос между опорами и закрыть кровлю сеткой" loading="lazy"><span class="tbgame__genre mono">Мини-аркада</span></div>
+      <div class="tbgame__body">
+        <h4>Натяни трос</h4>
+        <p class="muted small">Тянешь трос между опорами и ловишь натяжение талрепом: слабо — провиснет, сильно — лопнет. Успей закрыть кровлю за 60 секунд.</p>
+        <span class="link tbgame__cta">Играть <span class="arrow">→</span></span>
+      </div>
+    </li>
+    </ul>
+  </div>
+</section>
+
 <!-- WORK -->
 <section id="work" class="section">
   <div class="section-head reveal">
@@ -380,6 +469,6 @@
 <footer class="footer">© 2026 Настя Архипова · удалённо</footer>
 </main>
 
-<script src="./script.js?v=202610290805"></script>
+<script src="./script.js?v=202611030824"></script>
 </body>
 </html>
