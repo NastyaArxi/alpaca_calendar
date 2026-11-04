@@ -92,7 +92,7 @@ h1, h2, h3, p, figure { margin: 0; }
 .logo .mono { transition: transform .5s var(--ease-spring); }
 .logo:hover .mono { transform: rotate(-12deg) scale(1.15); }
 
-.nav { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 26px; font-size: 15px; }
+.nav { position: relative; display: flex; flex-wrap: nowrap; white-space: nowrap; align-items: center; gap: 8px 26px; font-size: 15px; }
 .nav a { position: relative; text-decoration: none; color: var(--muted); padding: 6px 0; transition: color .25s; }
 .nav a:hover, .nav a.is-active { color: var(--text); }
 .nav__line {
@@ -661,7 +661,7 @@ h1, h2, h3, p, figure { margin: 0; }
 .footer { padding: 24px 0 32px; border-top: 1px solid var(--line); font-size: 13px; color: var(--dim); }
 
 /* ===== Responsive ===== */
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
   .burger { display: inline-block; order: 3; }
   .header__actions { margin-left: auto; }
   .nav {
