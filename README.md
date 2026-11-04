@@ -57,4 +57,4 @@ python3 -m http.server 8000
 
 ### Публикация
 
-Сайт публикуется на GitHub Pages workflow-ом [`.github/workflows/pages.yml`](.github/workflows/pages.yml) при каждом пуше в `main`. Если Pages ещё не включены: **Settings → Pages → Source: GitHub Actions**.
+Сайт публикуется через GitHub Pages (Settings → Pages → Deploy from a branch → `main`, корень репозитория) автоматически после каждого пуша в `main`.
