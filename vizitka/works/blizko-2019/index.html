@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+      crossorigin="anonymous"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/parallax/3.1.0/parallax.min.js"></script>
+   <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
+      integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" rel="stylesheet" />
+   <link href="https://fonts.gstatic.com" rel="preconnect" />
+   <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&amp;display=swap"
+      rel="stylesheet" />
+   <title></title>
+</head>
+<style type="text/css">
+   html,
+   body {
+      font-family: 'Roboto', sans-serif;
+      color: #232323;
+      font-size: 16px;
+      line-height: 1.2;
+   }
+
+   * {
+      box-sizing: border-box;
+   }
+
+   button,
+   button:hover,
+   button:focus {
+      font-family: inherit;
+      outline: none;
+      border: none;
+   }
+
+   a {
+      text-decoration: none;
+      color: #232323;
+   }
+
+   a:hover {
+      text-decoration: none;
+      color: #232323;
+   }
+
+   li {
+      color: #232323;
+   }
+
+   h2 {
+      font-size: 35px;
+   }
+
+
+
+   h1,
+   h2,
+   h3,
+   h4,
+   h5,
+   h6 {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      color: #232323;
+      font-weight: 700;
+      line-height: 1.2em;
+   }
+
+   p {
+      color: #232323;
+      line-height: 1.2em;
+   }
+
+   ol,
+   ul {
+      list-style: none;
+      padding-left: 0;
+   }
+
+   a.active.focus,
+   a.active:focus,
+   a.focus,
+   a:active.focus,
+   a:active:focus,
+   a:focus,
+   button.active.focus,
+   button.active:focus,
+   button.focus,
+   button:active.focus,
+   button:active:focus,
+   button:focus,
+   .btn.active.focus,
+   .btn.active:focus,
+   .btn.focus,
+   .btn:active.focus,
+   .btn:active:focus,
+   .btn:focus {
+      outline: 0 !important;
+      outline-color: transparent !important;
+      outline-width: 0 !important;
+      outline-style: none !important;
+      box-shadow: 0 0 0 0 rgba(0, 123, 255, 0) !important;
+   }
+
+   .fixed-top {
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 0;
+      z-index: 2;
+      padding-top: 20px;
+      padding-bottom: 20px;
+      background: #f2f2f2;
+   }
+
+   .btn {
+      color: #ffffff;
+      width: 250px;
+      font-size: 22px;
+      background: #ff6600;
+      border-radius: 0.15em;
+      margin: 0 auto;
+      border: none;
+      transition: all 0.5s;
+      box-shadow: 0px 20px 30px rgba(150, 76, 6, 0.2);
+   }
+
+   .btn:hover {
+      color: #d4d4d4;
+      background: #d85600;
+      transition: all 0.5s;
+      box-shadow: 0px 10px 10px rgba(150, 100, 6, 0.2);
+   }
+
+   .container-fluid {
+      max-width: 1600px;
+   }
+
+   /* nav */
+   .nav-item {
+      font-size: 16px;
+   }
+
+   .btn-nav {
+      width: 315px;
+      font-size: 16px;
+      text-align: center;
+      padding: 5px 5px;
+      margin-right: 10px;
+      margin-top: 0 !important;
+      border-radius: 0.15em;
+      transition: all 0.5s;
+      box-shadow: none;
+   }
+
+   .btn-nav:hover {
+      box-shadow: none;
+   }
+
+   .navbar-expand-xl .navbar-nav .nav-link {
+      margin-left: 0.5rem;
+      margin-top: 0.25rem;
+      margin-bottom: 0.25rem;
+      font-size: 12px;
+      transition: opacity 0.5s;
+   }
+
+   .nav-link {
+      display: block;
+      transition: opacity 0.5s;
+      color: #ffffff;
+      transition: all 0.5s;
+   }
+
+   .nav-link:hover {
+      color: #ff6600;
+      transition: all 0.5s;
+   }
+
+
+   .nav-link:focus,
+   .nav-link:hover {
+      color: #ff6600;
+   }
+
+   .icon-header {
+      width: 20px;
+      height: 20px;
+   }
+
+   .navbar-toggler {
+      color: #ff6600;
+      border: 2px solid #ff6600;
+      font-size: 25px;
+   }
+
+   .navbar-toggler:active,
+   .navbar-toggler:focus,
+   .navbar-toggler:hover {
+      border: 2px solid #d85600;
+   }
+
+   .nav-phone {
+      color: #232323;
+      transition: all 0.5s;
+   }
+
+   .nav-phone:hover {
+      color: #ff6600;
+      text-decoration: none;
+      opacity: 0.6;
+      transition: all 0.5s;
+   }
+
+
+   .navbar>.container,
+   .navbar>.container-fluid,
+   .navbar>.container-lg,
+   .navbar>.container-md,
+   .navbar>.container-sm,
+   .navbar>.container-xl,
+   .navbar>.container-xxl {
+      display: flex;
+      flex-wrap: inherit;
+      align-items: flex-start;
+      justify-content: space-between;
+   }
+
+   /* nav end */
+
+   /* offer  */
+   .header {
+      background: #355655;
+      padding-top: 60px;
+      padding-bottom: 60px;
+      color: #fff;
+   }
+
+   h1,
+   .h1 {
+      color: #ffffff;
+      background: none;
+      font-size: 40px;
+      padding-left: 0;
+      margin-bottom: 10px;
+      line-height: 1.2em;
+   }
+
+   .offer__title span {
+      color: #ff6600;
+   }
+
+   .offer__text {
+      color: #ffffff;
+      font-size: 25px;
+      font-weight: 300;
+   }
+
+   .offer__img {
+      transition: all 0.5s ease;
+   }
+
+   section:hover .offer__img,
+   section:hover .offer__img {
+      transform: scale(1.02);
+      -webkit-transform: scale(1.02);
+      -moz-transform: scale(1.02);
+   }
+
+   /* offer end  */
+   /* profitable */
+   .profitable {
+      background: #f2f2f2;
+      padding: 30px 0;
+   }
+
+   .benefits__img {
+      width: 55px;
+   }
+
+   .benefits {
+      display: flex;
+      align-items: center;
+   }
+
+   .benefits__text {
+      margin-bottom: 0;
+      margin-left: 25px;
+      font-size: 18px;
+      font-weight: 500;
+   }
+
+   /* profitable end */
+   /* block */
+
+   .block {
+      padding: 30px 0;
+      background: #355655;
+   }
+
+   .block-line {
+      color: #ff6600;
+      transition: all 0.5s;
+   }
+
+   .block-line:hover {
+      color: #e05a00;
+      text-decoration: underline;
+      transition: all 0.5s;
+   }
+
+   .block-title {
+      font-size: 25px;
+      font-weight: 500;
+      color: #ffffff;
+   }
+
+   /* block end */
+   /* products */
+   .products {
+      padding-top: 90px;
+   }
+
+   .menu-link {
+      transition: color 0.5s;
+   }
+
+   .menu-link:hover {
+      color: #d85600;
+      transition: color 0.5s;
+   }
+
+   /* products end */
+   /* rubric */
+   .rubric {
+      padding: 60px 0;
+   }
+
+   .rubric-title {
+      margin-bottom: 40px;
+   }
+
+   .card-body {
+      box-shadow: 0 2px 50px rgb(68 69 98 / 22%);
+      background: #ffffff;
+      margin-bottom: 30px;
+      border-radius: 5px;
+      width: 100%;
+      height: 95%;
+      text-align: left;
+      transition: all 0.5s;
+   }
+
+   .card-body:hover {
+      transform: translateY(-0.5rem) scale(1.0125);
+      box-shadow: 0 0.5em 3rem -1rem rgb(0 0 0 / 50%);
+      transition: all 0.5s;
+   }
+
+   .card-title {
+      font-weight: 400px;
+      margin-top: 15px;
+      margin-bottom: 15px;
+   }
+
+
+   .card-text {
+      font-size: 18px;
+      font-weight: 500;
+      margin-top: 20px;
+   }
+
+   /* rubric-end */
+
+   /* footer */
+
+   .footer {
+      background: #f2f2f2;
+      padding: 60px 0;
+   }
+
+   .footer-title {
+      font-size: 14px;
+      color: #232323;
+   }
+
+   .footer-content__list {
+      font-size: 14px;
+      list-style: none;
+      padding: 0;
+   }
+
+   .cont-icon {
+      height: 30px;
+      width: 30px;
+   }
+
+   .footer-content__list-item a {
+      color: #404040;
+      text-decoration: none;
+      transition: all 0.5s;
+   }
+
+   .footer-content__list-item {
+      transition: all 0.5s;
+   }
+
+   .footer-content__list-item:hover {
+      padding-left: 5px;
+      opacity: 0.5;
+      transition: all 0.5s;
+   }
+
+   .footer-icon {
+      display: flex;
+      list-style: none;
+      padding: 0;
+   }
+
+   .icon {
+      margin-right: 10px;
+      transition: all 0.5s;
+   }
+
+   .icon:hover {
+      opacity: 0.5;
+      transition: all 0.5s;
+   }
+
+   .footer-logo__slogan {
+      color: #404040;
+      font-size: 14px;
+      margin-top: 5px;
+   }
+
+   .footer-content__list-item {
+      margin-top: 10px;
+      margin-bottom: 10px;
+   }
+
+   .footer-btn {
+      color: #ffffff;
+      background: #ff6600;
+      width: 230px;
+      font-size: 14px;
+      text-align: center;
+      padding: 8px 10px;
+      border-radius: 0.15em;
+      transition: all 0.5s;
+   }
+
+   .footer-btn:hover {
+      color: #d4d4d4;
+      background: #d85600;
+      transition: all 0.5s;
+   }
+
+   /* footer end */
+   span {
+      color: #747474;
+   }
+
+   /* scrollUp */
+   #toTop {
+      background: #ff5600;
+      height: 50px;
+      width: 50px;
+      right: 31px;
+      bottom: 18px;
+      position: fixed;
+      color: #fff;
+      text-align: center;
+      border-radius: 50%;
+      line-height: 44px;
+      cursor: pointer;
+      font-size: 25px;
+      border: 2px solid transparent;
+      box-shadow: 0 0 10px 3px rgb(108 98 98 / 20%);
+      z-index: 5;
+   }
+
+
+   #toTop:hover {
+      color: #fff;
+   }
+
+   @media (max-width: 1200px) {}
+
+   /* Large: 992px - 1199px */
+   @media (max-width: 1199px) {
+      .img-offer {
+         width: 370px;
+      }
+
+      .products {
+         padding-top: 75px;
+      }
+
+      .header {
+         text-align: center;
+      }
+
+   }
+
+   /* Medium: 768px - 991px */
+   @media (max-width: 991px) {
+      .offer__img {
+         width: 380px;
+      }
+
+      .footer-btn {
+         margin-bottom: 15px;
+      }
+
+      .offer__img {
+         margin-top: 50px;
+      }
+
+      .btn-nav {
+         margin-bottom: 10px;
+         margin-top: 15px !important;
+      }
+   }
+
+   /* Small: 576px - 767px */
+   @media (max-width: 767px) {}
+
+
+   /* Extra small: 0px (320px) - 575px */
+   @media (max-width: 575px) {
+      .header {
+         padding-bottom: 30px;
+         text-align: center;
+      }
+
+      .rubric {
+         padding: 15px 0;
+      }
+
+      .rubric-title {
+         margin-bottom: 20px;
+      }
+
+      .offer__text {
+         margin-bottom: 0;
+      }
+
+      h1 {
+         font-size: 25px;
+      }
+
+      h2 {
+         font-size: 22px;
+         text-align: center;
+      }
+
+      h3 {
+         font-size: 20px;
+      }
+
+      h4 {
+         font-size: 18px;
+      }
+
+      .btn-nav {
+         font-size: 16px !important;
+      }
+
+
+      .footer {
+         padding: 15px 0;
+      }
+
+   }
+
+   .block-p {
+      font-size: 20px;
+      margin-bottom: 10px;
+   }
+
+   .block-text {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 0;
+   }
+</style>
+
+<body>
+   <section>
+      <nav class="navbar fixed-top navbar-expand-lg">
+         <div class="container-fluid">
+            <div class="logo"><a class="navbar-brand" href="https://{region:name_lat}.blizko.ru/" target="blank"><img
+                     alt="BLIZKO" class="img-fluid logo"
+                     src="https://st29.stblizko.ru/images/useful_links/000/098/112_original.png?1651126702" /> </a>
+            </div>
+            <button aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation"
+               class="navbar-toggler" data-bs-target="#navbarColor01" data-bs-toggle="collapse"
+               type="button">&equiv;</button>
+
+            <div class="collapse navbar-collapse justify-content-end" id="navbarColor01">
+               <div class="d-flex">
+                  <ul class="navbar-nav me-auto align-items-baseline">
+                     <li class="nav-item"><a class="btn btn-nav d-none d-sm-block"
+                           href="http://{region:name_lat}.blizko.ru/users/new?return_to=https%3A%2F%2Fmsk.blizko.ru%2F"
+                           target="_blank">Зарегистрироваться как покупатель</a></li>
+                     <li class="nav-item"><a class="btn btn-nav d-block d-sm-none"
+                           href="http://{region:name_lat}.blizko.ru/users/new?return_to=https%3A%2F%2Fmsk.blizko.ru%2F"
+                           target="_blank">Зарегистрироваться как покупатель</a></li>
+                     <li class="nav-item"><a class="btn btn-nav d-none d-sm-block" style="background: #2d5aa9;"
+                           href="http://{region:name_lat}.blizko.ru/company_wizard/new?page=house_cottage&amp;button=true&amp;type=dk"
+                           target="_blank">Зарегистрироваться как продавец</a></li>
+                     <li class="nav-item"><a class="btn btn-nav d-block d-sm-none" style="background: #2d5aa9;"
+                           href="http://{region:name_lat}.blizko.ru/company_wizard/new?page=house_cottage&amp;button=true&amp;type=dk&amp;mobile"
+                           target="_blank">Зарегистрироваться как продавец</a></li>
+                     <li class="nav-item"><img alt="" class="icon-header"
+                           src="https://st32.stblizko.ru/images/useful_links/000/098/361_original.png?1653551324" />
+                        <a class="nav-phone"
+                           href="tel:{region:variable(phone_blizko)}">{region:variable(phone_blizko)}</a>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+         </div>
+      </nav>
+   </section>
+
+   <section class="products" id="products">
+      <div class="container-fluid">
+         <div class="row justify-content-between d-none d-lg-block">
+            <div class="col-12">
+               <ul class="menu d-flex justify-content-between">
+                  <li class="menu-list"><a class="menu-link"
+                        href="https://msk.blizko.ru/predl/construction/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">Дом,
+                        дача</a></li>
+                  <li class="menu-list"><a class="menu-link"
+                        href="https://msk.blizko.ru/predl/promgood/tehnika/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">Техника</a></li>
+                  <li class="menu-list"><a class="menu-link"
+                        href="https://msk.blizko.ru/predl/promgood/interier/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">Интерьер</a></li>
+                  <li class="menu-list"><a class="menu-link"
+                        href="https://msk.blizko.ru/predl/transport/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">Авто</a></li>
+                  <li class="menu-list"><a class="menu-link"
+                        href="https://msk.blizko.ru/predl/transport/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">Одежда</a>
+                  </li>
+                  <li class="menu-list"><a class="menu-link"
+                        href="https://msk.blizko.ru/predl/tovary_dlya_detey/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">Дети</a></li>
+                  <li class="menu-list"><a class="menu-link"
+                        href="https://msk.blizko.ru/predl/promgood/krasota_uhod_za_telom/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">Красота</a>
+                  </li>
+                  <li class="menu-list"><a class="menu-link"
+                        href="https://msk.blizko.ru/predl/promgood/medicina/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">Здоровье</a></li>
+                  <li class="menu-list"><a class="menu-link"
+                        href="https://msk.blizko.ru/predl/otdyhirazvlecheniya/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">Отдых</a></li>
+                  <li class="menu-list"><a class="menu-link"
+                        href="https://msk.blizko.ru/predl/service/service/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">Услуги</a></li>
+                  <li class="menu-list"><a class="menu-link"
+                        href="https://msk.blizko.ru/predl/service/nedvizhimost/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">Недвижимость</a></li>
+                  <li class="menu-list"><a class="menu-link"
+                        href="https://msk.blizko.ru/predl/service/nedvizhimost/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">Оборудование</a></li>
+                  <li class="menu-list"><a class="menu-link"
+                        href="https://msk.blizko.ru/deals/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank" style="color: #ff0000;">Скидки</a></li>
+               </ul>
+            </div>
+         </div>
+      </div>
+
+
+   </section>
+
+   <section id="header" class="header">
+      <div class="container-fluid">
+         <div class="row justify-content-center">
+            <div class="col-11">
+               <div class="offer">
+                  <div class="row justify-content-center align-items-center">
+                     <div class="col-12 col-md-12 col-lg-6">
+                        <h1 class="offer__title">BLIZKO предлагает <span>широкий выбор</span> товаров для строительства,
+                           отделки и ремонта в Москве</span>
+                        </h1>
+                        <p class="offer__text">Постройте дом, обустройте квартиру или дачу и позаботьтесь о себе и своем
+                           здоровье с BLIZKO!</p>
+                     </div>
+
+                     <div class="col-7 col-lg-4 d-none d-sm-block">
+                        <div class="offer__img">
+                           <img class="img-offer"
+                              src="https://st37.stblizko.ru/images/useful_links/000/098/522_original.png?1655384721"
+                              alt="img-offer">
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+   </section>
+
+   <section class="profitable" id="profitable">
+      <div class="container-fluid">
+         <div class="row justify-content-center">
+            <div class="col-12 col-lg-3">
+               <div class="benefits"><img alt="" class="benefits__img"
+                     src="https://st32.stblizko.ru/images/useful_links/000/098/467_original.png?1654495964" />
+                  <div class="benefits-wrapper">
+                     <p class="benefits__text">Широкий выбор товаров и услуг</p>
+                  </div>
+               </div>
+            </div>
+
+            <div class="col-12 col-lg-3">
+               <div class="benefits"><img alt="" class="benefits__img"
+                     src="https://st29.stblizko.ru/images/useful_links/000/098/125_original.png?1651207951" />
+                  <div class="benefits-wrapper">
+                     <p class="benefits__text">Регулярное обновление и расширение ассортимента</p>
+                  </div>
+               </div>
+            </div>
+
+            <div class="col-12 col-lg-3">
+               <div class="benefits"><img alt="" class="benefits__img"
+                     src="https://st29.stblizko.ru/images/useful_links/000/098/127_original.png?1651208100" />
+                  <div class="benefits-wrapper">
+                     <p class="benefits__text">Лучшие предложения напрямую от компаний </p>
+                  </div>
+               </div>
+            </div>
+
+            <div class="col-12 col-lg-3">
+               <div class="benefits"><img alt="" class="benefits__img"
+                     src="https://st32.stblizko.ru/images/useful_links/000/098/468_original.png?1654496016" />
+                  <div class="benefits-wrapper">
+                     <p class="benefits__text"> <a class="block-line"
+                           href="https://msk.blizko.ru/deals/construction/?utm_campaign=hard_regions&utm_content=build_msk"
+                           target="_blank">
+                           Скидки</a> на товары до 30%</p>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </section>
+
+
+   <section class="rubric" id="rubric">
+      <div class="container-fluid">
+         <div class="row justify-content-center">
+            <div class="col-12 col-lg-10">
+               <div class="row justify-content-center text-center">
+                  <div class="col-12 col-lg-11">
+                     <h2 class="rubric-title">Все для дома и дачи</h2>
+                  </div>
+               </div>
+               <div class="row justify-content-center d-flex ">
+                  <div class="col-12 col-md-6 col-lg-3">
+                     <a href="https://msk.blizko.ru/predl/construction/building/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">
+                        <div class="card-body">
+                           <div class="col-12">
+                              <div class="row text-center">
+                                 <div class="col-12">
+                                    <img alt="Сайт" class="img-fluid"
+                                       src="https://st37.stblizko.ru/images/useful_links/000/098/509_original.png?1655363555" />
+                                    <p class="card-text">Строительные товары</p>
+                                    <span>(247697 товаров)</span>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </a>
+                  </div>
+
+                  <div class="col-12 col-md-6 col-lg-3">
+                     <a href="https://msk.blizko.ru/predl/construction/decoration/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">
+                        <div class="card-body">
+                           <div class="col-12">
+                              <div class="row text-center">
+                                 <div class="col-12">
+                                    <img alt="Сайт" class="img-fluid"
+                                       src="https://st37.stblizko.ru/images/useful_links/000/098/510_original.png?1655292475" />
+                                    <p class="card-text">Отделочные материалы</p>
+                                    <span>(688491 товаров)</span>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </a>
+                  </div>
+
+                  <div class="col-12 col-md-6 col-lg-3">
+                     <a href="https://msk.blizko.ru/predl/construction/dachnye_postroyki/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">
+                        <div class="card-body">
+                           <div class="col-12">
+                              <div class="row text-center">
+                                 <div class="col-12">
+                                    <img alt="Сайт" class="img-fluid"
+                                       src="https://st35.stblizko.ru/images/icons/rubrics/menus/001/408/777_original.jpg?1648801499" />
+                                    <p class="card-text">Дачные постройки</p>
+                                    <span>(25747 товаров)</span>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </a>
+                  </div>
+
+                  <div class="col-12 col-md-6 col-lg-3">
+                     <a href="https://msk.blizko.ru/predl/construction/santehnika/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">
+                        <div class="card-body">
+                           <div class="col-12">
+                              <div class="row text-center">
+                                 <div class="col-12">
+                                    <img alt="Сайт" class="img-fluid"
+                                       src="https://st37.stblizko.ru/images/useful_links/000/098/513_original.png?1655293381" />
+                                    <p class="card-text">Сантехника</p>
+                                    <span>(789941 товаров)</span>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </a>
+                  </div>
+
+                  <div style="margin-top: 5px;">
+                     <div class="row justify-content-center d-flex ">
+                        <div class="col-12 col-md-6 col-lg-6">
+                           <a href="https://msk.blizko.ru/predl/construction/instrument/?utm_campaign=hard_regions&utm_content=build_msk"
+                              target="_blank">
+                              <div class="card-body">
+                                 <div class="col-12">
+                                    <div class="row text-center">
+                                       <div class="col-12">
+                                          <img alt="Сайт" class="img-fluid"
+                                             src="https://st37.stblizko.ru/images/useful_links/000/098/516_original.png?1655355024" />
+                                          <p class="card-text">Инструменты</p>
+                                          <span>(665261 товаров)</span>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </a>
+                        </div>
+
+                        <div class="col-12 col-md-6 col-lg-6">
+                           <a href="https://msk.blizko.ru/predl/construction/elektrotovary/?utm_campaign=hard_regions&utm_content=build_msk"
+                              target="_blank">
+                              <div class="card-body">
+                                 <div class="col-12">
+                                    <div class="row text-center">
+                                       <div class="col-12">
+                                          <img alt="Сайт" class="img-fluid"
+                                             src="https://st37.stblizko.ru/images/useful_links/000/098/517_original.png?1655361454" />
+                                          <p class="card-text">Электротовары</p>
+                                          <span>(404884 товаров)</span>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </a>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <!-- часть 2 -->
+               <div class="row justify-content-center d-flex ">
+                  <div class="col-12 col-md-6 col-lg-3">
+                     <a href="https://msk.blizko.ru/predl/construction/conditioning/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">
+                        <div class="card-body">
+                           <div class="col-12">
+                              <div class="row text-center">
+                                 <div class="col-12">
+                                    <img alt="Сайт" class="img-fluid"
+                                       src="https://st37.stblizko.ru/images/useful_links/000/098/518_original.png?1655295740" />
+                                    <p class="card-text">Отопление, кондиционирование, вентиляция</p>
+                                    <span>(475854 товаров)</span>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </a>
+                  </div>
+
+                  <div class="col-12 col-md-6 col-lg-3">
+                     <a href="https://msk.blizko.ru/predl/construction/plumbing/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">
+                        <div class="card-body">
+                           <div class="col-12">
+                              <div class="row text-center">
+                                 <div class="col-12">
+                                    <img alt="Сайт" class="img-fluid"
+                                       src="https://st37.stblizko.ru/images/useful_links/000/098/519_original.png?1655296085" />
+                                    <p class="card-text">Водоснабжение, канализация</p>
+                                    <span>(102240 товаров)</span>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </a>
+                  </div>
+
+                  <div class="col-12 col-md-6 col-lg-3">
+                     <a href="https://msk.blizko.ru/predl/construction/biuldservices/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">
+                        <div class="card-body">
+                           <div class="col-12">
+                              <div class="row text-center">
+                                 <div class="col-12">
+                                    <img alt="Сайт" class="img-fluid"
+                                       src="https://st37.stblizko.ru/images/useful_links/000/098/520_original.png?1655296709" />
+                                    <p class="card-text">Строительные и ремонтные работы</p>
+                                    <span>(3417 товаров)</span>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </a>
+                  </div>
+
+                  <div class="col-12 col-md-6 col-lg-3">
+                     <a href="https://msk.blizko.ru/predl/construction/valve/?utm_campaign=hard_regions&utm_content=build_msk"
+                        target="_blank">
+                        <div class="card-body">
+                           <div class="col-12">
+                              <div class="row text-center">
+                                 <div class="col-12">
+                                    <img alt="Сайт" class="img-fluid"
+                                       src="https://st37.stblizko.ru/images/useful_links/000/098/521_original.png?1655297401" />
+                                    <p class="card-text">Фитинги, вентили, трубы</p>
+                                    <span>(381971 товаров)</span>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </a>
+                  </div>
+
+                  <div style="margin-top: 5px;">
+                     <div class="row justify-content-center d-flex ">
+                        <div class="col-12 col-md-6 col-lg-6">
+                           <a href="https://msk.blizko.ru/predl/construction/equipment/?utm_campaign=hard_regions&utm_content=build_msk"
+                              target="_blank">
+                              <div class="card-body">
+                                 <div class="col-12">
+                                    <div class="row text-center">
+                                       <div class="col-12">
+                                          <img alt="Сайт" class="img-fluid"
+                                             src="https://st37.stblizko.ru/images/useful_links/000/098/514_original.png?1655360954" />
+                                          <p class="card-text">Оборудование для строительства</p>
+                                          <span>(216183 товаров)</span>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </a>
+                        </div>
+
+                        <div class="col-12 col-md-6 col-lg-6">
+                           <a href="https://msk.blizko.ru/predl/construction/guarding/?utm_campaign=hard_regions&utm_content=build_msk"
+                              target="_blank">
+                              <div class="card-body">
+                                 <div class="col-12">
+                                    <div class="row text-center">
+                                       <div class="col-12">
+                                          <img alt="Сайт" class="img-fluid"
+                                             src="https://st37.stblizko.ru/images/useful_links/000/098/515_original.png?1655294029" />
+                                          <p class="card-text">Охранные и пожарные сигнализации</p>
+                                          <span>(71452 товаров)</span>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </a>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+   </section>
+
+   <section class="block">
+      <div class="container-fluid">
+         <div class="row justify-content-center text-center">
+            <div class="col-12 col-lg-10">
+               <h3 class="block-title">Не забудьте про товары для <a class="block-line"
+                     href="https://msk.blizko.ru/predl/promgood/medicina/?utm_campaign=hard_regions&utm_content=build_msk"
+                     target="_blank"> здоровья</a>
+                  и <a class="block-line"
+                     href="https://msk.blizko.ru/predl/promgood/interier/?utm_campaign=hard_regions&utm_content=build_msk"
+                     target="_blank">интерьера.</a>
+               </h3>
+               <h3 class="block-title"><a class="block-line"
+                     href="https://msk.blizko.ru/predl/promgood/tehnika/?utm_campaign=hard_regions&utm_content=build_msk"
+                     target="_blank">Техника</a>, все для <a class="block-line"
+                     href="https://msk.blizko.ru/predl/transport/?utm_campaign=hard_regions&utm_content=build_msk"
+                     target="_blank">авто</a>, товары для <a class="block-line"
+                     href="https://msk.blizko.ru/predl/tovary_dlya_detey/?utm_campaign=hard_regions&utm_content=build_msk"
+                     target="_blank">детей</a> -
+                  это и многое другое
+                  есть на BLIZKO.</a>
+               </h3>
+            </div>
+         </div>
+      </div>
+   </section>
+
+   <footer class="footer" id="footer">
+      <div class="container-fluid">
+         <div class="row justify-content-between">
+            <div class="col-12 col-6 col-md-3">
+               <div class="footer-logo"><a href="https://{region:name_lat}.blizko.ru" target="blank"><img
+                        alt="Blizko.ru" title="BLIZKO"
+                        src="https://st32.stblizko.ru/images/useful_links/000/098/401_original.png?1653983890" />
+                  </a>
+                  <p class="footer-logo__slogan">для бизнеса</p> <a class="footer-btn d-none d-sm-block"
+                     href="http://{region:name_lat}.blizko.ru/company_wizard/new?page=house_cottage&amp;footer&amp;button=true&amp;type=dk"
+                     target="blank">Зарегистрировать компанию</a> <a class="footer-btn d-block d-sm-none"
+                     href="http://{region:name_lat}.blizko.ru/company_wizard/new?page=house_cottage&amp;footer&amp;button=true&amp;type=dk&amp;mobile"
+                     target="blank">Зарегистрировать компанию</a>
+               </div>
+            </div>
+            <div class="col-12 col-6 col-md-3 col-lg-3">
+               <h5 class="footer-title">BLIZKO для бизнеса</h5>
+               <ul class="footer-content__list">
+                  <li class="footer-content__list-item"><a href="https://{region:name_lat}.blizko.ru/about/reklama"
+                        target="blank">Подобрать тариф</a></li>
+                  <li class="footer-content__list-item"><a href="https://{region:name_lat}.blizko.ru/about/response"
+                        target="blank">Отзывы наших клиентов</a></li>
+                  <li class="footer-content__list-item"><a class="d-none d-sm-block"
+                        href="https://{region:name_lat}.blizko.ru/about/create_a_website?page=house_cottage&amp;type=ssb&amp;footer"
+                        target="_blank">Создать сайт на BLIZKO</a></li>
+                  <li class="footer-content__list-item"><a class="d-block d-sm-none"
+                        href="https://{region:name_lat}.blizko.ru/about/create_a_website?page=house_cottage&amp;type=ssb&amp;footer&amp;mobile"
+                        target="_blank">Создать сайт на BLIZKO</a></li>
+               </ul>
+            </div>
+
+            <div class="col-12 col-6 col-md-3 col-lg-3">
+               <h5 class="footer-title">Развитие продаж</h5>
+               <ul class="footer-content__list">
+                  <li class="footer-content__list-item"><a href="https://{region:name_lat}.blizko.ru/about/FAQ"
+                        target="blank">Помощь по работе с BLIZKO</a></li>
+                  <li class="footer-content__list-item"><a href="https://{region:name_lat}.blizko.ru/about/webinar"
+                        target="blank">Расписание вебинаров</a></li>
+                  <li class="footer-content__list-item"><a href="https://{region:name_lat}.blizko.ru/blogs"
+                        target="blank">Бизнес-блог</a></li>
+               </ul>
+            </div>
+            <div class="col-12 col-6 col-md-4 col-lg-2">
+               <h5 class="footer-title">Мы в соцсетях</h5>
+               <ul class="footer-content__list footer-icon">
+                  <li class="footer-content__list-item icon"><a aria-label="Youtube" class="pf-link"
+                        href="https://www.youtube.com/user/BlizkoBusiness/sub_confirmation=1" target="blank"><img alt=""
+                           class="cont-icon" title="YouTube"
+                           src="https://st20.stblizko.ru/images/useful_links/000/098/341_original.png?1653983203" /></a>
+                  </li>
+                  <li class="footer-content__list-item icon"><a aria-label="Вконтакте" class="pf-link"
+                        href="https://vk.com/blizkobusiness" target="blank"><img alt="" class="cont-icon" title="VK"
+                           src="https://st20.stblizko.ru/images/useful_links/000/098/340_original.png?1653983133" /></a>
+                  </li>
+                  <li class="footer-content__list-item icon"><a href="https://zen.yandex.ru/id/5f23dc3cb81d304d2406271b"
+                        target="blank"><img alt="" class="cont-icon" title="Zen_yandex"
+                           src="https://st20.stblizko.ru/images/useful_links/000/098/342_original.png?1653983256" /></a>
+                  </li>
+                  <li class="footer-content__list-item icon"><a href="https://tenchat.ru/blizko" target="blank"><img
+                           alt="" class="cont-icon" title="Tenchat"
+                           src="https://st32.stblizko.ru/images/useful_links/000/098/400_original.png?1653983310" /></a>
+                  </li>
+               </ul>
+
+               <ul class="footer-content__list" style="border-top: 1px solid #5a5a5a;">
+                  <li class="footer-content__list-item"><a href="https://{region:name_lat}.blizko.ru" target="blank">На
+                        главную</a></li>
+                  <li class="footer-content__list-item"><a href="https://www.blizko.ru/terms"
+                        target="blank">Пользовательское соглашение</a></li>
+               </ul>
+            </div>
+         </div>
+      </div>
+   </footer>
+   <div id="toTop">&#8593</div>
+   <script>
+      const scene = document.getElementById('scene');
+      const parallaxInstance = new Parallax(scene);
+   </script>
+   <script>
+      $(function () {
+         $(window).scroll(function () {
+            if ($(this).scrollTop() != 0) {
+               $('#toTop').fadeIn();
+            } else {
+               $('#toTop').fadeOut();
+            }
+         });
+         $('#toTop').click(function () {
+            $('body,html').animate({ scrollTop: 0 }, 800);
+         });
+      });
+   </script>
+
+   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+      integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+      crossorigin="anonymous"></script>
+   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+   <p style="display: none;"> {
+      crm_analytics: show_page(special_offer, Ходил на страницу_посадка_Дом_дача)
+      }
+   </p>
+</body>
+
+</html>

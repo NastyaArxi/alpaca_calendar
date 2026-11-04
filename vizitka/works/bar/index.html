@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Der Goldene Krug — немецкий пивной бар</title>
+  <meta name="description" content="Баварская пивная Der Goldene Krug: двенадцать сортов на кране, литровые кружки, рулька и брецели. Бронирование столов онлайн.">
+  <meta name="theme-color" content="#120E09">
+  <meta property="og:title" content="Der Goldene Krug — немецкий пивной бар">
+  <meta property="og:description" content="Пиво, как в Мюнхене. Только ближе.">
+  <meta property="og:image" content="img/hall.webp">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='8' fill='%23120E09'/%3E%3Crect x='7' y='10' width='20' height='24' rx='3' fill='none' stroke='%23E8A33D' stroke-width='2.5'/%3E%3Cpath d='M27 15h4a4 4 0 0 1 4 4v4a4 4 0 0 1-4 4h-4' fill='none' stroke='%23E8A33D' stroke-width='2.5'/%3E%3Cpath d='M6 11c1-4 5-6 9-4 2-3 8-3 10 1 2 0 3 2 2 3' fill='%23F3E9D2'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Oswald:wght@400;600&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Загрузчик: кружка наполняется, потом «Prost!» -->
+<div class="loader" aria-hidden="true">
+  <div class="loader__mug">
+    <svg class="tap" width="120" height="70" viewBox="0 0 120 70"><rect x="10" y="8" width="80" height="16" rx="8" fill="#5A4329"/><rect x="40" y="24" width="20" height="26" rx="4" fill="#8A6A3E"/><path d="M44 50h12l-2 12h-8z" fill="#C9A56A"/><rect x="62" y="-6" width="10" height="30" rx="5" fill="#E8A33D" transform="rotate(25 67 24)"/></svg>
+    <div class="loader__stream"></div>
+    <div class="loader__glass">
+      <div class="loader__liquid"><span class="bub" style="left:20%;animation-delay:.1s"></span><span class="bub" style="left:45%;animation-delay:.6s"></span><span class="bub" style="left:70%;animation-delay:1s"></span><span class="bub" style="left:33%;animation-delay:1.3s"></span></div>
+      <div class="loader__foam"></div>
+    </div>
+    <div class="loader__drip"></div>
+    <div class="loader__handle"></div>
+  </div>
+  <div class="loader__caption">
+    <p class="loader__txt">Наливаем вашу кружку…</p>
+    <p class="loader__prost">Prost!</p>
+  </div>
+  <div class="loader__bar"><div></div></div>
+</div>
+<div class="progress" aria-hidden="true"></div>
+
+<header class="nav">
+  <nav class="nav__inner" aria-label="Главное меню">
+    <a href="#top" class="logo">
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="7" y="10" width="20" height="24" rx="3" fill="none" stroke="#E8A33D" stroke-width="2.5"/><path d="M27 15h4a4 4 0 0 1 4 4v4a4 4 0 0 1-4 4h-4" fill="none" stroke="#E8A33D" stroke-width="2.5"/><path d="M6 11c1-4 5-6 9-4 2-3 8-3 10 1 2 0 3 2 2 3" fill="#F3E9D2"/><line x1="13" y1="17" x2="13" y2="29" stroke="#E8A33D" stroke-width="2"/><line x1="20" y1="17" x2="20" y2="29" stroke="#E8A33D" stroke-width="2"/></svg>
+      <span>Der Goldene Krug</span>
+    </a>
+    <div class="nav__links">
+      <a href="#bier">Пиво</a>
+      <a href="#sorten">Сорта</a>
+      <a href="#menu">Меню</a>
+      <a href="#abende">Вечера</a>
+      <a href="#reserve" class="btn btn--sm">Забронировать</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section id="top" class="hero">
+    <div class="hero__bg">
+      <div class="hero__shift"><img src="img/hall.webp" alt="Сводчатый кирпичный зал пивной с длинными деревянными столами и кружками пива" class="par" width="1536" height="864"></div>
+      <div class="hero__shade"></div>
+      <div class="hero__spot"></div>
+    </div>
+    <div class="hero__bubbles" aria-hidden="true"></div>
+
+    <div class="hero__inner">
+      <div class="hero__copy">
+        <p class="eyebrow in" style="--d:3.3s">Баварская пивная · с открытия до последней кружки</p>
+        <h1 class="hero__title">
+          <span class="line"><span class="w" style="--d:3.4s">Пиво,</span> <span class="w" style="--d:3.52s">как</span> <span class="w" style="--d:3.64s">в</span></span>
+          <span class="line"><span class="w it" style="--d:3.76s"><span class="gold">Мюнхене</span></span><span class="w" style="--d:3.88s">.</span></span>
+          <span class="line"><span class="w" style="--d:4s">Только</span> <span class="w" style="--d:4.12s">ближе.</span></span>
+        </h1>
+        <p class="hero__lead in" style="--d:4.3s">Литровые кружки, хрустящие брецели и рулька, которая готовится шесть часов. Двенадцать сортов на кране — сваренных по Закону о чистоте пива 1516 года.</p>
+        <div class="hero__cta in" style="--d:4.45s">
+          <a href="#reserve" class="btn btn--lg shine">Занять стол</a>
+          <a href="#menu" class="btn btn--lg btn--ghost">Смотреть меню</a>
+        </div>
+      </div>
+      <div class="badge in" style="--d:4.6s">
+        <svg class="spin" width="200" height="200" viewBox="0 0 200 200" role="img" aria-label="Ein Prosit der Gemütlichkeit">
+          <defs><path id="gkcircle" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0"/></defs>
+          <circle cx="100" cy="100" r="98" fill="rgba(18,14,9,.55)" stroke="#E8A33D" stroke-width="1.5"/>
+          <text class="badge__text" fill="#F3E9D2"><textPath href="#gkcircle">Ein Prosit · Ein Prosit · Der Gemütlichkeit ·</textPath></text>
+        </svg>
+        <span class="badge__prost">Prost!</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <section class="marquee" aria-label="Сорта на кране">
+    <div class="marquee__track" data-marquee="Helles|Hefeweizen|Dunkel|Pilsner|Rauchbier|Doppelbock"></div>
+  </section>
+  <div class="marquee2" aria-hidden="true">
+    <div class="marquee2__track" data-marquee2="12 сортов на кране|кружка 1 литр|живая музыка по пятницам|кухня до полуночи|Октоберфест каждый день"></div>
+  </div>
+
+  <!-- STATS -->
+  <section class="stats" aria-label="Немного цифр">
+    <div class="wrap stats__row">
+      <div class="stat reveal"><p class="stat__num"><span class="count" data-to="1516">1516</span></p><p class="stat__label">год Закона о чистоте пива</p></div>
+      <div class="stat reveal"><p class="stat__num"><span class="count" data-to="12">12</span><small>сортов</small></p><p class="stat__label">на кране каждый день</p></div>
+      <div class="stat reveal"><p class="stat__num"><span class="count" data-to="6">6</span><small>часов</small></p><p class="stat__label">томится наша рулька</p></div>
+      <div class="stat reveal"><p class="stat__num"><span class="count" data-to="1000">1000</span><small>мл</small></p><p class="stat__label">в настоящей кружке Maß</p></div>
+    </div>
+  </section>
+
+  <!-- BIER -->
+  <section id="bier" class="bier">
+    <svg class="hop" aria-hidden="true" width="70" height="90" viewBox="0 0 70 90" style="left:3%;top:90px"><use href="#hop"/></svg>
+    <svg class="hop" aria-hidden="true" width="46" height="60" viewBox="0 0 70 90" style="right:6%;top:60px;animation-delay:-3s;animation-duration:11s"><use href="#hop"/></svg>
+    <svg class="hop" aria-hidden="true" width="56" height="72" viewBox="0 0 70 90" style="right:40%;bottom:40px;animation-delay:-6s;animation-duration:13s"><use href="#hop"/></svg>
+
+    <div class="wrap bier__row">
+      <figure class="bier__photo zoom reveal">
+        <img src="img/pour.webp" alt="Золотистое светлое пиво наливается в высокий бокал, густая пена и пузырьки" width="864" height="1152" loading="lazy">
+        <figcaption class="bier__temp"><span>Температура подачи</span><strong>6–8 °C</strong></figcaption>
+      </figure>
+
+      <div class="bier__copy">
+        <p class="eyebrow reveal">Reinheitsgebot · 1516</p>
+        <h2 class="h2 reveal">Четыре ингредиента.<br><span class="it accent">Ноль компромиссов.</span></h2>
+        <p class="lead reveal">Баварский закон о чистоте пива разрешает только воду, солод, хмель и дрожжи. Мы держимся его спустя пять столетий — потому что честному пиву нечего скрывать. Каждая кружка наливается в три приёма, ровно семь минут, чтобы пена стояла шапкой.</p>
+
+        <div class="bier__bottom">
+          <div class="minimug reveal" aria-hidden="true">
+            <div class="minimug__glass"><div class="minimug__liquid"></div><div class="minimug__foam"></div></div>
+            <div class="minimug__handle"></div>
+          </div>
+          <ul class="ingr">
+            <li class="ingr__card card reveal"><p class="ingr__n">H₂O</p><p class="ingr__t">Вода</p><p class="ingr__d">Мягкая, как в Альпах</p></li>
+            <li class="ingr__card card reveal"><p class="ingr__n">Malz</p><p class="ingr__t">Солод</p><p class="ingr__d">Ячменный и пшеничный</p></li>
+            <li class="ingr__card card reveal"><p class="ingr__n">Hopfen</p><p class="ingr__t">Хмель</p><p class="ingr__d">Из долины Халлертау</p></li>
+            <li class="ingr__card card reveal"><p class="ingr__n">Hefe</p><p class="ingr__t">Дрожжи</p><p class="ingr__d">Живые, верхового и низового брожения</p></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POUR: прокрутка наполняет кружку -->
+  <section class="pin" aria-label="Как рождается кружка" data-scroll="pin">
+    <div class="pin__stage">
+      <div class="pin__glow tl" aria-hidden="true"></div>
+      <div class="steps">
+        <p class="steps__label">Как рождается кружка</p>
+        <div class="step s1 tl"><p class="step__no">01</p><h3>Затор</h3><p>Солод смешивают с мягкой водой и медленно нагревают — крахмал превращается в сахар.</p></div>
+        <div class="step s2 tl"><p class="step__no">02</p><h3>Варка с хмелем</h3><p>Сусло кипит, хмель из Халлертау отдаёт горчинку и аромат.</p></div>
+        <div class="step s3 tl"><p class="step__no">03</p><h3>Брожение</h3><p>Дрожжи работают неделями в холоде. Пиво созревает спокойно, без спешки.</p></div>
+        <div class="step s4 tl"><p class="step__no">04</p><h3>Розлив — и Prost!</h3><p>Наливаем в три приёма, чтобы пена встала шапкой. Кружка ваша.</p></div>
+      </div>
+      <div class="bigmug" aria-hidden="true">
+        <div class="bigmug__rot tl">
+          <svg class="bigmug__tap" width="150" height="80" viewBox="0 0 120 70"><rect x="10" y="8" width="80" height="16" rx="8" fill="#5A4329"/><rect x="40" y="24" width="20" height="26" rx="4" fill="#8A6A3E"/><path d="M44 50h12l-2 12h-8z" fill="#C9A56A"/><rect x="62" y="-6" width="10" height="30" rx="5" fill="#E8A33D" transform="rotate(25 67 24)"/></svg>
+          <div class="bigmug__stream tl"></div>
+          <div class="bigmug__glass">
+            <div class="bigmug__liquid tl"><span class="bub" style="left:18%;animation-delay:.1s"></span><span class="bub" style="left:42%;animation-delay:.7s"></span><span class="bub" style="left:66%;animation-delay:1.1s"></span><span class="bub" style="left:84%;animation-delay:.4s"></span></div>
+            <div class="bigmug__foam tl"></div>
+            <div class="bigmug__gloss"></div>
+          </div>
+          <div class="bigmug__handle"></div>
+        </div>
+      </div>
+      <div class="pin__bar"><div class="tl"></div></div>
+    </div>
+  </section>
+
+  <!-- SORTEN: горизонтальная полка -->
+  <section id="sorten" class="hz" aria-label="Сорта на кране" data-scroll="hz">
+    <div class="hz__stage">
+      <div class="hz__head">
+        <h2 class="h2">Шесть сортов —<br><span class="gold it">шесть характеров</span></h2>
+        <p class="hz__hint">Листайте вниз — полка едет</p>
+      </div>
+      <div class="hz__track tl" id="sorts"></div>
+    </div>
+  </section>
+
+  <!-- MENU -->
+  <section id="menu" class="menu">
+    <div class="menu__wave" aria-hidden="true">
+      <svg class="wave" width="200%" height="70" viewBox="0 0 2400 70" preserveAspectRatio="none"><path d="M0 0h2400v24c-60 0-70 30-110 30s-40-22-90-22-60 40-100 40-50-30-100-30-50 18-100 18-60-36-110-36-50 26-100 26-40-20-90-20-60 34-100 34-60-28-100-28H1200c-60 0-70 30-110 30s-40-22-90-22-60 40-100 40-50-30-100-30-50 18-100 18-60-36-110-36-50 26-100 26-40-20-90-20-60 34-100 34-60-28-100-28H0z" fill="#120E09"/></svg>
+    </div>
+    <div class="wrap">
+      <div class="menu__head">
+        <div>
+          <p class="fraktur reveal">Speisekarte</p>
+          <h2 class="h2 reveal">Меню, от которого<br><span class="it">поют за столом</span></h2>
+        </div>
+        <div class="tabs" role="tablist" aria-label="Раздел меню">
+          <button type="button" role="tab" id="tab-beer" aria-controls="menu-panel" aria-selected="true" data-tab="beer">Пиво</button>
+          <button type="button" role="tab" id="tab-food" aria-controls="menu-panel" aria-selected="false" data-tab="food" tabindex="-1">Кухня</button>
+        </div>
+      </div>
+
+      <div class="menu__body">
+        <div class="menu__list">
+          <div id="menu-panel" role="tabpanel" aria-labelledby="tab-beer"></div>
+          <p class="menu__note">Цены указаны в рублях. Пиво — 0,5 л / 1 л «Maß».</p>
+        </div>
+        <figure class="menu__side zoom reveal">
+          <img id="menu-img" src="img/pour.webp" alt="Светлое пиво наливается в высокий бокал" width="864" height="1152" loading="lazy">
+          <figcaption class="tag sway">Хит<br><strong id="menu-hit">Сет 5×0,2</strong></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABENDE -->
+  <section id="abende" class="abende">
+    <div class="abende__bg">
+      <img src="img/toast.webp" alt="" class="par" width="1152" height="864" loading="lazy">
+      <div class="abende__shade"></div>
+    </div>
+    <div class="wrap abende__inner">
+      <p class="eyebrow reveal">Каждый вечер — повод</p>
+      <h2 class="h2 abende__title reveal">Здесь чокаются <span class="it accent">громче,</span> чем говорят</h2>
+      <ul class="nights">
+        <li class="flip reveal"><button type="button" class="flip__in" aria-expanded="false">
+          <span class="face"><span class="face__day">Пн</span><span class="face__title">Stammtisch</span><span class="face__hint">Наведите или нажмите</span></span>
+          <span class="face face--back"><span class="face__title">Stammtisch</span><span class="face__desc">Вечер постоянных гостей: второй литр — за счёт заведения.</span></span>
+        </button></li>
+        <li class="flip reveal"><button type="button" class="flip__in" aria-expanded="false">
+          <span class="face"><span class="face__day">Ср</span><span class="face__title">Пивной квиз</span><span class="face__hint">Наведите или нажмите</span></span>
+          <span class="face face--back"><span class="face__title">Пивной квиз</span><span class="face__desc">Шесть раундов о Германии, пиве и всём на свете. Победителям — бочонок.</span></span>
+        </button></li>
+        <li class="flip reveal"><button type="button" class="flip__in" aria-expanded="false">
+          <span class="face"><span class="face__day">Пт</span><span class="face__title">Духовой оркестр</span><span class="face__hint">Наведите или нажмите</span></span>
+          <span class="face face--back"><span class="face__title">Духовой оркестр</span><span class="face__desc">Живая баварская музыка, танцы на скамейках и общий хор «Ein Prosit».</span></span>
+        </button></li>
+        <li class="flip reveal"><button type="button" class="flip__in" aria-expanded="false">
+          <span class="face"><span class="face__day">Вс</span><span class="face__title">Frühschoppen</span><span class="face__hint">Наведите или нажмите</span></span>
+          <span class="face face--back"><span class="face__title">Frühschoppen</span><span class="face__desc">Поздний завтрак по-мюнхенски: белые колбаски, брецель и пшеничное.</span></span>
+        </button></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <section class="quote">
+    <div class="lamps" aria-hidden="true">
+      <div class="lamp"><span class="lamp__cord"></span><span class="lamp__shade"></span></div>
+      <div class="lamp"><span class="lamp__cord"></span><span class="lamp__shade" style="animation-delay:.9s"></span></div>
+      <div class="lamp"><span class="lamp__cord"></span><span class="lamp__shade" style="animation-delay:1.8s"></span></div>
+    </div>
+    <blockquote class="quote__text reveal">«Пиво — это доказательство того, что жизнь можно сделать <span class="accent">чуть лучше</span>, если сесть за один длинный стол»</blockquote>
+    <p class="quote__word reveal" aria-label="Gemütlichkeit" data-letters="Gemütlichkeit"></p>
+    <p class="quote__note reveal">немецкое слово, которое не переводится — его надо почувствовать</p>
+  </section>
+
+  <!-- RESERVE -->
+  <section id="reserve" class="reserve">
+    <div class="wrap resbox reveal">
+      <svg aria-hidden="true" class="resbox__wheel spin" width="420" height="420" viewBox="0 0 100 100"><g fill="none" stroke="#120E09" stroke-width="1.2"><circle cx="50" cy="50" r="46"/><circle cx="50" cy="50" r="34"/><path d="M50 4v92M4 50h92M17 17l66 66M83 17L17 83"/></g></svg>
+      <div class="resbox__copy">
+        <p class="fraktur fraktur--dark">Reservierung</p>
+        <h2 class="h2">Ваш стол<br>уже ждёт</h2>
+        <p class="resbox__lead">По пятницам и субботам свободных мест к восьми вечера не остаётся. Забронируйте заранее — первую кружку нальём, как только войдёте.</p>
+        <address class="resbox__contacts">
+          <span>[АДРЕС БАРА]</span>
+          <span>[ТЕЛЕФОН] · ежедневно 12:00 — 02:00</span>
+        </address>
+      </div>
+
+      <div class="form-wrap">
+        <form class="form" id="reserve-form" novalidate>
+          <label class="field">Имя
+            <input type="text" name="name" placeholder="Например, Анна" autocomplete="given-name" required>
+            <span class="field__err" hidden>Напишите имя, чтобы мы знали, кого ждать</span>
+          </label>
+          <div class="form__row">
+            <label class="field">Дата
+              <input type="date" name="date" required>
+              <span class="field__err" hidden>Выберите дату визита</span>
+            </label>
+            <label class="field field--time">Время
+              <input type="time" name="time" value="19:30" min="12:00" required>
+            </label>
+          </div>
+          <fieldset class="guests">
+            <legend>Гостей</legend>
+            <div class="guests__opts">
+              <label><input type="radio" name="guests" value="2"><span>2</span></label>
+              <label><input type="radio" name="guests" value="3"><span>3</span></label>
+              <label><input type="radio" name="guests" value="4" checked><span>4</span></label>
+              <label><input type="radio" name="guests" value="6"><span>6</span></label>
+              <label><input type="radio" name="guests" value="8"><span>8</span></label>
+              <label><input type="radio" name="guests" value="10+"><span>10+</span></label>
+            </div>
+          </fieldset>
+          <button type="submit" class="btn btn--xl shine">Забронировать стол</button>
+        </form>
+        <div class="form-done" id="form-done" hidden tabindex="-1">
+          <p class="form-done__prost">Prost!</p>
+          <p class="form-done__msg" id="form-done-msg">Заявка принята. Мы перезвоним, чтобы подтвердить бронь.</p>
+          <button type="button" class="btn btn--ghost" id="form-reset">Новая бронь</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer__row">
+    <span class="footer__logo">Der Goldene Krug</span>
+    <span class="footer__warn">Чрезмерное употребление алкоголя вредит вашему здоровью. 18+</span>
+    <div class="footer__links">
+      <a href="https://t.me/">Telegram</a>
+      <a href="https://vk.com/">ВКонтакте</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Шишка хмеля, переиспользуется через <use> -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="hop" viewBox="0 0 70 90"><g fill="#7E9A3A" stroke="#4E6322" stroke-width="1.5"><path d="M35 10c10 6 16 16 16 28 0 18-8 34-16 44-8-10-16-26-16-44 0-12 6-22 16-28z"/><path d="M19 38c8 4 24 4 32 0M21 52c8 4 20 4 28 0M24 66c6 3 16 3 22 0" fill="none"/></g><path d="M35 10c0-6 4-9 9-9" fill="none" stroke="#4E6322" stroke-width="2"/></symbol>
+</svg>
+
+<script src="js/main.js" defer></script>
+</body>
+</html>

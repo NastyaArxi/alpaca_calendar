@@ -1,0 +1,2276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+      crossorigin="anonymous"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+   <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
+      integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" rel="stylesheet" />
+   <link href="https://fonts.gstatic.com" rel="preconnect" />
+   <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&amp;display=swap"
+      rel="stylesheet" />
+   <title>Landing page для компании blizko</title>
+</head>
+<style type="text/css">
+   html,
+   body {
+      font-family: 'Roboto', sans-serif;
+      color: #333333;
+      font-size: 16px;
+      line-height: 24px;
+   }
+
+   body {
+      overflow-x: hidden;
+   }
+
+   a {
+      text-decoration: none;
+   }
+
+   a:hover {
+      text-decoration: none;
+   }
+
+   p {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 300;
+      font-size: 18px;
+      line-height: 22px;
+      color: #333333;
+
+   }
+
+   ol {
+
+      margin-top: 0;
+      margin-bottom: 0.25rem;
+   }
+
+
+
+   .col-xs-15,
+   .col-sm-15,
+   .col-md-15,
+   .col-lg-15 {
+      position: relative;
+      min-height: 1px;
+      padding-right: 10px;
+      padding-left: 10px;
+   }
+
+   .no_gutters {
+      padding: 0px;
+      margin: 0px;
+   }
+
+   a.active.focus,
+   a.active:focus,
+   a.focus,
+   a:active.focus,
+   a:active:focus,
+   a:focus,
+   button.active.focus,
+   button.active:focus,
+   button.focus,
+   button:active.focus,
+   button:active:focus,
+   button:focus,
+   .btn.active.focus,
+   .btn.active:focus,
+   .btn.focus,
+   .btn:active.focus,
+   .btn:active:focus,
+   .btn:focus {
+      outline: 0 !important;
+      outline-color: transparent !important;
+      outline-width: 0 !important;
+      outline-style: none !important;
+      box-shadow: 0 0 0 0 rgba(0, 123, 255, 0) !important;
+   }
+
+   .nav-link {
+      color: #cfcfcf !important;
+      transition: color 0.2s;
+   }
+
+   .nav-link:hover {
+      color: #ff6600 !important;
+      transition: color 0.2s;
+   }
+
+   .btn {
+      font-family: 'Roboto', sans-serif;
+      border-radius: 0.15em;
+   }
+
+   .btn_2 {
+      font-family: 'Roboto', sans-serif;
+      display: inline-block;
+      font-weight: 400;
+      line-height: 1.5;
+      text-align: center;
+      text-decoration: none;
+      vertical-align: middle;
+      cursor: pointer;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+      background-color: transparent;
+      border: 1px solid transparent;
+      padding: 0.5em 1.9em;
+      font-size: 1.15rem;
+      background-color: #FF6600;
+      color: #ffffff;
+      border-radius: 0.15em;
+      transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+   }
+
+   .btn_2:hover {
+      background-color: #ff934b;
+      color: #ffffff !important;
+      text-decoration: none;
+   }
+
+   .btn-secondary {
+      background-color: #F13A00;
+      border: none;
+   }
+
+   .btn-secondary:hover {
+      background-color: #FF6600;
+      color: #ffffff !important;
+
+   }
+
+   .navbar-brand {
+      font-size: 0rem;
+   }
+
+
+   .orange {
+      font-family: 'Roboto', sans-serif;
+      padding-left: 0.7em;
+      padding-right: 0.7em;
+      background-color: #FF6600;
+      border-radius: 0.15em;
+      color: #ffffff !important;
+   }
+
+   .orange:hover {
+      background-color: #ff934b;
+      color: #ffffff !important;
+   }
+
+   .nav-item {
+      margin: 0.15rem 1.5rem;
+      font-size: 16px;
+   }
+
+   .h1,
+   h1 {
+      color: #f7f7f7;
+      font-size: 47px;
+      line-height: 55px;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 600;
+      margin-bottom: 20px;
+      background: none !important;
+   }
+
+   .h2,
+   h2 {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 600;
+      font-size: 30px;
+      line-height: 40px;
+      color: #333333;
+   }
+
+   .h4,
+   h4 {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 400;
+      font-size: 20px;
+      line-height: 23px;
+      color: #333333;
+   }
+
+   .h6,
+   h6 {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 400;
+      font-size: 20px;
+      line-height: 26px;
+      color: #333333;
+   }
+
+   .section_margin {
+      padding-top: 4.2rem;
+
+
+   }
+
+   .h2_bottom {
+      margin-bottom: 1.8rem;
+
+   }
+
+   .section_top {
+      padding-top: 4rem;
+      padding-bottom: 4rem;
+   }
+
+   .h4_bottom {
+      margin-bottom: 1.4rem;
+   }
+
+   .orange_ul {
+      color: #FF6600;
+      margin-block-start: 0em;
+
+   }
+
+   .gray_ul {
+      color: #979494;
+      margin-block-start: 0em;
+      padding-inline-start: 20px;
+   }
+
+   .gray {
+      background-color: #f7f7f7;
+      border-radius: 5px 5px 0px 0px;
+   }
+
+
+   .section_padding {
+      padding: 100px 15px;
+   }
+
+   .card-header:first-child {
+      border-radius: 0px 2px 2px 0px;
+   }
+
+   .card-header {
+      margin-top: 1.1rem;
+      padding: .5rem 1rem;
+      margin-bottom: 0;
+      background-color: #FF6600;
+      border-bottom: 1px solid #FF6600;
+   }
+
+   .card {
+      padding-left: 0px;
+      box-shadow: 2px 2px 10px 4px rgba(55, 55, 55, 0.13);
+   }
+
+   .card-body {
+      padding: 0 !important;
+   }
+
+   .card-body_2 {
+      padding: 0px 50px 45px 104px;
+   }
+
+   .card-header_b {
+      border-radius: 5px 5px 0px 0px;
+      padding: 25px 15px;
+      background-color: #FF6600;
+      color: #ffffff;
+      font-size: 19px;
+      font-weight: 600;
+      text-align: center;
+      height: 100%;
+      width: 100%;
+   }
+
+   .flex-grow-1 {
+      padding: 16px 16px 26px 16px;
+   }
+
+   .b-1 {
+      margin: 0px 16px 0px 16px;
+   }
+
+
+
+   .btn-blue {
+      width: 66%;
+      background-color: #FF6600;
+      color: #ffffff;
+      margin-top: 20px;
+      margin-bottom: 40px;
+      font-weight: 600;
+   }
+
+
+   .btn-blue:hover {
+      background-color: #ff9474;
+      color: #ffffff;
+   }
+
+   .blue1 {
+      color: #FF6600;
+      font-size: 22px;
+
+   }
+
+   .p_card2 {
+      font-size: 14px;
+      line-height: 18px;
+      padding-bottom: 0px;
+      margin-bottom: 0px;
+      color: #333333;
+   }
+
+   .card_shadow_2 {
+      padding-left: 0px;
+      padding-right: 0px;
+      margin: 8px;
+      background-color: #ffffff;
+      box-shadow: 0px 7px 17px rgba(0, 0, 0, 0.07), 0px 1.56354px 3.52734px rgba(0, 0, 0, 0.0417275), 0px 0.465507px 1.47609px rgba(0, 0, 0, 0.0282725);
+   }
+
+
+
+   .a_modal {
+      color: #F13A00;
+      text-decoration: none;
+   }
+
+   .a_modal:hover {
+      color: #ff6c3f;
+      text-decoration: none;
+   }
+
+   .modal_desc {
+      padding: .75rem 1rem .75rem 1.25rem;
+      border-top: 1px solid #dee2e6;
+      border-bottom-right-radius: calc(.3rem - 1px);
+      border-bottom-left-radius: calc(.3rem - 1px);
+   }
+
+   .li_modal_a {
+      padding-left: 2.75rem;
+   }
+
+   .modal-body {
+      padding: 1rem 4rem;
+   }
+
+   .modal-header {
+      padding: 1.25rem;
+   }
+
+   .modal-footer {
+      padding: 1.25rem;
+   }
+
+
+   .modal-header .close {
+      padding: 1rem 1rem;
+      margin: -1rem -1rem -1rem auto;
+   }
+
+   button.close {
+      padding: 0;
+      background-color: transparent;
+      border: 0;
+   }
+
+   .close {
+      float: right;
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1;
+      color: #000;
+      text-shadow: 0 1px 0 #fff;
+      opacity: .5;
+   }
+
+
+
+
+   .navbar-toggler {
+      color: #ffffff !important;
+      border-color: #FF6600 !important;
+      background: #FF6600 !important;
+      padding: .25rem .75rem;
+      font-size: 1.75rem;
+      line-height: 1;
+      background-color: transparent;
+      border: 1px solid transparent;
+      border-radius: .25rem;
+   }
+
+
+
+
+
+
+
+   /*.card-title{
+padding-top: 16px;
+} */
+
+   /* Style the buttons that are used to open and close the accordion panel */
+   .accordion {
+      color: #373737;
+      cursor: pointer;
+      padding: 0px;
+      margin-top: 8px;
+      /*margin-bottom: 16px;*/
+      width: 100%;
+      text-align: left;
+      border: none;
+      outline: none;
+      transition: 0.4s;
+      background-color: #ffffff;
+   }
+
+   /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+   .active,
+   .accordion:hover {
+      background-color: #ffffff;
+   }
+
+   /* Style the accordion panel. Note: hidden by default */
+   .panel {
+      padding: 0px 18px;
+      background-color: #ffffff;
+      display: none;
+      overflow: hidden;
+   }
+
+   .container_acc {
+      padding-top: 8px;
+      padding-bottom: 8px;
+   }
+
+   hr {
+      margin: 1rem 0;
+      color: inherit;
+      background-color: #FF6600;
+      border: 0;
+      opacity: 0.99;
+   }
+
+   .container_card {
+      margin-top: 0.7rem;
+      margin-bottom: 0.7rem;
+   }
+
+   .form-control {
+      display: block;
+      width: 100%;
+      margin: 0rem 0.1rem 0.5rem 0.1rem;
+   }
+
+   .form_width {
+      width: 100%;
+      margin: 0rem 0.15rem;
+   }
+
+   .orange_link {
+      color: #FF6600;
+   }
+
+   .orange_link:hover {
+      color: #F13A00;
+   }
+
+
+
+   .footer {
+      background-color: #333333;
+      padding: 50px 0;
+
+   }
+
+   .white {
+      color: #c1c1c1;
+      text-decoration: none;
+      transition: color 0.2s;
+
+   }
+
+   .white:hover {
+      color: #ffac74;
+      transition: color 0.2s;
+   }
+
+
+
+   .social-icons-5 {
+      list-style: none;
+      margin: 50px 0 0px 26px;
+      padding: 0;
+      display: flex;
+   }
+
+   .social-icons-5 a {
+      text-decoration: none;
+      margin: 0 6px;
+      transition: border-top-left-radius 0.1s linear 0s, border-top-right-radius 0.1s linear 0.1s, border-bottom-right-radius 0.1s linear 0.2s, border-bottom-left-radius 0.1s linear 0.3s;
+   }
+
+
+   .social-icons-5 a i,
+   .social-icons-5 a img {
+      transition: transform 0.4s linear 0s;
+   }
+
+   .social-icons-5 a:hover {
+      transform: rotate(360deg);
+      border-radius: 50%;
+   }
+
+   .social-icons-5 a:hover i,
+   .social-icons-5 a:hover img {
+      transform: rotate(-360deg);
+   }
+
+
+   .icons_footer {
+      display: inline-block;
+      margin: auto 8px auto 0px;
+      padding-bottom: 10px;
+   }
+
+   .cont_2 {
+      padding-left: 0px;
+
+   }
+
+   .cont_icon {
+      max-width: 30px;
+   }
+
+   .cont_icon_2 {
+      max-width: 25px;
+      margin-right: 3%;
+   }
+
+   .a_white {
+      color: #ffffff;
+      text-decoration: none;
+   }
+
+   .a_white:hover {
+      color: #FF6600;
+      text-decoration: none;
+   }
+
+   .contacts li {
+      padding-bottom: 5px;
+      padding-left: 0px;
+   }
+
+   .contacts {
+      padding-inline-start: 0px;
+   }
+
+
+
+   /* слайдер 2 отзывы начало */
+
+   .carousel {
+      position: relative;
+   }
+
+   .carousel.pointer-event {
+      touch-action: pan-y;
+   }
+
+   .carousel-inner {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+
+   }
+
+   .carousel-item {
+      position: relative;
+      display: none;
+      float: left;
+      width: 100%;
+      margin-right: -100%;
+      backface-visibility: hidden;
+      @include transition($carousel-transition);
+   }
+
+   .carousel-item.active,
+   .carousel-item-next,
+   .carousel-item-prev {
+      display: block;
+   }
+
+   /* rtl:begin:ignore */
+   .carousel-item-next:not(.carousel-item-start),
+   .active.carousel-item-end {
+      transform: translateX(100%);
+   }
+
+   .carousel-item-prev:not(.carousel-item-end),
+   .active.carousel-item-start {
+      transform: translateX(-100%);
+   }
+
+   /* rtl:end:ignore */
+
+   .sr-only {
+      display: none;
+   }
+
+   .carousel-item.active,
+   .carousel-item-next.carousel-item-start,
+   .carousel-item-prev.carousel-item-end {
+      z-index: 1;
+      opacity: 1;
+   }
+
+   .active.carousel-item-start,
+   .active.carousel-item-end {
+      z-index: 1;
+      opacity: 1;
+
+   }
+
+
+   .carousel-control-prev {
+      position: absolute !important;
+      width: 36px !important;
+      left: 0 !important;
+      height: 36px !important;
+      margin-top: -18px !important;
+      margin-left: -60px !important;
+      top: 50% !important;
+      background: #ff6600 !important;
+      border-radius: 50% !important;
+      cursor: pointer !important;
+      z-index: 1 !important;
+   }
+
+   .carousel-control-prev:before {
+      content: "" !important;
+      position: absolute !important;
+      width: 16px !important;
+      height: 16px !important;
+      border-right: 2px solid #fff !important;
+      border-top: 2px solid #fff !important;
+      top: 50% !important;
+      left: 50% !important;
+      -webkit-box-sizing: border-box !important;
+      box-sizing: border-box !important;
+      -webkit-transform: translate(-50%, -50%) rotate(225deg) !important;
+      -ms-transform: translate(-50%, -50%) rotate(225deg) !important;
+      transform: translate(-50%, -50%) rotate(225deg) !important;
+      margin-left: 2px !important;
+   }
+
+   .carousel-control-next {
+      position: absolute !important;
+      width: 36px !important;
+      right: 0 !important;
+      height: 36px !important;
+      margin-top: -18px !important;
+      margin-right: -60px !important;
+      top: 50% !important;
+      background: #ff6600 !important;
+      border-radius: 50% !important;
+      cursor: pointer !important;
+      z-index: 1 !important;
+   }
+
+   .carousel-control-next:before {
+      content: "" !important;
+      position: absolute !important;
+      width: 16px !important;
+      height: 16px;
+      border-right: 2px solid #fff;
+      border-top: 2px solid #fff;
+      top: 50% !important;
+      left: 50% !important;
+      -webkit-box-sizing: border-box !important;
+      box-sizing: border-box !important;
+      -webkit-transform: translate(-50%, -50%) rotate(45deg) !important;
+      -ms-transform: translate(-50%, -50%) rotate(45deg) !important;
+      transform: translate(-50%, -50%) rotate(45deg) !important;
+      margin-left: -2px !important;
+   }
+
+   .carousel-control-prev-icon {
+      background-image: escape-svg($carousel-control-prev-icon-bg);
+   }
+
+   .carousel-control-next-icon {
+      background-image: escape-svg($carousel-control-next-icon-bg);
+   }
+
+   nav {
+      border-bottom: 1px solid #464646;
+   }
+
+   .header {
+      background: #333333;
+      border-radius: 0px 0px 5px 5px;
+      position: relative;
+   }
+
+   .offer {
+      max-width: 560px;
+      height: auto;
+      margin-left: 180px;
+      margin-bottom: 90px;
+      margin-top: 70px;
+
+   }
+
+   .offer__title {
+      color: #f7f7f7;
+      font-size: 47px;
+      line-height: 55px;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 600;
+      margin-bottom: 20px;
+      padding: 0;
+   }
+
+   .offer__text {
+      color: #f7f7f7;
+      font-size: 25px;
+      line-height: 35px;
+      margin-bottom: 30px;
+   }
+
+   .offer__btn {
+      font-family: 'Roboto', sans-serif;
+      display: inline-block;
+      font-weight: 400;
+      line-height: 1.5;
+      text-align: center;
+      text-decoration: none;
+      vertical-align: middle;
+      cursor: pointer;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+      background-color: transparent;
+      border: 1px solid transparent;
+      padding: 0.5em 1.9em;
+      font-size: 1.15rem;
+      background-color: #FF6600;
+      color: #f7f7f7;
+      border-radius: 0.15em;
+      transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+
+   }
+
+   .offer__btn:hover {
+      color: #dddddd;
+      background-color: #ff7011;
+      box-shadow: 0 0 5px #ff7920;
+   }
+
+
+
+   .offer__img {
+
+      background: url(https://st34.stblizko.ru/images/useful_links/000/097/456_original.png?1641795784) no-repeat center center /cover;
+      width: 40%;
+      height: 540px;
+      position: absolute;
+      top: 0;
+      right: 0;
+   }
+
+   .btn_list {
+      background: none;
+      border: 1px solid #979494;
+      transition: all .15s;
+   }
+
+   .btn_list:hover {
+      background: none;
+      color: #878787 !important;
+      border: 1px solid #878787;
+      transition: all .15s;
+
+   }
+
+   .reviews {
+      padding-bottom: 50px;
+   }
+
+   @media screen and (max-width: 1530px) {
+
+
+      .offer__img {
+         width: 42%;
+         height: 540px;
+      }
+
+   }
+
+   @media screen and (max-width: 1380px) {
+      .card-header_b {
+         height: 27%;
+      }
+
+      .offer {
+         margin-left: 48px;
+      }
+
+      .offer__title {
+         font-size: 42px;
+         line-height: 50px;
+      }
+
+      .offer__text {
+         font-size: 22px;
+         line-height: 30px;
+      }
+
+      .offer__img {
+         width: 42%;
+         height: 500px;
+      }
+
+   }
+
+   @media screen and (max-width: 1300px) {
+
+      .offer__img {
+         width: 48%;
+         height: 530px;
+      }
+
+   }
+
+   @media (max-width: 1200px) {
+
+      .next,
+      .prev {
+         transform: scale(1);
+         opacity: 1
+      }
+
+      .item {
+         display: block !important
+      }
+
+      .card-title {
+         margin: 20px 0;
+      }
+
+      .offer__img {
+         width: 48%;
+         height: 480px;
+      }
+
+   }
+
+
+
+
+   @media (max-width: 1110px) {
+
+
+      .h2,
+      h2 {
+         font-size: 34px;
+         line-height: 40px;
+      }
+
+      .h4,
+      h4 {
+         font-family: 'Roboto', sans-serif;
+         font-weight: 400;
+         font-size: 22px;
+         line-height: 26px;
+         color: #373737;
+      }
+
+      .offer {
+         margin-left: 15px;
+      }
+
+      .offer__img {
+         width: 46%;
+         height: 425px;
+      }
+
+   }
+
+
+
+
+
+   @media (max-width: 1024px) {
+
+
+      .h2,
+      h2 {
+         font-size: 34px;
+         line-height: 40px;
+      }
+
+      .h4,
+      h4 {
+         font-family: 'Roboto', sans-serif;
+         font-weight: 400;
+         font-size: 20px;
+         line-height: 22px;
+         color: #373737;
+      }
+
+
+
+      .offer__title {
+         font-size: 36px;
+         line-height: 42px;
+      }
+
+      .offer__text {
+         font-size: 22px;
+         line-height: 30px;
+      }
+
+      .offer__img {
+         width: 42%;
+         height: 383px;
+      }
+
+      .nav-item {
+         margin: 10px 0;
+
+      }
+
+
+   }
+
+   @media (max-width: 960px) {
+
+
+      .offer__img {
+         width: 35%;
+         height: 280px;
+      }
+   }
+
+
+   @media (max-width: 960px) {
+
+      .offer {
+         text-align: center;
+
+         margin: 0 auto;
+         padding: 40px 0;
+      }
+
+      .offer__img {
+         display: none;
+      }
+   }
+
+
+
+
+
+   @media (max-width: 580px) {
+      .carousel-control-prev {
+         display: none !important;
+      }
+
+      .carousel-control-next {
+         display: none !important;
+      }
+
+      .card-title {
+         text-align: center;
+      }
+
+      .card-text {
+         text-align: center;
+      }
+
+
+
+   }
+
+   @media all and (max-width: 426.9px) {
+
+      .h2,
+      h2 {
+         font-size: 20px;
+         line-height: 28px;
+      }
+
+      .h4,
+      h4 {
+         font-family: 'Roboto', sans-serif;
+         font-weight: 400;
+         font-size: 18px;
+         line-height: 24px;
+         color: #333333;
+      }
+
+      .h6,
+      h6 {
+         font-family: 'Roboto', sans-serif;
+         font-weight: 400;
+         font-size: 18px;
+         line-height: 25px;
+         color: #333333;
+      }
+
+      .form-text {
+         font-size: 12px;
+         line-height: 16px;
+      }
+
+      .card-header_b {
+         height: 27%;
+      }
+
+      .offer__title {
+         font-size: 29px;
+         line-height: 42px;
+      }
+
+      .carousel-control-prev {
+         display: none !important;
+      }
+
+      .carousel-control-next {
+         display: none !important;
+      }
+
+      .card-body {
+         margin-right: 0;
+         text-align: center !important;
+      }
+
+      .card-title {
+         text-align: center;
+      }
+
+      .card-text {
+         text-align: center;
+      }
+   }
+
+   @media (max-width: 360px) {
+      .offer {
+         margin: 0;
+      }
+
+      .offer__btn {
+         width: 100%;
+      }
+
+      .offer__title {
+         font-size: 28px;
+         line-height: 37px;
+      }
+
+      .offer__text {
+         font-size: 20px;
+         line-height: 27px;
+      }
+
+      .section_padding {
+         padding: 20px 20px;
+      }
+   }
+</style>
+<div class="container-fluid" style="max-width: 1600px;">
+   <div class="row justify-content-center">
+      <nav class="navbar navbar-expand-lg navbar-light" style="background: #333333;">
+         <div class="container-fluid"><a class="navbar-brand" href="http://russia.blizko.ru/" target="_blank"><img
+                  alt="BLIZKO" class="img-fluid"
+                  src="https://st28.stblizko.ru/images/useful_links/000/093/014_original.png"
+                  style="width: 120px; height: 23px;" /></a><button aria-controls="navbarColor01" aria-expanded="false"
+               aria-label="Toggle navigation" class="navbar-toggler collapsed" data-target="#navbarColor01"
+               data-toggle="collapse" type="button">&equiv;</button>
+            <div class="collapse navbar-collapse" id="navbarColor01">
+               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li class="nav-item"><a class="nav-link" href="#1">Кейсы</a></li>
+                  <li class="nav-item"><a class="nav-link" href="#2">Интервью</a></li>
+                  <li class="nav-item"><a class="nav-link" href="#3">Отзывы</a></li>
+               </ul>
+
+               <form class="d-flex">
+                  <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                     <li class="nav-item"><a class="btn orange btn_list" target="_blank"
+                           href="https://drive.google.com/file/d/1CUQPzS9gecyp57TCpezCfehwmDHbqIH3/view?usp=sharing"
+                           download="">Аудит сайта</a></li>
+                     <li class="nav-item"><a class="btn orange"
+                           href="http://{region:name_lat}.blizko.ru/about/reklama/order_call" target="_blank">Заказать
+                           звонок</a></li>
+
+                  </ul>
+               </form>
+            </div>
+         </div>
+      </nav>
+
+      <section class="header">
+         <div class="row align-items-center">
+            <div class="col-lg-7 col-12">
+               <div class="offer">
+                  <h1 class="offer__title">Откройте дверь новым возможностям с BLIZKO</h1>
+
+                  <p class="offer__text">Получите покупателей, звонки и заявки на самых выгодных условиях.</p>
+
+                  <div class="offer__btns flex-column flex-sm-row"><a
+                        class="offer__btn offer__btn_primary align-items-center justify-content-center"
+                        href="https://www.blizko.ru/zayvka/ugc/santech_30_z" target="blank">Получить сейчас </a>
+                  </div>
+               </div>
+            </div>
+
+            <div class="col-lg-5 col-12" style="padding: 0;">
+               <div class="offer__img"></div>
+            </div>
+         </div>
+      </section>
+
+
+      <section>
+         <div class="container-fluid section_padding" id="1">
+            <div class="row justify-content-center">
+               <div class="col-xl-12 col-lg-12 col-md-10 col-sm-10 col-12">
+                  <div class="row justify-content-center">
+                     <div class="col-xl-9 col-lg-9 col-md-10 col-sm-10 col-12 h2_bottom" style="padding: 0;">
+                        <h2>Результаты онлайн-магазинов рынка стройки и ремонта на BLIZKO</h2>
+
+                        <h4>Помогаем компаниям получать новых покупателей.</h4>
+                     </div>
+                  </div>
+
+
+                  <div class="row justify-content-center">
+                     <div class="col-xl-12 col-lg-12 col-md-10 col-sm-10 col-10 divider_h4">
+                        <div class="row justify-content-center flex-wrap">
+                           <div class="col-xl-3 col-md-6 col-12 d-flex flex-column card_shadow_2"
+                              style="border-radius: .25rem;">
+                              <div class="card-header_b">Сеть магазинов<br />
+                                 сантехники<br />
+                                 <br />
+                                 5 лет на BLIZKO<br />
+                                 Краснодарcкий край
+                              </div>
+
+                              <div class="flex-grow-1">
+                                 <p><b>Платиновый пакет, дизайн главной страницы, акции</b></p>
+                                 <p>Среднемесячные показатели за январь-июнь 2021 года:</p>
+
+                                 <ul class="divider_p card_ul_padd">
+                                    <li class="blue1">
+                                       <p class="p_card2">12638 просмотров</p>
+                                    </li>
+                                    <li class="blue1">
+                                       <p class="p_card2">2287 посетителей</p>
+                                    </li>
+                                 </ul>
+                              </div>
+
+                              <div class="flex-grow-0">
+                                 <div class="cont" style="text-align: center;"><img alt="Кейс-1"
+                                       src="https://st27.stblizko.ru/images/useful_links/000/097/431_original.png?1640685133"
+                                       style="width: 100%;" /> <!-- Modal -->
+                                    <hr /><button class="btn btn-blue" data-target="#exampleModalCenter1"
+                                       data-toggle="modal" type="button">Как добились</button> <!-- Modal -->
+
+                                    <div aria-hidden="true" aria-labelledby="exampleModalCenterTitle" class="modal fade"
+                                       id="exampleModalCenter1" role="dialog" tabindex="-1">
+                                       <div class="modal-dialog modal-dialog-centered" role="document">
+                                          <div class="modal-content">
+                                             <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLongTitle"
+                                                   style="color: #F13A00;">Как мы добились результатов:</h5>
+                                             </div>
+
+                                             <div class="modal-body" style="text-align: left;">
+                                                <ol>
+                                                   <li><b>Платиновый пакет:</b> оформили сайт в современном стиле,
+                                                      добавили реальные и качественные фотографии к каждому товару и
+                                                      услуге.</li>
+                                                   <li><b>Индивидуальный дизайн главной страницы сайта:</b> был
+                                                      разработан с учетом особенностей ассортимента товаров магазина
+                                                      с
+                                                      акцентом на высокомаржинальные позиции. Добавлена карусель с
+                                                      рекламными слайдерами, проработана удобная структура каталога.
+                                                      Для
+                                                      повышения лояльности добавлен раздел &ldquo;Отзывы&rdquo; и
+                                                      возможностью оставить его с помощью формы обратной связи. Все
+                                                      это
+                                                      обеспечило увеличение конверсии в заказ.</li>
+                                                   <li><b>Грамотное размещение акций:</b> на сайте и в каталогах
+                                                      BLIZKO
+                                                      позволило увеличить средний чек и количество заказов.</li>
+                                                </ol>
+                                             </div>
+
+                                             <div class="modal-footer"><button class="btn btn-secondary"
+                                                   data-dismiss="modal" type="button">Закрыть</button></div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+
+                           <div class="col-xl-3 col-md-6 col-12 d-flex flex-column card_shadow_2"
+                              style="border-radius: .25rem;">
+                              <div class="card-header_b">Магазин товаров для отопления и водоснабжения<br />
+                                 <br />
+                                 6 лет на BLIZKO<br />
+                                 Саратовская область
+                              </div>
+
+                              <div class="flex-grow-1">
+                                 <p><b>Платиновый пакет,<br />
+                                       Мегатрафик</b></p>
+                                 <p>Среднемесячные показатели за февраль-ноябрь 2021 года:</p>
+
+                                 <ul class="divider_p card_ul_padd">
+                                    <li class="blue1">
+                                       <p class="p_card2">2304 просмотров</p>
+                                    </li>
+                                    <li class="blue1">
+                                       <p class="p_card2">941 посетитель</p>
+                                    </li>
+                                 </ul>
+                              </div>
+
+                              <div class="flex-grow-0">
+                                 <div class="cont" style="text-align: center;"><img alt=""
+                                       src="https://st27.stblizko.ru/images/useful_links/000/097/433_original.png?1640685449"
+                                       style="width: 100%;" />
+                                    <hr /><button class="btn btn-blue" data-target="#exampleModalCenter2"
+                                       data-toggle="modal" type="button">Как добились</button> <!-- Modal -->
+
+                                    <div aria-hidden="true" aria-labelledby="exampleModalCenterTitle" class="modal fade"
+                                       id="exampleModalCenter2" role="dialog" tabindex="-1">
+                                       <div class="modal-dialog modal-dialog-centered" role="document">
+                                          <div class="modal-content">
+                                             <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLongTitle"
+                                                   style="color: #F13A00;">Как мы добились результатов:</h5>
+                                             </div>
+
+                                             <div class="modal-body" style="text-align: left;">
+                                                <ol>
+                                                   <li><b>Золотой пакет:</b> контент-менеджер создали и оформили
+                                                      компании сайт на BLIZKO, загрузили товары, фото и описания.
+                                                      Была
+                                                      проработана структура каталога, ассортимент которого составляет
+                                                      23667 позиций. В соответствии с поисковыми запросами
+                                                      пользователей
+                                                      подобрали описания товаров и их названия.</li>
+                                                   <li><b>Работа с контентом:</b> помимо обычной работы над удобной
+                                                      навигацией и структурой каталога, была учтена специфика товаров
+                                                      и
+                                                      помимо фото, добавлены технические чертежи со всеми
+                                                      необходимыми
+                                                      параметрами.<br />
+                                                      Пока сотрудники отдыхают, сайт продолжает работать, покупатели
+                                                      могут в любое время подобрать необходимый товар, оплатить его и
+                                                      заказать доставку самостоятельно. Наш клиент помнит о важности
+                                                      актуальности всех данных на сайте, а мы оперативно их
+                                                      публикуем,
+                                                      поэтому свои заказы покупатели получат в срок.</li>
+                                                </ol>
+                                             </div>
+
+                                             <div class="modal-footer"><button class="btn btn-secondary"
+                                                   data-dismiss="modal" type="button">Закрыть</button></div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+
+                           <div class="col-xl-3 col-md-6 col-12 d-flex flex-column card_shadow_2"
+                              style="border-radius: .25rem;">
+                              <div class="card-header_b">Магазин сантехники и строительных материалов<br />
+                                 <br />
+                                 2 года на BLIZKO<br />
+                                 Республика Крым
+                              </div>
+
+                              <div class="flex-grow-1">
+                                 <p><b>Золотой пакет, проработка сайта контент-менеджером</b></p>
+                                 <p>Среднемесячные показатели за январь-сентябрь 2021 года:</p>
+
+                                 <ul class="divider_p card_ul_padd">
+                                    <li class="blue1">
+                                       <p class="p_card2">6363 просмотра</p>
+                                    </li>
+                                    <li class="blue1">
+                                       <p class="p_card2">1232 посетителя</p>
+                                    </li>
+                                    <!--li class="blue1"><p class="p_card2">14040 переходов на сайт компании на BLIZKO</p></li-->
+                                 </ul>
+                              </div>
+
+                              <div class="flex-grow-0">
+                                 <div class="cont" style="text-align: center;"><img alt=""
+                                       src="https://st27.stblizko.ru/images/useful_links/000/097/434_original.png?1640686858"
+                                       style="width: 100%;" />
+                                    <hr /><button class="btn btn-blue" data-target="#exampleModalCenter3"
+                                       data-toggle="modal" type="button">Как добились</button> <!-- Modal -->
+
+                                    <div aria-hidden="true" aria-labelledby="exampleModalCenterTitle" class="modal fade"
+                                       id="exampleModalCenter3" role="dialog" tabindex="-1">
+                                       <div class="modal-dialog modal-dialog-centered" role="document">
+                                          <div class="modal-content">
+                                             <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLongTitle"
+                                                   style="color: #F13A00;">Как мы добились результатов:</h5>
+                                             </div>
+
+                                             <div class="modal-body" style="text-align: left;">
+                                                <ol>
+                                                   <li><b>Золотой пакет:</b> создали и оформили компании сайт на
+                                                      BLIZKO,
+                                                      загрузили товары, фото и описания.</li>
+                                                   <li><b>Работа с сайтом:</b> проработали структуру каталога,
+                                                      ассортимент которого составляет 10115 позиций. В соответствии с
+                                                      поисковыми запросами пользователей подобрали описания товаров и
+                                                      их
+                                                      названия. На главной странице сайта разместили контакты
+                                                      компании и
+                                                      кнопку обратной связи для возможности оставить заявку на
+                                                      обратный
+                                                      звонок.)</li>
+                                                   <li><b>Работа с отзывами:</b> разместили отзывы на сайте компании
+                                                      в
+                                                      соответствующем разделе. Наличие отзывов повышает доверие
+                                                      потенциальных клиентов. Сейчас у компании опубликован 41 отзыв.
+                                                   </li>
+                                                </ol>
+                                             </div>
+
+                                             <div class="modal-footer"><button class="btn btn-secondary"
+                                                   data-dismiss="modal" type="button">Закрыть</button></div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+
+      <section class="gray">
+         <div class="row justify-content-center section_top">
+            <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 col-12">
+               <div class="row justify-content-center">
+                  <!--div class="col-xl-1 col-lg-1 col-md-1 d-sm-none d-none d-xl-block d-lg-block"></div-->
+                  <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-12 h2_bottom" id="form30">
+                     <h2>Хотите получать такие же результаты или лучше?</h2>
+
+                     <h4>Оставьте заявку сейчас и забирайте своё <b>годовое размещение на BLIZKO с мегаскидкой
+                           30%.</b>
+                     </h4>
+
+                     <h4>Предложение действует&nbsp;<strong>только до 30 января</strong>.</h4>
+                  </div>
+               </div>
+
+               <div class="row justify-content-center">
+                  <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-12">
+                     <div class="row justify-content-center">
+                        <div class="col-12">
+                           <div class="row">
+                              <div class="col-xl-3 col-lg-3 col-md-3 d-sm-none d-none d-xl-block d-lg-block"><img alt=""
+                                    class="img-fluid"
+                                    src="https://st28.stblizko.ru/images/useful_links/000/093/028_original.png" />
+                              </div>
+
+                              <div class="col-xl-9 col-lg-9 col-md-9 col-sm-9 col-11 h4_bottom">
+                                 <form
+                                    action="https://docs.google.com/forms/d/e/1FAIpQLSf6ZGOueNJICL46ubZ2DoCIvloJ3GSGI_yEhJ7Jd6relJsDvw/formResponse">
+                                    <div class="form-group"><input aria-describedby="i.desc.1729042047 i.err.1729042047"
+                                          aria-label="Ваше имя" autocomplete="off" class="form-control"
+                                          data-initial-dir="auto" data-initial-value="" dir="auto" id="name"
+                                          jsname="YPqjbf" name="entry.1023970238" placeholder="Ваше имя" required=""
+                                          tabindex="0" type="name" value="" /></div>
+
+                                    <div class="form-group"><input aria-describedby="i.desc.2045831205 i.err.2045831205"
+                                          aria-label="Телефон для связи" autocomplete="off" class="form-control"
+                                          data-initial-dir="auto" data-initial-value="" dir="auto" id="Mytel"
+                                          jsname="YPqjbf" name="entry.981856079" placeholder="Телефон" required=""
+                                          tabindex="0" type="Mytel" value="" /></div>
+                                    <!--скрытое поле-->
+
+                                    <div
+                                       class="freebirdFormviewerViewItemsItemItem freebirdFormviewerViewItemsTextTextItem"
+                                       data-item-id="1320946362" jsaction="sPvj8e:e4JwSe,vwKRrd;" jscontroller="rDGJeb"
+                                       jsname="ibnC6b" role="listitem" style="display: none;">
+                                       <div class="freebirdFormviewerViewItemsItemItemHeader">
+                                          <div class="freebirdFormviewerViewItemsItemItemTitleContainer">
+                                             <div aria-describedby="i.desc.1320946362" aria-level="2"
+                                                class="freebirdFormviewerViewItemsItemItemTitle" dir="auto"
+                                                role="heading">ID компании</div>
+
+                                             <div class="freebirdFormviewerViewItemsItemItemHelpText" dir="auto"
+                                                id="i.desc.1320946362"></div>
+                                          </div>
+                                       </div>
+
+                                       <div class="freebirdFormviewerViewItemsTextItemWrapper"
+                                          style="/* display: none; */">
+                                          <div
+                                             class="quantumWizTextinputPaperinputEl freebirdFormviewerViewItemsTextShortText freebirdThemedInput"
+                                             jsaction="clickonly:KjsqPd; focus:Jt1EX; blur:fpfTEe; input:Lg5SV;"
+                                             jscontroller="pxq3x" jsname="W85ice" jsshadow="">
+                                             <div class="quantumWizTextinputPaperinputMainContent exportContent">
+                                                <div class="quantumWizTextinputPaperinputContentArea">
+                                                   <div class="quantumWizTextinputPaperinputInputArea"><input
+                                                         aria-describedby="i.desc.1320946362 i.err.1320946362"
+                                                         aria-label="ID компании" autocomplete="off"
+                                                         class="quantumWizTextinputPaperinputInput exportInput"
+                                                         data-initial-dir="auto" data-initial-value="" dir="auto"
+                                                         jsname="YPqjbf" name="entry.1597220320" tabindex="0"
+                                                         type="text" value="{user:company_id}" /></div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                    <button class="btn orange form_width" type="submit">Хочу пакет размещения со
+                                       скидкой</button><small class="form-text text-muted">Нажимая на кнопку, вы
+                                       даете
+                                       согласие на обработку персональных данных в соответствии с <a class="orange_link"
+                                          href="https://www.blizko.ru/privacy_policy" target="_blank">политикой
+                                          конфиденциальности</a> и принимаете условия <a class="orange_link"
+                                          href="https://www.blizko.ru/terms" target="_blank">пользовательского
+                                          соглашения</a></small>
+                                 </form>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+
+      <section>
+         <div class="container-fluid section_padding" id="2">
+            <div class="row justify-content-center">
+               <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-12">
+                  <div class="row justify-content-center">
+                     <div class="col-xl-11 col-lg-11 col-md-10 col-sm-10 col-12 h2_bottom">
+                        <h2>Владельцы компаний&nbsp;рынка стройки и ремонта рассказывают о развитии бизнеса и
+                           инструментах роста продаж</h2>
+                     </div>
+                  </div>
+
+                  <div class="row justify-content-center" id="door1" style="margin-top: 30px;">
+                     <div class="stand col-xl-11 col-lg-11 col-12"
+                        style="box-shadow: 2px 2px 10px 4px rgb(55 55 55 / 13%); background-color: #ffffff; border-radius: 3px;">
+                        <div class="row">
+                           <div class="col-xl-5 col-lg-5 col-md-6 col-sm-10 col-12" style="padding-left: 0px;">
+                              <h6 class="card-header" style="color: #ffffff; text-align: left;">Компания
+                                 &ldquo;MARYSЯ&rdquo;</h6>
+                           </div>
+                        </div>
+
+                        <div class="row justify-content-center">
+                           <div class="col-xl-11 col-lg-11 col-md-11 col-sm-12 col-12"
+                              style="padding-top: 50px; padding-left: 24px;">
+                              <div class="row">
+                                 <div class="container_acc">
+                                    <h6>Успех из года в год</h6>
+
+                                    <div class="orange_ul">
+                                       <p>&laquo;Основной поток заказов на сантехнику, плитку и товары для ванной
+                                          комнаты магазин MARYSЯ получает из интернета. И 10 лет назад, и сегодня.
+                                          Меняются лишь инструменты.</p>
+                                    </div>
+                                 </div>
+                              </div>
+
+                              <div class="row">
+                                 <div class="col-12" style="padding-bottom: 24px;">
+                                    <div id="tab1">
+                                       <h3 style="visibility: hidden;">Читать подробнее</h3>
+
+                                       <div>
+                                          <div>
+                                             <div class="container_acc">
+                                                <h6>Свой конек</h6>
+
+                                                <div class="orange_ul">
+                                                   <p>Сотрудничество с BLIZKO мы начали очень-очень давно с
+                                                      бесплатного
+                                                      размещения. Мы посмотрели по рынку, что ни у кого не будет
+                                                      такого
+                                                      предложения купить чашу Генуя, как у нас, это был наш конек. 10
+                                                      позиций закинули. И люди нам звонили, и мы при бесплатном
+                                                      пакете
+                                                      были на первой странице и на BLIZKO, и в выдаче Яндекса. На
+                                                      сегодняшний день это просто фантастика!</p>
+                                                   <p>Платное размещение начали лет 10 назад. Перешли на платное
+                                                      из-за
+                                                      увеличения конкуренции - мы увидели, что нас вытесняют с
+                                                      топовых
+                                                      позиций. Взяли серебряный пакет, потом круче, круче, и дошли до
+                                                      платины. Мы размещались и на других маркетплейсах, но с BLIZKO
+                                                      получали больше заказов на дорогие позиции.</p>
+                                                </div>
+                                             </div>
+
+                                             <div class="container_acc">
+                                                <h6>Помощь во всем</h6>
+
+                                                <div class="orange_ul">
+                                                   <p>Сейчас мы размещаемся на BLIZKO, плюс есть свой сайт. Мы
+                                                      стараемся, чтобы позиции не пересекались, и, как правило,
+                                                      понимаем, откуда звонок. Если с нашего родного сайта поступает
+                                                      звонок, то есть уверенность 90% что он у нас клиент купит
+                                                      товар, а
+                                                      если с BLIZKO, то процентов 60, за него еще нужно побороться.
+                                                      Отлично, когда заказ делают прямо на сайте, так человека
+                                                      практически невозможно потерять. На BLIZKO ассортимент у нас в
+                                                      разы шире, потому что здесь работают специалисты, они загружают
+                                                      товары, следят за ними, рекомендуют, что делать.</p>
+                                                   <p>Сейчас мы стоим на BLIZKO плечом к плечу с такими компаниями,
+                                                      как
+                                                      LEROY MERLIN. Это вообще фантастика! Спасибо BLIZKO, что может
+                                                      на
+                                                      одной площадке сопоставить магазины разного формата, но в
+                                                      равном
+                                                      положении!. Человеку по большому счету нужно купить ванну или
+                                                      плитку, и ему, в принципе, всё равно у кого приобрести.
+                                                      Главное,
+                                                      чтобы устроили цена, предложение, и вперед.</p>
+                                                </div>
+                                             </div>
+
+                                             <div class="container_acc">
+                                                <h6>Что дальше?</h6>
+
+                                                <div class="orange_ul">
+                                                   <p>Будем активнее расширять ассортимент и представленность на
+                                                      сайте
+                                                      BLIZKO. Мы развиваем соцсети, особенно Инстаграм. Конечно,
+                                                      человек
+                                                      не наберет в Инстаграме &ldquo;Купить унитаз&rdquo;, он наберет
+                                                      в
+                                                      поисковике. Но соцсети - зеркало активности, люди видят, что
+                                                      компания живая, есть акции, обновляется линейка товара, даются
+                                                      советы. Поэтому фактически, Инстаграм тоже участвует в продаже.
+                                                   </p>
+                                                   <p>Люди любят яркие картинки, видео - они помогают продаже. Для
+                                                      этого
+                                                      мы баннеры у себя на сайте на BLIZKO всегда делаем
+                                                      эксклюзивные,
+                                                      фото стараемся яркие, запоминающиеся закидывать. И хорошо, что
+                                                      обновленный BLIZKO еще в мобильной версии это публикует.</p>
+                                                   <p><b>С BLIZKO мы, конечно же, будем продолжать сотрудничество.
+                                                         Любим, ценим, и надеемся на дальнейшее успешное
+                                                         сотрудничество!&raquo;</b></p>
+                                                </div>
+                                             </div>
+
+                                             <div class="row">
+                                                <div class="col-xl-8 col-sm-12 col-12">
+                                                   <div class="orange_ul" style="color: #333333;"><span><i>Коноплева
+                                                            Марина Павловна<br />
+                                                            Директор компании MARYSЯ, Краснодар<br />
+                                                            Пакет размещения: Платиновый</i></span></div>
+                                                </div>
+                                             </div>
+
+                                             <div class="row">
+                                                <div class="col-md-12 col-lg-12"><img alt="Card image cap"
+                                                      src="https://st23.stblizko.ru/images/useful_links/000/097/453_original.png?1640344480"
+                                                      style="width:100%; margin: 30px 0;" /></div>
+                                             </div>
+
+                                             <div class="container_acc">
+                                                <hr />
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+
+                                    <p class="clickme toggle-tab" data-tab="1"
+                                       style="color: #FF6600; font-size: 16px; cursor: pointer; text-decoration: underline; font-weight: 600;">
+                                       <span>Читать подробнее</span>
+                                    </p>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="row justify-content-center" style="margin-top: 30px;">
+                     <div class="stand col-xl-11 col-lg-11 col-12"
+                        style="box-shadow: 2px 2px 10px 4px rgb(55 55 55 / 13%); background-color: #ffffff; border-radius: 3px;">
+                        <div class="row">
+                           <div class="col-xl-5 col-lg-5 col-md-6 col-sm-10 col-12" style="padding-left: 0px;">
+                              <h6 class="card-header" style="color: #ffffff; text-align: left;">Магазин сантехники
+                                 &laquo;Кофулсо-Дон&raquo;</h6>
+                           </div>
+                        </div>
+
+                        <div class="row justify-content-center">
+                           <div class="col-xl-11 col-lg-11 col-md-11 col-sm-12 col-12"
+                              style="padding-top: 50px; padding-left: 24px; padding-right:24px;">
+                              <div class="row">
+                                 <div class="container_acc">
+                                    <h6>Как находить клиентов в интернете такому узкоспециализированному бизнесу и
+                                       что
+                                       делать чтобы покупатель выбрал именно ваш магазин?</h6>
+
+                                    <div class="orange_ul">
+                                       <p>&laquo;Мы 11 лет на рынке и без интернета точно не смогли бы качественно
+                                          развивать свой бизнес. Свой сайт, магазин на BLIZKO, карточка в 2-гис,
+                                          социальные сети - все эти инструменты приводят нам половину от всех наших
+                                          покупателей. Практически все, кто делает у нас первую покупку - узнали о
+                                          нас
+                                          из сети.</p>
+                                    </div>
+                                 </div>
+                              </div>
+
+                              <div class="row">
+                                 <div class="col-12" style="padding-bottom: 24px;">
+                                    <div id="tab3">
+                                       <h3 style="visibility: hidden;">Читать подробнее</h3>
+
+                                       <div>
+                                          <div>
+                                             <div class="container_acc">
+                                                <h6>Как люди принимают решение?</h6>
+
+                                                <div class="orange_ul">
+                                                   <p>Потребность в трубах и соединителях есть не всегда, если вы
+                                                      конечно не большой застройщик. Появилась задача - современный
+                                                      человек конечно ищет информацию в сети. Если идет в поисковики
+                                                      -
+                                                      по релевантным запросам наши товары на BLIZKO высоко в выдаче.
+                                                      Если ищет товар на 2-gis - там у нас тоже высокие позиции.
+                                                      Дальше
+                                                      он начинает получать контекстную рекламу, которая ведет на наш
+                                                      собственный сайт.</p>
+                                                </div>
+                                             </div>
+
+                                             <div class="container_acc">
+                                                <h6>Отзывы</h6>
+
+                                                <div class="orange_ul">
+                                                   <p>Получилась, можно сказать, экосистема, которая привлекает
+                                                      внимание
+                                                      клиента именно к нашему магазину в разных точках контакта. И
+                                                      конечно привлечь внимание - это только верхняя часть воронки
+                                                      продаж.</p>
+                                                   <p>Нужно ведь убедить купить именно у нас. И здесь помогают
+                                                      Отзывы.
+                                                      Договариваемся с нашими покупателями, чтобы они отправляли фото
+                                                      и
+                                                      видео уже смонтированных труб и писали свои мнения. Поскольку
+                                                      товар качественный - люди с удовольствием делятся позитивными
+                                                      впечатлениями.</p>
+                                                   <p>А новые клиенты часто так и говорят - читал о хорошие отзывы,
+                                                      хочу
+                                                      попробовать у вас купить. Мы гарантируем возврат в случае брака
+                                                      и
+                                                      это тоже аргумент, помогающий принять решение в нашу пользу.
+                                                      Финансово все каналы продвижения не очень затратны, стабильно
+                                                      приводят к нам будущих постоянных клиентов и соответственно
+                                                      вложения окупаются с лихвой.</p>
+                                                   <p>Если убрать из этой цепочки что нибудь одно - продажи могут
+                                                      просесть, так что развиваем все площадки. BLIZKO - была первой
+                                                      площадкой, на которой мы начали своё продвижение. Нравится их
+                                                      профессионализм, поэтому планируем продолжать сотрудничество.
+                                                   </p>
+                                                </div>
+                                             </div>
+
+                                             <div class="container_acc">
+                                                <h6>Дальнейшие планы</h6>
+
+                                                <div class="orange_ul">
+                                                   <p>Сейчас сезон высокого спроса и тех инструментов, что я
+                                                      перечислила
+                                                      хватает для стабильного потока клиентов, к весне, когда спрос
+                                                      снизится планируем подключить дополнительные каналы
+                                                      продвижения. у
+                                                      менеджеров BLIZKO есть разные инструменты для стимулирования
+                                                      спроса, обязательно рассмотрим предложения.</p>
+                                                </div>
+                                             </div>
+
+                                             <div class="row">
+                                                <div class="col-xl-8 col-12">
+                                                   <div class="orange_ul" style="color: #333333;"><span><i>Васильева
+                                                            Лариса Михайловна<br />
+                                                            Менеджер магазина сантехники
+                                                            &ldquo;Кофулсо-Дон&rdquo;,Ростов-на-Дону </i></span>
+                                                   </div>
+                                                </div>
+                                             </div>
+
+                                             <div class="row">
+                                                <div class="col-md-12 col-lg-12"><img alt="Card image cap"
+                                                      src="https://st23.stblizko.ru/images/useful_links/000/097/454_original.png?1640602590"
+                                                      style="width:100%; margin: 30px 0;" /></div>
+                                             </div>
+
+                                             <div class="container_acc">
+                                                <hr />
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+
+                                    <p class="clickme toggle-tab" data-tab="3"
+                                       style="color: #FF6600; font-size: 16px; cursor: pointer; text-decoration: underline; font-weight: 600;">
+                                       <span>Читать подробнее</span>
+                                    </p>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+
+      <section class="reviews">
+         <div class="container-fluid" id="3">
+            <div class="row justify-content-center">
+               <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-12">
+                  <div class="row justify-content-center" style="padding-bottom: 50px;">
+                     <div class="col-10">
+                        <h2>Отзывы компаний о работе с BLIZKO</h2>
+                     </div>
+                  </div>
+
+                  <div class="row justify-content-center">
+                     <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-12">
+                        <div class="row justify-content-center">
+                           <div class="col-12">
+                              <div class="row justify-content-center">
+                                 <div class="col-xl-12 col-lg-10 col-md-10 col-sm-10 col-12">
+                                    <div class="carousel slide" data-bs-ride="carousel" id="carouselExampleControls">
+                                       <div class="carousel-inner">
+                                          <div class="carousel slide" data-interval="false" data-ride="carousel"
+                                             id="carouselReviews">
+                                             <div class="carousel-item active" data-bs-interval="5000">
+                                                <div class="row">
+                                                   <div class="col-md-6 col-lg-4"><img alt="Card image cap"
+                                                         src="https://st28.stblizko.ru/images/useful_links/000/097/343_original.png?1639561778"
+                                                         style="width:100%;" /></div>
+
+                                                   <div class="col-xl-8 col-12">
+                                                      <div class="card-body">
+                                                         <h5 class="card-title">Пичугина Наталья Николаевна, менеджер
+                                                            ООО &laquo;ДИВАЛ-СТРОЙ&raquo;, город Каменск-Уральский
+                                                         </h5>
+
+                                                         <p class="card-text"><i>Жители нашего города и близлежащих
+                                                               поселков находят наши предложения на сайте BLIZKO.
+                                                               Звонят
+                                                               и приезжают в магазин посмотреть наши работы и
+                                                               оформить
+                                                               заказ на изготовление и установку дверей, окон,
+                                                               балконов,
+                                                               жалюзи, а также на ремонт в квартире или офисе.
+                                                               Контент-редакторы вносят все нужные изменения в
+                                                               описания
+                                                               товара и часто сами звонят с предложениями улучшить
+                                                               сайт.
+                                                               На большие праздники делаем акции, которые хорошо
+                                                               привлекают покупателей. BLIZKO &mdash; наша
+                                                               единственная
+                                                               площадка в интернете. Это удобней и выгодней, чем
+                                                               создавать и продвигать &laquo;с нуля&raquo;
+                                                               собственный
+                                                               сайт.</i></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+
+                                             <div class="carousel-item" data-bs-interval="5000">
+                                                <div class="row">
+                                                   <div class="col-md-6 col-lg-4"><img alt="Card image cap"
+                                                         src="https://st15.stblizko.ru/images/useful_links/000/095/347_original.png"
+                                                         style="width:100%;" /></div>
+
+                                                   <div class="col-xl-8 col-12">
+                                                      <div class="card-body">
+                                                         <h5 class="card-title">Александр Владимирович Егоров,
+                                                            директор
+                                                            компании директор Торгового дома Пигмент, г. Нижний
+                                                            Новгород
+                                                         </h5>
+
+                                                         <p class="card-text"><i>BLIZKO хорошо работает в нашем
+                                                               регионе
+                                                               - Нижнем Новгороде. Получаю много заказов, особенно в
+                                                               сезон, иначе бы я не размещался столько лет на BLIZKO.
+                                                               Как сходит снег - все бегут красить ограды, бордюры,
+                                                               лавочки. Зимой почему-то никто лавочки красить не
+                                                               хочет
+                                                               )) Менеджеры часто звонят, спрашивают как дела,
+                                                               помогают
+                                                               советом, что можно на сайте улучшить, и сами же эти
+                                                               улучшения делают - вы только скажите. В труднейший
+                                                               2020
+                                                               год мы с BLIZKO сработали так, как ни срабатывали даже
+                                                               в
+                                                               год, когда у нас был Чемпионат мира по футболу. Могу
+                                                               пожелать только успехов еще больших!</i></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+
+                                             <div class="carousel-item" data-bs-interval="5000">
+                                                <div class="row">
+                                                   <div class="col-md-6 col-lg-4"><img alt="Card image cap"
+                                                         src="https://st25.stblizko.ru/images/useful_links/000/096/524_original.png"
+                                                         style="width:100%;" /></div>
+
+                                                   <div class="col-xl-8 col-12">
+                                                      <div class="card-body">
+                                                         <h5 class="card-title">Зиновец Екатерина Ивановна,
+                                                            специалист
+                                                            по маркетингу, оконный завод ПЛАСТ СЕРВИС, Ростов-на-Дону
+                                                         </h5>
+
+                                                         <p class="card-text"><i>&quot;Много лет размещаемся
+                                                               и&nbsp;рекомендуем BLIZKO нашим партнерам. Получаем
+                                                               качественные лиды (контролируем каждый!), BLIZKO
+                                                               на&nbsp;втором месте по&nbsp;количеству заявок среди
+                                                               аналогичных площадок. Службой поддержки довольна
+                                                               очень,
+                                                               экономят мне массу времени. Каждый месяц звонят,
+                                                               я&nbsp;могу продиктовать новые цены или сказать, где
+                                                               посмотреть условия акции, и&nbsp;они сами всё
+                                                               поменяют.
+                                                               Хотелось бы&nbsp;пожелать, чтобы трафик был ровнее,
+                                                               бывают очень хорошие месяцы в&nbsp;плане заявок
+                                                               c&nbsp;BLIZKO, и&nbsp;бывают неудачные..&quot;</i></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+
+                                             <div class="carousel-item" data-bs-interval="5000">
+                                                <div class="row">
+                                                   <div class="col-md-6 col-lg-4"><img alt="Card image cap"
+                                                         src="https://st8.stblizko.ru/images/useful_links/000/094/089_original.png"
+                                                         style="width:100%;" /></div>
+
+                                                   <div class="col-xl-8 col-12">
+                                                      <div class="card-body">
+                                                         <h5 class="card-title">Чертушкина Наталья Александровна,
+                                                            руководитель отдела продаж, группа компаний АЛЕА,
+                                                            г.&nbsp;Краснодар</h5>
+
+                                                         <p class="card-text"><i>&quot;Хороший сервис для продаж
+                                                               в&nbsp;интернете, помогает продвижению бизнеса.
+                                                               Техподдержка нам хорошо помогает: если вопрос,
+                                                               проблема
+                                                               возникает&nbsp;- сразу решает, очень быстро
+                                                               и&nbsp;квалифицировано. Интерфейс личного кабинета
+                                                               понятный и&nbsp;функциональный. Для дополнительного
+                                                               привлечения клиентов пользуемся сервисом Акции
+                                                               и&nbsp;скидки.;&quot;</i></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+
+                                             <div class="carousel-item" data-bs-interval="5000">
+                                                <div class="row">
+                                                   <div class="col-md-6 col-lg-4"><img alt="Card image cap"
+                                                         src="https://st39.stblizko.ru/images/useful_links/000/094/298_original.png"
+                                                         style="width:100%;" /></div>
+
+                                                   <div class="col-xl-8 col-12">
+                                                      <div class="card-body">
+                                                         <h5 class="card-title">Иванова Татьяна Викторовна, менеджер
+                                                            компании &laquo;ЮГСТРОЙМАКС&raquo;,
+                                                            г.&nbsp;Ростов-на-Дону
+                                                         </h5>
+
+                                                         <p class="card-text"><i>&quot;Я&nbsp;могу сказать что очень
+                                                               довольна. Сайт получился красивый, на&nbsp;100%
+                                                               отработали, качественно и&nbsp;в&nbsp;срок. Менеджеры
+                                                               очень контактные, слышат все наши пожелания
+                                                               и&nbsp;сразу
+                                                               их&nbsp;выполняют, помогают в&nbsp;работе
+                                                               с&nbsp;сайтом,
+                                                               всё объясняют. Звоники и&nbsp;заявки есть, сайт
+                                                               работает.
+                                                               В&nbsp;сравнении с&nbsp;другой площадкой, где
+                                                               мы&nbsp;размещаемся, на&nbsp;BLIZKO эффективность выше
+                                                               и&nbsp;наши просьбы выполняются быстрее и&nbsp;точнее.
+                                                               При случае буду советовать работать с&nbsp;этой
+                                                               площадкой
+                                                               для размещения рекламы.&quot;</i></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+
+                                             <div class="carousel-item" data-bs-interval="5000">
+                                                <div class="row">
+                                                   <div class="col-md-6 col-lg-4"><img alt="Card image cap"
+                                                         src="https://st39.stblizko.ru/images/useful_links/000/094/307_original.png"
+                                                         style="width:100%;" /></div>
+
+                                                   <div class="col-xl-8 col-12">
+                                                      <div class="card-body">
+                                                         <h5 class="card-title">Тарола Александр Михайлович,
+                                                            специализированный магазин современных напольных покрытий
+                                                            &laquo;Уютный дом&raquo;, г. Ростов-на-Дону</h5>
+
+                                                         <p class="card-text"><i>&quot;Я&nbsp;в&nbsp;целом доволен
+                                                               сотрудничеством, с&nbsp;2016 года мы&nbsp;работаем,
+                                                               меня
+                                                               всё устраивает, стоимость, и&nbsp;те&nbsp;заявки,
+                                                               которые
+                                                               приходят. Сайт сам себя окупает и&nbsp;выходит
+                                                               в&nbsp;прибыль. Сотрудники&nbsp;- молодцы! Алина мне
+                                                               регулярно звонит, выставляет акции, помогает
+                                                               с&nbsp;техническими моментами, переносит информацию
+                                                               с&nbsp;моего родного сайта. В&nbsp;целом персоналу
+                                                               я&nbsp;могу пятерку поставить!.&quot;</i></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+
+                                             <div class="carousel-item" data-bs-interval="5000">
+                                                <div class="row">
+                                                   <div class="col-md-6 col-lg-4"><img alt="Card image cap"
+                                                         src="https://st39.stblizko.ru/images/useful_links/000/094/309_original.png"
+                                                         style="width:100%;" /></div>
+
+                                                   <div class="col-xl-8 col-12">
+                                                      <div class="card-body">
+                                                         <h5 class="card-title">Ермаков Станислав, менеджер продаж
+                                                            Урал-Плита, г.&nbsp;Екатеринбург</h5>
+
+                                                         <p class="card-text"><i>&quot;Наша компания на&nbsp;BLIZKO
+                                                               продает отделочные материалы во&nbsp;все регионы
+                                                               России&nbsp;- у&nbsp;нас есть собственное производство
+                                                               и&nbsp;прямые поставки от&nbsp;заводов изготовителей.
+                                                               У&nbsp;нас большой ассортимент товаров,
+                                                               контент-редактор
+                                                               помогает нам поддерживать прайс в&nbsp;актуальном
+                                                               состоянии, оформлять скидки, спецпредложения
+                                                               и&nbsp;акции, анализировать статистику&nbsp;-
+                                                               и&nbsp;статистика нас стабильно радует.&quot;</i></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+
+                                             <div class="carousel-item" data-bs-interval="5000">
+                                                <div class="row">
+                                                   <div class="col-md-6 col-lg-4"><img alt="Card image cap"
+                                                         src="https://st39.stblizko.ru/images/useful_links/000/094/318_original.png"
+                                                         style="width:100%;" /></div>
+
+                                                   <div class="col-xl-8 col-12">
+                                                      <div class="card-body">
+                                                         <h5 class="card-title">Куприянов Виталий Анатольевич,
+                                                            директор
+                                                            Торгового дома Универсал, г.&nbsp;Екатеринбург</h5>
+
+                                                         <p class="card-text"><i>&quot;Сотрудничаем с&nbsp;BLIZKO
+                                                               лет&nbsp;10, еще со&nbsp;времен журнала Ремонт.
+                                                               Стабильно
+                                                               получаем заявки и&nbsp;звонки со&nbsp;всей
+                                                               Свердловской
+                                                               области по поставке сантехники и&nbsp;радиаторов
+                                                               отопления&nbsp;- покупатели легко находят нас
+                                                               на&nbsp;BLIZKO. Менеджеры вежливые, всё доходчиво
+                                                               объясняют, оперативно работают, предлагают варианты
+                                                               для
+                                                               повышения результата..&quot;</i></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+
+                                             <div class="carousel-item" data-bs-interval="5000">
+                                                <div class="row">
+                                                   <div class="col-md-6 col-lg-4"><img alt="Card image cap"
+                                                         src="https://st39.stblizko.ru/images/useful_links/000/094/382_original.png"
+                                                         style="width:100%;" /></div>
+
+                                                   <div class="col-xl-8 col-12">
+                                                      <div class="card-body">
+                                                         <h5 class="card-title">Котляров Станислав Анатольевич,
+                                                            руководитель подразделения интернет маркетинга ООО
+                                                            &laquo;ЮТДК&raquo;, г. Краснодар</h5>
+
+                                                         <p class="card-text"><i>&quot; Хочу поблагодарить компанию
+                                                               BLIZKO за&nbsp;отличную и&nbsp;слаженную работу,
+                                                               оперативно принимаемые решения, за&nbsp;возможность
+                                                               практически круглосуточно вести консультации
+                                                               с&nbsp;менеджером, а&nbsp;также высокую отдачу
+                                                               с&nbsp;контекстной рекламы, настроенной для нашего
+                                                               сайта
+                                                               на&nbsp;BLIZKO, особенно по&nbsp;сравнению
+                                                               с&nbsp;фрилансерами, которых мы&nbsp;за&nbsp;всё время
+                                                               перебрали достаточное количество. Спасибо за&nbsp;всё
+                                                               время, что мы&nbsp;с&nbsp;вами!!!.&quot;</i></p>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                       <a class="carousel-control-prev" data-slide="prev" href="#carouselReviews"
+                                          role="button"><span class="sr-only">Previous</span> </a> <a
+                                          class="carousel-control-next" data-slide="next" href="#carouselReviews"
+                                          role="button"> <span class="sr-only">Next</span> </a>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+   </div>
+
+   <section class="gray">
+      <div class="container-fluid section_top">
+         <div class="row justify-content-center">
+            <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 col-12">
+               <div class="row justify-content-center ">
+                  <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-12 h2_bottom">
+                     <h2>Получите покупателей, звонки и заявки&nbsp;на самых выгодных условиях</h2>
+
+                     <h4>Оставьте заявку <strong>до 30 января</strong> и забирайте годовое размещение на BLIZKO <b>с
+                           мегаскидкой 30%.</b></h4>
+                  </div>
+               </div>
+
+               <div class="row justify-content-center">
+                  <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-12">
+                     <div class="row justify-content-center">
+                        <div class="col-12">
+                           <div class="row">
+                              <div class="col-xl-3 col-lg-3 col-md-3 d-sm-none d-none d-xl-block d-lg-block"><img alt=""
+                                    class="img-fluid"
+                                    src="https://st28.stblizko.ru/images/useful_links/000/093/040_original.png"
+                                    style="transform: scale(-1, 1);" /></div>
+
+                              <div class="col-xl-9 col-lg-9 col-md-9 col-sm-9 col-11 h4_bottom">
+                                 <form
+                                    action="https://docs.google.com/forms/d/e/1FAIpQLSf6ZGOueNJICL46ubZ2DoCIvloJ3GSGI_yEhJ7Jd6relJsDvw/formResponse">
+                                    <div class="form-group"><input aria-describedby="i.desc.1729042047 i.err.1729042047"
+                                          aria-label="Ваше имя" autocomplete="off" class="form-control"
+                                          data-initial-dir="auto" data-initial-value="" dir="auto" id="name"
+                                          jsname="YPqjbf" name="entry.1023970238" placeholder="Ваше имя" required=""
+                                          tabindex="0" type="name" value="" /></div>
+
+                                    <div class="form-group"><input aria-describedby="i.desc.2045831205 i.err.2045831205"
+                                          aria-label="Телефон для связи" autocomplete="off" class="form-control"
+                                          data-initial-dir="auto" data-initial-value="" dir="auto" id="Mytel"
+                                          jsname="YPqjbf" name="entry.981856079" placeholder="Телефон" required=""
+                                          tabindex="0" type="Mytel" value="" /></div>
+                                    <!--скрытое поле-->
+
+                                    <div
+                                       class="freebirdFormviewerViewItemsItemItem freebirdFormviewerViewItemsTextTextItem"
+                                       data-item-id="1320946362" jsaction="sPvj8e:e4JwSe,vwKRrd;" jscontroller="rDGJeb"
+                                       jsname="ibnC6b" role="listitem" style="display: none;">
+                                       <div class="freebirdFormviewerViewItemsItemItemHeader">
+                                          <div class="freebirdFormviewerViewItemsItemItemTitleContainer">
+                                             <div aria-describedby="i.desc.1320946362" aria-level="2"
+                                                class="freebirdFormviewerViewItemsItemItemTitle" dir="auto"
+                                                role="heading">ID компании</div>
+
+                                             <div class="freebirdFormviewerViewItemsItemItemHelpText" dir="auto"
+                                                id="i.desc.1320946362"></div>
+                                          </div>
+                                       </div>
+
+                                       <div class="freebirdFormviewerViewItemsTextItemWrapper"
+                                          style="/* display: none; */">
+                                          <div
+                                             class="quantumWizTextinputPaperinputEl freebirdFormviewerViewItemsTextShortText freebirdThemedInput"
+                                             jsaction="clickonly:KjsqPd; focus:Jt1EX; blur:fpfTEe; input:Lg5SV;"
+                                             jscontroller="pxq3x" jsname="W85ice" jsshadow="">
+                                             <div class="quantumWizTextinputPaperinputMainContent exportContent">
+                                                <div class="quantumWizTextinputPaperinputContentArea">
+                                                   <div class="quantumWizTextinputPaperinputInputArea"><input
+                                                         aria-describedby="i.desc.1320946362 i.err.1320946362"
+                                                         aria-label="ID компании" autocomplete="off"
+                                                         class="quantumWizTextinputPaperinputInput exportInput"
+                                                         data-initial-dir="auto" data-initial-value="" dir="auto"
+                                                         jsname="YPqjbf" name="entry.1597220320" tabindex="0"
+                                                         type="text" value="{user:company_id}" /></div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                    <button class="btn orange form_width" type="submit">Хочу пакет размещения со
+                                       скидкой</button><small class="form-text text-muted">Нажимая на кнопку, вы
+                                       даете
+                                       согласие на обработку персональных данных в соответствии с <a class="orange_link"
+                                          href="https://www.blizko.ru/privacy_policy" target="_blank">политикой
+                                          конфиденциальности</a> и принимаете условия <a class="orange_link"
+                                          href="https://www.blizko.ru/terms" target="_blank">пользовательского
+                                          соглашения</a></small>
+                                 </form>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </section>
+
+   <section class="footer">
+      <div class="row justify-content-center">
+         <div class="col-xl-11 col-lg-11 col-md-10 col-sm-12">
+            <div class="row justify-content-center">
+               <div class="col-xl-9 col-lg-8 col-md-8 col-sm-10 col-10">
+                  <ul>
+                     <li style="list-style-type: none; color: #c1c1c1; padding-top: 15px;"><a
+                           href="http://russia.blizko.ru/" style="text-decoration:none;" target="_blank"><img
+                              alt="Blizko.ru"
+                              src="https://st27.stblizko.ru/images/useful_links/000/097/384_original.png?1639977396" />
+                        </a></li>
+                     <li style="list-style-type: none; color: #c1c1c1; padding-top: 15px;"><a class="white"
+                           href="https://drive.google.com/file/d/1CUQPzS9gecyp57TCpezCfehwmDHbqIH3/view?usp=sharing"
+                           download="" target="_blank">Скачать чек-лист "Аудит
+                           сайта"</a></li>
+                     <li style="list-style-type: none; color: #c1c1c1; padding-top: 15px;"><a class="white"
+                           href="https://blizko.ru/terms/" target="_blank">Пользовательское соглашение</a></li>
+                     <li style="list-style-type: none; color: #c1c1c1; padding-top: 15px;"><a class="white"
+                           href="https://blizko.ru/about/response/" target="_blank">Отзывы</a></li>
+                  </ul>
+               </div>
+
+               <div class="col-xl-3 col-lg-4 col-md-4 col-sm-10 col-10">
+                  <ul class="social-icons-4">
+                     <li style="list-style-type: none; color: #ffffff; margin-top: 8px;"><img alt="email"
+                           class="cont_icon_2"
+                           src="https://st27.stblizko.ru/images/useful_links/000/097/392_original.png?1639996408"
+                           style="width: 30px;" /><a class="white" href="mailto:spravka@bliz"
+                           style="text-decoration: none;">spravka@blizko.ru</a></li>
+                     <li style="list-style-type: none; color: #ffffff; margin-top: 8px;"><img alt="email"
+                           class="cont_icon_2"
+                           src="https://st27.stblizko.ru/images/useful_links/000/097/391_original.png?1639996313"
+                           style="width: 30px;" /><a class="white" href=" tel:88007000191"
+                           style="text-decoration: none; ">8(800)7000-191</a></li>
+                     <li style="list-style-type: none; margin-top: 8px;"></li>
+                  </ul>
+
+                  <ul class="social-icons-5">
+                     <li><a href="https://www.facebook.com/blizkobusiness" target="_blank"><img alt="FB"
+                              class="cont_icon"
+                              src="https://st28.stblizko.ru/images/useful_links/000/097/328_original.png?1639476008" /></a>
+                     </li>
+                     <li><a href="https://vk.com/blizkobusiness" target="_blank"><img alt="VK" class="cont_icon"
+                              src="https://st28.stblizko.ru/images/useful_links/000/097/330_original.png?1639476286" /></a>
+                     </li>
+                     <li><a href="https://zen.yandex.ru/id/5f23dc3cb81d304d2406271b" target="_blank"><img alt="zen"
+                              class="cont_icon"
+                              src="https://st28.stblizko.ru/images/useful_links/000/097/331_original.png?1639476322" /></a>
+                     </li>
+                     <li><a href="https://www.youtube.com/user/BlizkoBusiness" target="_blank"><img alt="youtube"
+                              class="cont_icon"
+                              src="https://st28.stblizko.ru/images/useful_links/000/097/329_original.png?1639476098" /></a>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+         </div>
+      </div>
+   </section>
+   <script>
+      $('.clickme').click(function () {
+         if (!$(this).data('status')) {
+            $(this).html('Свернуть');
+            $(this).data('status', true);
+         }
+         else {
+            $(this).html('Читать  подробнее');
+            $(this).data('status', false);
+         }
+      });
+   </script>
+   <script>
+      $(function () {
+         $(" #tab1").accordion({ collapsible: true, active: false, heightStyle: "content" }); $("#tab2").accordion({
+            collapsible: true, active: false, heightStyle: "content"
+         }); $("#tab3").accordion({
+            collapsible: true, active: false, heightStyle: "content"
+         }); $("#tab4").accordion({
+            collapsible: true, active: false, heightStyle: "content"
+         });
+         $('.toggle-tab').on('click', function () {
+            var $accordion = $('#tab' +
+               $(this).data('tab')); var state = $accordion.accordion('option', 'active');
+            $accordion.accordion('option', { active: state === 0 ? false : 0 });
+         });
+      }); </script>
+   <script>
+      var acc = document.getElementsByClassName("accordion");
+      var i;
+
+      for (i = 0; i < acc.length; i++) {
+         acc[i].addEventListener("click", function () {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            if (panel.style.display === "block") {
+               panel.style.display = "none";
+            } else {
+               panel.style.display = "block";
+            }
+         });
+      }
+   </script>
+   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+      integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+      crossorigin="anonymous"></script>
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js"
+      integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s"
+      crossorigin="anonymous"></script>
+</div>
