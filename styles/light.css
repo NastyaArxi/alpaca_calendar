@@ -1,0 +1,8 @@
+.calendar.theme_light {
+    --calendar-bg: #18191C;
+    --calendar-text: #ffffff;
+    --calendar-hover: #f0f0f0;
+    --calendar-day-selected: #ffffff;
+    --calendar-in-range: #ffffff;
+    --calendar-hover: rgba(185, 184, 184, 0.16);
+    }

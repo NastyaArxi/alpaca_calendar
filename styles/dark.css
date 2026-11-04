@@ -1,0 +1,6 @@
+.calendar.theme_dark {
+    --calendar-bg: #18191C;
+    --calendar-text: #ffffff;
+    --calendar-day-selected: #2D9CDB;
+    --calendar-hover: #2D9CDB;
+    }
